@@ -5,28 +5,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({ "folderName", "parentFolderID", "isParent" })
 public class FolderFO {
 
-	private String folderName;
+	private String prospectId;
 
 	private int parentFolderID;
 
-	private String isParent;
 
-	private int customerId;
+	
 
-	public int getCustomerId() {
-		return customerId;
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setCustomerId(int customerId) {
-		this.customerId = customerId;
-	}
-
-	public String getFolderName() {
-		return folderName;
-	}
-
-	public void setFolderName(String folderName) {
-		this.folderName = folderName;
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
 
 	public int getParentFolderID() {
@@ -36,13 +27,4 @@ public class FolderFO {
 	public void setParentFolderID(int parentFolderID) {
 		this.parentFolderID = parentFolderID;
 	}
-
-	public String getIsParent() {
-		return isParent;
-	}
-
-	public void setIsParent(String isParent) {
-		this.isParent = isParent;
-	}
-
 }

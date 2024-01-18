@@ -16,8 +16,8 @@ public class FolderEntity {
 	@Column(name = "ID")
 	private Integer id;
 
-	@Column(name = "FOLDER_NAME")
-	private String folderName;
+	@Column(name = "PROSPECT_ID" , unique = true)
+	private String prospectId;
 
 	@Column(name = "PARENT_FOLDER_ID")
 	private int parentFolderID;
@@ -30,17 +30,6 @@ public class FolderEntity {
 
 	@Column(name = "TOKEN")
 	private String token;
-
-	@Column(name = "CUSTOMER_ID")
-	private int customerId;
-
-	public int getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(int customerId) {
-		this.customerId = customerId;
-	}
 
 	public String getToken() {
 		return token;
@@ -66,12 +55,14 @@ public class FolderEntity {
 		this.id = id;
 	}
 
-	public String getFolderName() {
-		return folderName;
+	
+
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setFolderName(String folderName) {
-		this.folderName = folderName;
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
 
 	public int getParentFolderID() {

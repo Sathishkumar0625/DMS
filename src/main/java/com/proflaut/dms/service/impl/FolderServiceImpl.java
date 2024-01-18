@@ -42,7 +42,7 @@ public class FolderServiceImpl implements FolderService {
 				FolderEntity folderEnt = helper.convertFOtoBO(folderFO,fileResponse);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
 				if (!fileResponse.equals(DMSConstant.FAILURE)) {
-					fileResponse.setDocId(folderRespEnt.getId());
+					fileResponse.setProspectId(folderEnt.getProspectId());
 					fileResponse.setFolderPath(folderRespEnt.getFolderPath());
 					fileResponse.setStatus(DMSConstant.SUCCESS);
 				}else {
@@ -64,7 +64,7 @@ public class FolderServiceImpl implements FolderService {
 			FolderEntity folderEntity=folderRepo.findById(id).get();
 			if (folderEntity != null) {
 				fileResponse.setStatus(DMSConstant.SUCCESS);
-				fileResponse.setDocId(id);
+				fileResponse.setProspectId(id.toString());
 				fileResponse.setFolderPath(folderEntity.getFolderPath());
 			}else {
 				fileResponse.setStatus(DMSConstant.FAILURE);
@@ -115,5 +115,4 @@ public class FolderServiceImpl implements FolderService {
 	    }
 	    return folderRetreiveResponse;
 	}
-
 }

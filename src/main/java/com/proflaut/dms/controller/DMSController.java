@@ -45,6 +45,8 @@ import com.proflaut.dms.model.ProfDmsHeaderReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
+import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
+import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -65,8 +67,6 @@ public class DMSController {
 	public DMSController(UserRegisterServiceImpl userRegisterServiceImpl) {
 		this.userRegisterServiceImpl = userRegisterServiceImpl;
 	}
-	
-	
 
 	@Autowired
 	FileManagementServiceImpl fileManagementServiceImpl;
@@ -146,23 +146,21 @@ public class DMSController {
 			return new ResponseEntity<>(fileRetreiveResponse, HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@GetMapping("/getBy")
-	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam int docId,@RequestParam String docName){
-		FileRetreiveByResponse fileRetreiveByResponse=null;
-		try {
-			fileRetreiveByResponse=fileManagementServiceImpl.reteriveFileByNameAndId(docId,docName);
-			if (fileRetreiveByResponse != null) {
-				return new ResponseEntity<>(fileRetreiveByResponse,HttpStatus.OK);
-			}else {
-				return new ResponseEntity<>(fileRetreiveByResponse,HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		
+	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam String prospectId,
+	        @RequestParam String docName) {
+	    try {
+	        FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl.reteriveFileByNameAndId(prospectId, docName);
+	        if (fileRetreiveByResponse != null) {
+	            return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
+	        } else {
+	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 
 	@PostMapping("/accountregistry")
@@ -317,19 +315,39 @@ public class DMSController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/saveExecution")
-	public ResponseEntity<ProfExecutionResponse> saveExcution(@RequestParam int userId, @RequestParam String activityName){
-		ProfExecutionResponse executionResponse=null;
+	public ResponseEntity<ProfExecutionResponse> saveExcution(@RequestParam int userId,
+			@RequestParam String activityName) {
+		ProfExecutionResponse executionResponse = null;
 		try {
-			executionResponse=userRegisterServiceImpl.saveData(userId,activityName);
+			executionResponse = userRegisterServiceImpl.saveData(userId, activityName);
 			if (executionResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
-				return new ResponseEntity<>(executionResponse,HttpStatus.OK);
-			}else {
-				return new ResponseEntity<>(executionResponse,HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(executionResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(executionResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@GetMapping("/getExecution")
+	public ResponseEntity<List<ProfGetExecutionFinalResponse> > getExecution(@RequestParam String key){
+		
+		try {
+			List<ProfGetExecutionResponse>	executionResponse=userRegisterServiceImpl.filterByMaker(key);
+			if (!executionResponse.isEmpty()) {
+			List<ProfGetExecutionFinalResponse> executionFinalResponses=userRegisterServiceImpl.findByProspectId(executionResponse);
+				return new ResponseEntity<>(executionFinalResponses,HttpStatus.OK);
+			}else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		
 	}
 }

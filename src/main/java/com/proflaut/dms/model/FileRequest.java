@@ -12,8 +12,8 @@ public class FileRequest {
 	@JsonProperty("docName")
 	private String dockName;
 	
-	@JsonProperty("docId")
-	private int docId;
+	@JsonProperty("prospectId")
+	private String prospectId;
 	
 	public String getDockName() {
 		return dockName;
@@ -45,12 +45,14 @@ public class FileRequest {
 		this.dockPath = dockPath;
 	}
 
-	public int getDocId() {
-		return docId;
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setDocId(int docId) {
-		this.docId = docId;
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
+
+	
 	
 }

@@ -1,7 +1,7 @@
 package com.proflaut.dms.model;
 
 public class DocumentDetails {
-	private int docId;
+	private String prospectId;
 
 	//private String image;
 	
@@ -30,13 +30,17 @@ public class DocumentDetails {
 		this.uploadedTime = uploadedTime;
 	}
 
-	public int getDocId() {
-		return docId;
+
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setDocId(int docId) {
-		this.docId = docId;
+
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
+
+	
 
 //	public String getImage() {
 //		return image;

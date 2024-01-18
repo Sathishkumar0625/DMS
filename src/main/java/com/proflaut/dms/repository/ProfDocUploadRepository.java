@@ -27,6 +27,6 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 
 	//ProfDocEntity findByUserName(String userName);
 
-	ProfDocEntity findByDocIdAndDocName(int docId, String docName);
+	ProfDocEntity findByProspectIdAndDocName(String prospectId, String docName);
 
 }

@@ -2,6 +2,7 @@ package com.proflaut.dms.constant;
 
 public class DMSConstant {
 	
+	DMSConstant(){}
 	
 	public static final String SUCCESS="Success";
 	public static final String FAILURE="Failure";

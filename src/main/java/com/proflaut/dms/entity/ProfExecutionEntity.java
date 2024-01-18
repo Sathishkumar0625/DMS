@@ -15,7 +15,7 @@ public class ProfExecutionEntity {
 	@Column(name = "ID")
 	private int id;
 
-	@Column(name = "PROSPECT_ID")
+	@Column(name = "PROSPECT_ID" , unique = true)
 	private String prospectId;
 
 	@Column(name = "ACTIVITY_NAME")

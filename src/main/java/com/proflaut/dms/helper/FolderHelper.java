@@ -1,6 +1,7 @@
 package com.proflaut.dms.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.model.FileResponse;
@@ -14,30 +15,42 @@ public class FolderHelper {
 	UserHelper userhelper;
 	@Autowired
 	FolderRepository folderRepository;
-	
+	@Value("${create.folderlocation}")
+	private String folderLocation;
 
-	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse)  {
-		
+	@Autowired
+	FolderRepository folderRepo;
+
+	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse) {
+
 		FolderEntity ent = new FolderEntity();
-		ent.setFolderName(folderFO.getFolderName());
-		ent.setIsParent(folderFO.getIsParent());
-		ent.setParentFolderID(folderFO.getParentFolderID());
-		ent.setCustomerId(folderFO.getCustomerId());
-		String folderPath="";
-		folderPath=userhelper.storeFolder(folderFO.getFolderName(),fileResponse,folderFO);
+		ent.setProspectId(folderFO.getProspectId());
+		FolderEntity entity = folderRepo.findByProspectId(folderFO.getProspectId());
+		ent.setIsParent(folderLocation);
+		String folderPath = "";
+		folderPath = userhelper.storeFolder(fileResponse, folderFO);
 		ent.setFolderPath(folderPath);
 		return ent;
-	}
+	}	
+
 	public FolderEntity callFolderEntity(Integer id) {
 		return folderRepository.findById(id).get();
 
 	}
+
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity) {
-		Folders folders=new Folders();
-	    folders.setFolderID(folderEntity.getId()); 
-	    folders.setFolderName(folderEntity.getFolderName());
-	    return folders ;
-		
+		Folders folders = new Folders();
+		folders.setFolderID(folderEntity.getId());
+		folders.setFolderName(folderEntity.getProspectId());
+		return folders;
+
 	}
-	
+
+	public FolderEntity convertFoToFolderEntity(String prospectId) {
+		FolderEntity entity = new FolderEntity();
+		entity.setProspectId(prospectId);
+
+		return entity;
+	}
+
 }

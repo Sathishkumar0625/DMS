@@ -51,7 +51,7 @@ public class FolderController {
 		} catch (Exception e) {
 
 			fileResponse.setStatus(DMSConstant.FAILURE);
-			fileResponse.setDocId(folderFO.getParentFolderID());
+			fileResponse.setProspectId(folderFO.getProspectId());
 			if (e.getMessage().contains(DMSConstant.CONSTRAINTVIOLATIONEXCEPTION)) {
 				fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 			} else {
@@ -71,7 +71,7 @@ public class FolderController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (fileResponse != null && fileResponse.getDocId() != null) {
+		if (fileResponse != null && fileResponse.getProspectId() != null) {
 			
 			return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 		} else {

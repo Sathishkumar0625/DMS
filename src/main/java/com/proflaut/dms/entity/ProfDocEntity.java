@@ -17,8 +17,8 @@ public class ProfDocEntity {
 	@Column(name = "ID")
 	private Integer id;
 	
-	@Column(name = "DOCUMENT_ID")
-	private int docId;
+	@Column(name = "PROSPECT_ID" , unique = true)
+	private String prospectId;
 
 	@Column(name = "DOCUMENT_NAME")
 	private String docName;
@@ -35,14 +35,13 @@ public class ProfDocEntity {
 	@Column(name = "TABS",columnDefinition = "CLOB NULL", nullable = true)
 	private String tabs;
 	
-	
 
-	public int getDocId() {
-		return docId;
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setDocId(int docId) {
-		this.docId = docId;
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
 
 	public String getTabs() {

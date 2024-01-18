@@ -1,11 +1,15 @@
 package com.proflaut.dms.helper;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -19,6 +23,7 @@ import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +54,8 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
+import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
+import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
@@ -71,7 +78,6 @@ public class UserHelper {
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-	
 
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
 
@@ -102,16 +108,16 @@ public class UserHelper {
 		return isValidate;
 	}
 
-	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token) throws Exception {
+	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity) {
 		ProfDocEntity ent = new ProfDocEntity();
 		ProfUserPropertiesEntity userProp = profUserPropertiesRepository.findByToken(token);
 		if (userProp != null) {
 			ent.setCreatedBy(userProp.getUserId());
 		}
 		ent.setUploadTime(LocalDateTime.now().toString());
-		ent.setDocId(fileRequest.getDocId());
+		ent.setProspectId(fileRequest.getProspectId());
 		ent.setDocName(fileRequest.getDockName());
-		ent.setDocPath(fileRequest.getDockPath());
+		ent.setDocPath(entity.getFolderPath());
 		return ent;
 	}
 
@@ -138,84 +144,38 @@ public class UserHelper {
 		return ent;
 	}
 
-//	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName) {
-//		boolean isFileCreated = false;
-//
-//		try {
-//			UUID uuid = UUID.randomUUID();
-//			String fileName = uuid.toString();
-//			String path = uId + "_" + uName + File.separator + fileName;
-//			String targetPath=uId+"_"+uName+File.separator+ "_Backup";
-//			
-//			if (path.isEmpty()) {
-//				File file = new File(fileLocation + path);
-//				file.getParentFile().mkdirs();
-//
-//				if (!file.exists() && (file.createNewFile())) {
-//					logger.info("File Created");
-//				}
-//
-//				FileWriter fw = new FileWriter(file.getAbsoluteFile());
-//				try (BufferedWriter bw = new BufferedWriter(fw)) {
-//					bw.write(encrypted);
-//					fileRequest.setDockPath(file.getAbsoluteFile().toString());
-//					isFileCreated = true;
-//				}
-//			}else {
-//				Files.move(Paths.get(path), Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
-//			}
-//
-////			File file = new File(fileLocation + path);
-////			file.getParentFile().mkdirs();
-////
-////			if (!file.exists() && (file.createNewFile())) {
-////				logger.info("File Created");
-////			}
-////
-////			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-////			try (BufferedWriter bw = new BufferedWriter(fw)) {
-////				bw.write(encrypted);
-////				fileRequest.setDockPath(file.getAbsoluteFile().toString());
-////				isFileCreated = true;
-////			}
-//		} catch (IOException iox) {
-//			iox.printStackTrace();
-//		}
-//		return isFileCreated;
-//	}
-
+	@Transactional
 	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName) {
 		boolean isFileCreated = false;
+		FolderEntity entity = folderRepository.findByProspectId(fileRequest.getProspectId());
 
-		try {
+		if (entity != null) {
+			int count = entity.getParentFolderID();
+			count += 1;
+			String path = entity.getFolderPath();
 			UUID uuid = UUID.randomUUID();
 			String fileName = uuid.toString();
-			String path = uId + "_" + uName + File.separator + fileName;
-			String targetPath = uId + "_" + uName + "_Backup" + File.separator + fileName;
 
-			File file = new File(fileLocation + path);
+			// Create the file with the correct filename
+			File file = new File(path + File.separator + fileName);
+			String path1=entity.getFolderPath()+file.getPath();
+			folderRepository.updateParentFolderIdAndFolderPath(count,path1, entity.getProspectId());
+			try {
+				// Assuming you want to write the encrypted content to the file
+				FileWriter fileWriter = new FileWriter(file);
+				fileWriter.write(encrypted);
+				fileWriter.close();
 
-			if (!file.exists()) {
-				file.getParentFile().mkdirs();
-				Files.write(file.toPath(), encrypted.getBytes());
-				fileRequest.setDockPath(file.getAbsolutePath());
 				isFileCreated = true;
-			} else {
-				// Move the existing file to the backup directory
-				Files.move(file.toPath(), Paths.get(targetPath, fileName), StandardCopyOption.REPLACE_EXISTING);
-
-				// Create a new file
-				File newFile = new File(fileLocation + path);
-				newFile.getParentFile().mkdirs();
-				Files.write(newFile.toPath(), encrypted.getBytes());
-				fileRequest.setDockPath(newFile.getAbsolutePath());
-				isFileCreated = true;
+			} catch (IOException e) {
+				// Handle the exception appropriately (e.g., log or throw)
+				e.printStackTrace();
 			}
-		} catch (IOException iox) {
-			iox.printStackTrace();
 		}
+
 		return isFileCreated;
 	}
+
 //	public String retrievDocument(List<ProfDocEntity> profDocEntity, String decrypted,
 //			FileRetreiveResponse fileRetreiveResponse) {
 //		try {
@@ -256,8 +216,8 @@ public class UserHelper {
 					decrypted = td.decrypt(content);
 					if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 						DocumentDetails documentDetails = new DocumentDetails();
-						documentDetails.setDocId(profDocEntity.get(i).getDocId());
-						//documentDetails.setImage(decrypted);
+						documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
+						// documentDetails.setImage(decrypted);
 						documentDetails.setDocName(profDocEntity.get(i).getDocName());
 						documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 						document.add(i, documentDetails);
@@ -266,8 +226,8 @@ public class UserHelper {
 				} catch (Exception e) {
 					e.printStackTrace();
 					DocumentDetails documentDetails = new DocumentDetails();
-					documentDetails.setDocId(profDocEntity.get(i).getDocId());
-					//documentDetails.setImage(decrypted);
+					documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
+					// documentDetails.setImage(decrypted);
 					documentDetails.setDocName(profDocEntity.get(i).getDocName());
 					documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 					document.add(i, documentDetails);
@@ -330,15 +290,12 @@ public class UserHelper {
 //	    return file.getAbsolutePath();
 //	}
 
-	public String storeFolder(String folderName, FileResponse fileResponse, FolderFO folderFO) {
-		String folderPath = folderLocation + "customerId_" + folderFO.getCustomerId() + "_parentFolderID_"
-				+ folderFO.getParentFolderID() + "/" + folderName;
+	public String storeFolder(FileResponse fileResponse, FolderFO folderFO) {
+		String folderPath = folderLocation + folderFO.getProspectId();
 
 		File file = new File(folderPath);
 
 		if (file.exists()) {
-			logger.info("Directory already exists for parentFolderID {} and customerId {}",
-					folderFO.getParentFolderID(), folderFO.getCustomerId());
 			fileResponse.setStatus(DMSConstant.FAILURE);
 			fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 			return folderPath; // Return the existing folder path
@@ -363,7 +320,7 @@ public class UserHelper {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
-		//oldImageEntity.setUserName(existingDocEntity.getUserName());
+		// oldImageEntity.setUserName(existingDocEntity.getUserName());
 		return oldImageEntity;
 	}
 
@@ -395,8 +352,8 @@ public class UserHelper {
 		mainEntity.setName(mainRequest.getName());
 		mainEntity.setUserId(mainRequest.getUserId());
 		mainEntity.setKey(mainRequest.getKey());
-		String uniqueId=generateUniqueId();
-		mainEntity.setProspectId("DMS_"+uniqueId);
+		String uniqueId = generateUniqueId();
+		mainEntity.setProspectId("DMS_" + uniqueId);
 		return mainEntity;
 	}
 
@@ -423,8 +380,8 @@ public class UserHelper {
 		return mainEntity;
 	}
 
-	public ProfDmsHeader convertjsontoHeaderEntity( String jsonData) {
-		ProfDmsHeader dmsHeader=new ProfDmsHeader();
+	public ProfDmsHeader convertjsontoHeaderEntity(String jsonData) {
+		ProfDmsHeader dmsHeader = new ProfDmsHeader();
 		dmsHeader.setKey("maker");
 		dmsHeader.setFields(convertToJsonString(jsonData));
 		return dmsHeader;
@@ -432,30 +389,58 @@ public class UserHelper {
 
 	private String convertToJsonString(String jsonData) {
 		try {
-			jsonData = jsonData.replace("\r","").replace("\n","");
-	        return jsonData;
+			jsonData = jsonData.replace("\r", "").replace("\n", "");
+			return jsonData;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "Something Went Wrong";
 		}
 	}
 
-	public String retrievDocument(ProfDocEntity docEntity, String decrypted) {
-		String path=docEntity.getDocPath();
+//	public String retrievDocument(ProfDocEntity docEntity) {
+//	    String decrypted = "";
+//	    String path = docEntity.getDocPath();
+//	    try {
+//	        if (path != null) {
+//	            String content = new String(Files.readAllBytes(Paths.get(path)));
+//	            PasswordEncDecrypt td = new PasswordEncDecrypt();
+//	            decrypted = td.decrypt(content);
+//	        }
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	    }
+//	    return decrypted;
+//	}
+
+	public String retrievDocument(ProfDocEntity docEntity) {
+		String decrypted = "";
+		String path = docEntity.getDocPath() ;
+		//String path = "D:\\Dms\\DMS_0008\\b7e28cbd-e287-4b6c-be91-2f18d18de4b9"; 
 		try {
 			if (path != null) {
+				logger.info("File path -> {} ", path);
+				if (!Files.exists(Paths.get(path))) {
+					logger.info("File does not exist");
+					return decrypted;
+				}
+				
+				System.out.println("Paths.get(path) --" + Paths.get(path));
 				String content = new String(Files.readAllBytes(Paths.get(path)));
 				PasswordEncDecrypt td = new PasswordEncDecrypt();
 				decrypted = td.decrypt(content);
 			}
+		} catch (AccessDeniedException e) {
+			logger.info("Access denied ->{} ", e.getMessage());
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return decrypted;
-	}
+}
 
-	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName, ProfExecutionEntity executionEntity) {
-		ProfDmsMainEntity mainEntity=new ProfDmsMainEntity();
+	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
+			ProfExecutionEntity executionEntity) {
+		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
 		mainEntity.setAccountNo("12345678");
 		mainEntity.setUserId(userId);
 		mainEntity.setBranchcode("1406");
@@ -463,20 +448,42 @@ public class UserHelper {
 		mainEntity.setIfsc("IOB12345");
 		mainEntity.setKey(activityName);
 		mainEntity.setName("sathish");
+		mainEntity.setBranchName("Ambattur");
 		mainEntity.setProspectId(executionEntity.getProspectId());
 		return mainEntity;
 	}
 
 	public ProfExecutionEntity convertRequestToProfHeader(String activityName, ProfUserInfoEntity entity) {
-		ProfExecutionEntity executionEntity=new ProfExecutionEntity();
+		ProfExecutionEntity executionEntity = new ProfExecutionEntity();
 		executionEntity.setActionBy(entity.getUserName());
 		executionEntity.setActivityName(activityName);
 		executionEntity.setEntryDate(LocalDateTime.now().toString());
-		String uniqueId=generateUniqueId();
-		executionEntity.setProspectId("DMS_"+uniqueId);
+		String uniqueId = generateUniqueId();
+		executionEntity.setProspectId("DMS_" + uniqueId);
 		executionEntity.setStatus("IN PROGRESS");
 		return executionEntity;
 	}
-	
-	
+	public ProfGetExecutionResponse convertExecutionToGetExecution(ProfExecutionEntity profExecutionEntity) {
+		ProfGetExecutionResponse executionResponse=new ProfGetExecutionResponse();
+		executionResponse.setKey(profExecutionEntity.getActivityName());
+		executionResponse.setProspectId(profExecutionEntity.getProspectId());		
+		return executionResponse;
+	}
+
+	public ProfGetExecutionFinalResponse convertMainEntityToFinalResponse(List<ProfDmsMainEntity> dmsMainEntities) {
+		ProfGetExecutionFinalResponse executionFinalResponse=new ProfGetExecutionFinalResponse();
+		if (!dmsMainEntities.isEmpty()) {
+			executionFinalResponse.setAccountNumber(dmsMainEntities.get(0).getAccountNo());
+			executionFinalResponse.setBranchCode(dmsMainEntities.get(0).getBranchcode());
+			executionFinalResponse.setBranchname(dmsMainEntities.get(0).getBranchName());
+			executionFinalResponse.setCustomerId(dmsMainEntities.get(0).getCustomerId());
+			executionFinalResponse.setIfsc(dmsMainEntities.get(0).getIfsc());
+			executionFinalResponse.setKey(dmsMainEntities.get(0).getKey());
+			executionFinalResponse.setName(dmsMainEntities.get(0).getName());
+			executionFinalResponse.setProspectId(dmsMainEntities.get(0).getProspectId());
+		}
+		
+		return executionFinalResponse;
+	}
+
 }

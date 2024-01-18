@@ -8,7 +8,7 @@ public class FileResponse {
 
 	private String status;
 
-	private Integer docId;
+	private String prospectId;
 
 	private String folderPath;
 
@@ -38,11 +38,13 @@ public class FileResponse {
 		this.status = status;
 	}
 
-	public Integer getDocId() {
-		return docId;
+	public String getProspectId() {
+		return prospectId;
 	}
 
-	public void setDocId(Integer docId) {
-		this.docId = docId;
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
 	}
+
+	
 }

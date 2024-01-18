@@ -37,6 +37,7 @@ import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.UserHelper;
 import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.AccountDetailsResponse;
+import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.LoginResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfActivityResponse;
@@ -45,6 +46,8 @@ import com.proflaut.dms.model.ProfDmsHeaderReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
+import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
+import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -53,6 +56,7 @@ import com.proflaut.dms.repository.ProfAccountRegisterRepository;
 import com.proflaut.dms.repository.ProfActivityRepository;
 import com.proflaut.dms.repository.ProfDmsHeaderRepository;
 import com.proflaut.dms.repository.ProfDmsMainRepository;
+import com.proflaut.dms.repository.ProfExecutionRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.util.TokenGenerator;
@@ -85,6 +89,12 @@ public class UserRegisterServiceImpl {
 	
 	@Autowired 
 	private EntityManager entityManager;
+	
+	@Autowired
+	FolderServiceImpl folderServiceImpl;
+	
+	@Autowired
+	ProfExecutionRepository executionRepository;
 
 	private static final Logger logger = LogManager.getLogger(UserRegisterServiceImpl.class);
 
@@ -366,6 +376,9 @@ public class UserRegisterServiceImpl {
 		    entityManager.persist(executionEntity);
 		    ProfDmsMainEntity mainEntity =helper.convertRequestToProfMain(userId,activityName,executionEntity);
 		    entityManager.persist(mainEntity);
+		    FolderFO folderFO=new FolderFO();
+		    folderFO.setProspectId(executionEntity.getProspectId());
+		    folderServiceImpl.saveFolder(folderFO);
 		    profExecutionResponse.setStatus(DMSConstant.SUCCESS);
 		} catch(Exception e) {
 			 profExecutionResponse.setStatus(DMSConstant.FAILURE);
@@ -373,5 +386,34 @@ public class UserRegisterServiceImpl {
 		}	
 		return profExecutionResponse;
 	}
+
+	public List<ProfGetExecutionResponse> filterByMaker(String key) {
+		List<ProfGetExecutionResponse> executionResponse=new ArrayList<>();
+		try {
+		List<ProfExecutionEntity>executionEntity=executionRepository.findByActivityName(key);
+		for (ProfExecutionEntity profExecutionEntity : executionEntity) {
+			ProfGetExecutionResponse executionResponses=helper.convertExecutionToGetExecution(profExecutionEntity);
+			executionResponse.add(executionResponses);
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return executionResponse;
+	}
+
+	public List<ProfGetExecutionFinalResponse> findByProspectId(List<ProfGetExecutionResponse> executionResponse) {
+	    List<ProfGetExecutionFinalResponse> finalexecutionResponse = new ArrayList<>();
+	    try {
+	        for (ProfGetExecutionResponse response : executionResponse) {
+	            List<ProfDmsMainEntity> dmsMainEntities = dmsMainRepository.findByProspectId(response.getProspectId());
+	            ProfGetExecutionFinalResponse executionFinalResponse = helper.convertMainEntityToFinalResponse(dmsMainEntities);
+	            finalexecutionResponse.add(executionFinalResponse);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return finalexecutionResponse;
+	}
+
 
 }

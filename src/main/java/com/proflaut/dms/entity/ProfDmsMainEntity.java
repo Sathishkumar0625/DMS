@@ -14,7 +14,7 @@ public class ProfDmsMainEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name="PROSPECT_ID")
+	@Column(name="PROSPECT_ID" , unique = true)
 	private String prospectId;
 	@Column(name = "CUSTOMER_ID")
 	private int customerId;
