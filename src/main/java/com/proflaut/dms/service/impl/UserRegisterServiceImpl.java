@@ -20,6 +20,8 @@ import javax.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -86,15 +88,22 @@ public class UserRegisterServiceImpl {
 
 	@Autowired
 	ProfDmsHeaderRepository headerRepository;
-	
-	@Autowired 
+
+	@Autowired
 	private EntityManager entityManager;
-	
+
 	@Autowired
 	FolderServiceImpl folderServiceImpl;
-	
+
 	@Autowired
 	ProfExecutionRepository executionRepository;
+
+	@Autowired
+	private final JdbcTemplate jdbcTemplate;
+
+	public UserRegisterServiceImpl(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	private static final Logger logger = LogManager.getLogger(UserRegisterServiceImpl.class);
 
@@ -344,76 +353,92 @@ public class UserRegisterServiceImpl {
 //		return headerRepository.findByKey(key);
 //	}
 	public List<Map<String, Object>> retrieveHeadersByKey(String key) {
-	    List<ProfDmsHeader> headers = headerRepository.findByKey(key);
-	    List<Map<String, Object>> headerList = new ArrayList<>();
-	    ObjectMapper objectMapper = new ObjectMapper();
+		List<ProfDmsHeader> headers = headerRepository.findByKey(key);
+		List<Map<String, Object>> headerList = new ArrayList<>();
+		ObjectMapper objectMapper = new ObjectMapper();
 
-	    headers.forEach(header -> {
-	        try {
-	            String fields = header.getFields();
-	            if (fields != null) {
-	                @SuppressWarnings("unchecked")
-	                Map<String, Object> fieldsMap = objectMapper.readValue(fields, Map.class);
-	                @SuppressWarnings("unchecked")
+		headers.forEach(header -> {
+			try {
+				String fields = header.getFields();
+				if (fields != null) {
+					@SuppressWarnings("unchecked")
+					Map<String, Object> fieldsMap = objectMapper.readValue(fields, Map.class);
+					@SuppressWarnings("unchecked")
 					List<Map<String, Object>> innerHeaders = (List<Map<String, Object>>) fieldsMap.get("headers");
-	                headerList.addAll(innerHeaders);
-	            }
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	    });
+					headerList.addAll(innerHeaders);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 
-	    return headerList;
+		return headerList;
 	}
-	@Transactional(rollbackFor = {SQLException.class,Exception.class})
+
+	@Transactional(rollbackFor = { SQLException.class, Exception.class })
 	public ProfExecutionResponse saveData(int userId, String activityName) {
-		ProfExecutionResponse profExecutionResponse=new ProfExecutionResponse();
+		ProfExecutionResponse profExecutionResponse = new ProfExecutionResponse();
 
 		try {
-			ProfUserInfoEntity entity=profUserInfoRepository.findByUserId(userId);
-		    // Do something with the EntityManager such as persist(), merge() or remove()
-		    ProfExecutionEntity executionEntity=helper.convertRequestToProfHeader(activityName,entity);
-		    entityManager.persist(executionEntity);
-		    ProfDmsMainEntity mainEntity =helper.convertRequestToProfMain(userId,activityName,executionEntity);
-		    entityManager.persist(mainEntity);
-		    FolderFO folderFO=new FolderFO();
-		    folderFO.setProspectId(executionEntity.getProspectId());
-		    folderServiceImpl.saveFolder(folderFO);
-		    profExecutionResponse.setStatus(DMSConstant.SUCCESS);
-		} catch(Exception e) {
-			 profExecutionResponse.setStatus(DMSConstant.FAILURE);
+			ProfUserInfoEntity entity = profUserInfoRepository.findByUserId(userId);
+			// Do something with the EntityManager such as persist(), merge() or remove()
+			ProfExecutionEntity executionEntity = helper.convertRequestToProfHeader(activityName, entity);
+			entityManager.persist(executionEntity);
+			ProfDmsMainEntity mainEntity = helper.convertRequestToProfMain(userId, activityName, executionEntity);
+			entityManager.persist(mainEntity);
+			FolderFO folderFO = new FolderFO();
+			folderFO.setProspectId(executionEntity.getProspectId());
+			folderServiceImpl.saveFolder(folderFO);
+			profExecutionResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			profExecutionResponse.setStatus(DMSConstant.FAILURE);
 			e.printStackTrace();
-		}	
+		}
 		return profExecutionResponse;
 	}
 
 	public List<ProfGetExecutionResponse> filterByMaker(String key) {
-		List<ProfGetExecutionResponse> executionResponse=new ArrayList<>();
+		List<ProfGetExecutionResponse> executionResponse = new ArrayList<>();
 		try {
-		List<ProfExecutionEntity>executionEntity=executionRepository.findByActivityName(key);
-		for (ProfExecutionEntity profExecutionEntity : executionEntity) {
-			ProfGetExecutionResponse executionResponses=helper.convertExecutionToGetExecution(profExecutionEntity);
-			executionResponse.add(executionResponses);
-		}
+			List<ProfExecutionEntity> executionEntity = executionRepository.findByActivityName(key);
+			for (ProfExecutionEntity profExecutionEntity : executionEntity) {
+				ProfGetExecutionResponse executionResponses = helper
+						.convertExecutionToGetExecution(profExecutionEntity);
+				executionResponse.add(executionResponses);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return executionResponse;
 	}
 
-	public List<ProfGetExecutionFinalResponse> findByProspectId(List<ProfGetExecutionResponse> executionResponse) {
-	    List<ProfGetExecutionFinalResponse> finalexecutionResponse = new ArrayList<>();
-	    try {
-	        for (ProfGetExecutionResponse response : executionResponse) {
-	            List<ProfDmsMainEntity> dmsMainEntities = dmsMainRepository.findByProspectId(response.getProspectId());
-	            ProfGetExecutionFinalResponse executionFinalResponse = helper.convertMainEntityToFinalResponse(dmsMainEntities);
-	            finalexecutionResponse.add(executionFinalResponse);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return finalexecutionResponse;
-	}
+//	public List<ProfGetExecutionFinalResponse> findByProspectId(List<ProfGetExecutionResponse> executionResponse) {
+//		List<ProfGetExecutionFinalResponse> finalexecutionResponse = new ArrayList<>();
+//		try {
+//			for (ProfGetExecutionResponse response : executionResponse) {
+//				List<ProfDmsMainEntity> dmsMainEntities = dmsMainRepository.findByProspectId(response.getProspectId());
+//				ProfGetExecutionFinalResponse executionFinalResponse = helper
+//						.convertMainEntityToFinalResponse(dmsMainEntities);
+//				finalexecutionResponse.add(executionFinalResponse);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return finalexecutionResponse;
+//	}
 
+//	public List<ProfGetExecutionFinalResponse> convertToResponseList(List<Object[]> resultList) {
+//		List<ProfGetExecutionFinalResponse> executionFinalResponses = new ArrayList<>();
+//
+//		for (Object[] result : resultList) {
+//			// Check the length of the result array before accessing its elements
+//
+//			executionFinalResponses.add(new ProfGetExecutionFinalResponse((String) result[0], (String) result[1],
+//					(String) result[2], (String) result[3], (String) result[4], (String) result[5], (String) result[6],
+//					(String) result[7], (String) result[8], (String) result[9]));
+//		}
+//
+//		return executionFinalResponses;
+//	}
 
 }

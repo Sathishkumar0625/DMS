@@ -382,7 +382,7 @@ public class UserHelper {
 
 	public ProfDmsHeader convertjsontoHeaderEntity(String jsonData) {
 		ProfDmsHeader dmsHeader = new ProfDmsHeader();
-		dmsHeader.setKey("maker");
+		dmsHeader.setKey("checker");
 		dmsHeader.setFields(convertToJsonString(jsonData));
 		return dmsHeader;
 	}
@@ -415,7 +415,6 @@ public class UserHelper {
 	public String retrievDocument(ProfDocEntity docEntity) {
 		String decrypted = "";
 		String path = docEntity.getDocPath() ;
-		//String path = "D:\\Dms\\DMS_0008\\b7e28cbd-e287-4b6c-be91-2f18d18de4b9"; 
 		try {
 			if (path != null) {
 				logger.info("File path -> {} ", path);
@@ -470,20 +469,18 @@ public class UserHelper {
 		return executionResponse;
 	}
 
-	public ProfGetExecutionFinalResponse convertMainEntityToFinalResponse(List<ProfDmsMainEntity> dmsMainEntities) {
-		ProfGetExecutionFinalResponse executionFinalResponse=new ProfGetExecutionFinalResponse();
-		if (!dmsMainEntities.isEmpty()) {
-			executionFinalResponse.setAccountNumber(dmsMainEntities.get(0).getAccountNo());
-			executionFinalResponse.setBranchCode(dmsMainEntities.get(0).getBranchcode());
-			executionFinalResponse.setBranchname(dmsMainEntities.get(0).getBranchName());
-			executionFinalResponse.setCustomerId(dmsMainEntities.get(0).getCustomerId());
-			executionFinalResponse.setIfsc(dmsMainEntities.get(0).getIfsc());
-			executionFinalResponse.setKey(dmsMainEntities.get(0).getKey());
-			executionFinalResponse.setName(dmsMainEntities.get(0).getName());
-			executionFinalResponse.setProspectId(dmsMainEntities.get(0).getProspectId());
-		}
-		
-		return executionFinalResponse;
-	}
-
+//	public ProfGetExecutionFinalResponse convertMainEntityToFinalResponse(List<ProfDmsMainEntity> dmsMainEntities) {
+//		ProfGetExecutionFinalResponse executionFinalResponse=new ProfGetExecutionFinalResponse();
+//		if (!dmsMainEntities.isEmpty()) {
+//			executionFinalResponse.setAccountNumber(dmsMainEntities.get(0).getAccountNo());
+//			executionFinalResponse.setBranchCode(dmsMainEntities.get(0).getBranchcode());
+//			executionFinalResponse.setBranchName(dmsMainEntities.get(0).getBranchName());
+//			executionFinalResponse.setCustomerId(dmsMainEntities.get(0).getCustomerId());
+//			executionFinalResponse.setIfsc(dmsMainEntities.get(0).getIfsc());
+//			executionFinalResponse.setKey(dmsMainEntities.get(0).getKey());
+//			executionFinalResponse.setName(dmsMainEntities.get(0).getName());
+//			executionFinalResponse.setProspectId(dmsMainEntities.get(0).getProspectId());
+//		}
+//		return executionFinalResponse;
+//	}
 }

@@ -3,13 +3,38 @@ package com.proflaut.dms.model;
 public class ProfGetExecutionFinalResponse {
 
 	private String accountNumber;
-	private String branchname;
+	private String branchName;
 	private String branchCode;
 	private int customerId;
 	private String ifsc;
 	private String key;
 	private String name;
 	private String prospectId;
+	
+	
+
+	public ProfGetExecutionFinalResponse() {
+	}
+
+
+
+	public ProfGetExecutionFinalResponse(String accountNumber, String branchName, String branchCode, int customerId) {
+		this.accountNumber = accountNumber;
+		this.branchName = branchName;
+		this.branchCode = branchCode;
+		this.customerId = customerId;
+	}
+	
+	
+
+	public ProfGetExecutionFinalResponse(String ifsc, String key, String name, String prospectId) {
+		this.ifsc = ifsc;
+		this.key = key;
+		this.name = name;
+		this.prospectId = prospectId;
+	}
+
+
 
 	public String getAccountNumber() {
 		return accountNumber;
@@ -19,12 +44,12 @@ public class ProfGetExecutionFinalResponse {
 		this.accountNumber = accountNumber;
 	}
 
-	public String getBranchname() {
-		return branchname;
+	public String getBranchName() {
+		return branchName;
 	}
 
-	public void setBranchname(String branchname) {
-		this.branchname = branchname;
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
 	}
 
 	public String getBranchCode() {
@@ -73,6 +98,13 @@ public class ProfGetExecutionFinalResponse {
 
 	public void setProspectId(String prospectId) {
 		this.prospectId = prospectId;
+	}
+
+	@Override
+	public String toString() {
+		return "ProfGetExecutionFinalResponse [accountNumber=" + accountNumber + ", branchName=" + branchName
+				+ ", branchCode=" + branchCode + ", customerId=" + customerId + ", ifsc=" + ifsc + ", key=" + key
+				+ ", name=" + name + ", prospectId=" + prospectId + "]";
 	}
 
 }

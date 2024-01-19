@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +53,7 @@ import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
+import com.proflaut.dms.repository.ProfExecutionRepository;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.UserRegisterServiceImpl;
 
@@ -61,11 +64,18 @@ public class DMSController {
 
 	private final UserRegisterServiceImpl userRegisterServiceImpl;
 
+	@Autowired
+	ProfExecutionRepository executionRepository;
+
+	private final JdbcTemplate jdbcTemplate;
+
 	private static final Logger logger = LogManager.getLogger(DMSController.class);
 
 	@Autowired
-	public DMSController(UserRegisterServiceImpl userRegisterServiceImpl) {
+	public DMSController(UserRegisterServiceImpl userRegisterServiceImpl, JdbcTemplate jdbcTemplate) {
 		this.userRegisterServiceImpl = userRegisterServiceImpl;
+		this.jdbcTemplate = jdbcTemplate;
+
 	}
 
 	@Autowired
@@ -149,18 +159,19 @@ public class DMSController {
 
 	@GetMapping("/getBy")
 	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam String prospectId,
-	        @RequestParam String docName) {
-	    try {
-	        FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl.reteriveFileByNameAndId(prospectId, docName);
-	        if (fileRetreiveByResponse != null) {
-	            return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
-	        } else {
-	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
+			@RequestParam String docName) {
+		try {
+			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl
+					.reteriveFileByNameAndId(prospectId, docName);
+			if (fileRetreiveByResponse != null) {
+				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping("/accountregistry")
@@ -331,23 +342,87 @@ public class DMSController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	@GetMapping("/getExecution")
-	public ResponseEntity<List<ProfGetExecutionFinalResponse> > getExecution(@RequestParam String key){
-		
+
+//	@GetMapping("/getExecution")
+//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution(@RequestParam String key) {
+//
+//		try {
+//			List<ProfGetExecutionResponse> executionResponse = userRegisterServiceImpl.filterByMaker(key);
+//			if (!executionResponse.isEmpty()) {
+//				List<ProfGetExecutionFinalResponse> executionFinalResponses = userRegisterServiceImpl
+//						.findByProspectId(executionResponse);
+//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
+//			} else {
+//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+
+//	@GetMapping("/getExecutions")
+//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution1(@RequestParam String key) {
+//		try {
+//			List<Object[]> resultList = executionRepository.joinQuery(key);
+//			List<ProfGetExecutionFinalResponse> executionFinalResponses = userRegisterServiceImpl
+//					.convertToResponseList(resultList);
+//
+//			if (!executionFinalResponses.isEmpty()) {
+//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
+//			} else {
+//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+
+//	@GetMapping("/getExecutions")
+//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution2(@RequestParam String key , @RequestParam int userId) {
+//		try {
+//			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  "
+//					+ "        FROM PROF_EXCECUTION e " 
+//					+ "        JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
+//					+ "        WHERE e.activity_name = ? And d.user_id= ?";
+//
+//			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
+//					new Object[] { key,userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
+//
+//			if (!executionFinalResponses.isEmpty()) {
+//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
+//			} else {
+//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+	@GetMapping("/getExecutions")
+	public ResponseEntity<Map<String, Object>> getExecution2(@RequestParam String key , @RequestParam int userId) {
 		try {
-			List<ProfGetExecutionResponse>	executionResponse=userRegisterServiceImpl.filterByMaker(key);
-			if (!executionResponse.isEmpty()) {
-			List<ProfGetExecutionFinalResponse> executionFinalResponses=userRegisterServiceImpl.findByProspectId(executionResponse);
-				return new ResponseEntity<>(executionFinalResponses,HttpStatus.OK);
-			}else {
+			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  "
+					+ "        FROM PROF_EXCECUTION e " 
+					+ "        JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
+					+ "        WHERE e.activity_name = ? And d.user_id= ?";
+
+			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
+					new Object[] { key,userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
+			List<Map<String, Object>> headers = userRegisterServiceImpl.retrieveHeadersByKey(key);
+			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("headers", headers);
+			map.put(key, executionFinalResponses);
+			if (!map.isEmpty()) {
+				return new ResponseEntity<>(map, HttpStatus.OK);
+			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		
 	}
+
 }
