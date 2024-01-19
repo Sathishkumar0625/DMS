@@ -16,7 +16,7 @@ public class FolderEntity {
 	@Column(name = "ID")
 	private Integer id;
 
-	@Column(name = "PROSPECT_ID" , unique = true)
+	@Column(name = "PROSPECT_ID" )
 	private String prospectId;
 
 	@Column(name = "PARENT_FOLDER_ID")

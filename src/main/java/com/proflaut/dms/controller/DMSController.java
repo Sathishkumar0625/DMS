@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.AccountDetailsResponse;
 import com.proflaut.dms.model.DocumentDetails;
@@ -43,12 +39,10 @@ import com.proflaut.dms.model.LoginResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfActivityResponse;
 import com.proflaut.dms.model.ProfActivityReterive;
-import com.proflaut.dms.model.ProfDmsHeaderReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
 import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
-import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -308,7 +302,7 @@ public class DMSController {
 
 	}
 
-	@PostMapping("/save-header")
+	@PostMapping("/saveHeader")
 	private ResponseEntity<ProfUpdateDmsMainResponse> saveHeader() {
 		ProfUpdateDmsMainResponse dmsMainResponsedmsMainResponse = null;
 
@@ -379,39 +373,18 @@ public class DMSController {
 //		}
 //	}
 
-//	@GetMapping("/getExecutions")
-//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution2(@RequestParam String key , @RequestParam int userId) {
-//		try {
-//			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  "
-//					+ "        FROM PROF_EXCECUTION e " 
-//					+ "        JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
-//					+ "        WHERE e.activity_name = ? And d.user_id= ?";
-//
-//			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
-//					new Object[] { key,userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
-//
-//			if (!executionFinalResponses.isEmpty()) {
-//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
-//			} else {
-//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
 	@GetMapping("/getExecutions")
-	public ResponseEntity<Map<String, Object>> getExecution2(@RequestParam String key , @RequestParam int userId) {
+	public ResponseEntity<Map<String, Object>> getExecution(@RequestParam String key, @RequestParam int userId) {
 		try {
-			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  "
-					+ "        FROM PROF_EXCECUTION e " 
+
+			logger.info("Entering in to getExecution -> {}", key);
+			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  " + "        FROM PROF_EXCECUTION e "
 					+ "        JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
 					+ "        WHERE e.activity_name = ? And d.user_id= ?";
-
 			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
-					new Object[] { key,userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
+					new Object[] { key, userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
 			List<Map<String, Object>> headers = userRegisterServiceImpl.retrieveHeadersByKey(key);
-			Map<String, Object> map=new HashMap<String, Object>();
+			Map<String, Object> map = new HashMap<>();
 			map.put("headers", headers);
 			map.put(key, executionFinalResponses);
 			if (!map.isEmpty()) {
@@ -424,5 +397,4 @@ public class DMSController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
 }

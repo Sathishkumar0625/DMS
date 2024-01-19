@@ -114,10 +114,10 @@ public class UserHelper {
 		if (userProp != null) {
 			ent.setCreatedBy(userProp.getUserId());
 		}
+		ent.setFolderId(entity.getId());
 		ent.setUploadTime(LocalDateTime.now().toString());
 		ent.setProspectId(fileRequest.getProspectId());
 		ent.setDocName(fileRequest.getDockName());
-		ent.setDocPath(entity.getFolderPath());
 		return ent;
 	}
 
@@ -158,18 +158,13 @@ public class UserHelper {
 
 			// Create the file with the correct filename
 			File file = new File(path + File.separator + fileName);
-			String path1=entity.getFolderPath()+file.getPath();
-			folderRepository.updateParentFolderIdAndFolderPath(count,path1, entity.getProspectId());
-			try {
-				// Assuming you want to write the encrypted content to the file
-				FileWriter fileWriter = new FileWriter(file);
-				fileWriter.write(encrypted);
-				fileWriter.close();
-
-				isFileCreated = true;
+			folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
+			
+			try (FileWriter fileWriter = new FileWriter(file)) {
+			    fileWriter.write(encrypted);
+			    isFileCreated = true;
 			} catch (IOException e) {
-				// Handle the exception appropriately (e.g., log or throw)
-				e.printStackTrace();
+			    e.printStackTrace();
 			}
 		}
 

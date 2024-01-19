@@ -25,7 +25,6 @@ public class FolderHelper {
 
 		FolderEntity ent = new FolderEntity();
 		ent.setProspectId(folderFO.getProspectId());
-		FolderEntity entity = folderRepo.findByProspectId(folderFO.getProspectId());
 		ent.setIsParent(folderLocation);
 		String folderPath = "";
 		folderPath = userhelper.storeFolder(fileResponse, folderFO);

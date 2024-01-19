@@ -9,15 +9,15 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROF_DOCUMENT_PROPERTY",indexes = { @Index(columnList = "CREATED_BY") })
+@Table(name = "PROF_DOCUMENT_PROPERTY", indexes = { @Index(columnList = "CREATED_BY") })
 public class ProfDocEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
-	
-	@Column(name = "PROSPECT_ID" , unique = true)
+
+	@Column(name = "FOLDER_NAME")
 	private String prospectId;
 
 	@Column(name = "DOCUMENT_NAME")
@@ -31,10 +31,17 @@ public class ProfDocEntity {
 
 	@Column(name = "UPLOADED_TIME")
 	private String uploadTime;
-	
-	@Column(name = "TABS",columnDefinition = "CLOB NULL", nullable = true)
-	private String tabs;
-	
+
+	@Column(name = "FOLDER_ID")
+	private int folderId;
+
+	public int getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(int folderId) {
+		this.folderId = folderId;
+	}
 
 	public String getProspectId() {
 		return prospectId;
@@ -42,14 +49,6 @@ public class ProfDocEntity {
 
 	public void setProspectId(String prospectId) {
 		this.prospectId = prospectId;
-	}
-
-	public String getTabs() {
-		return tabs;
-	}
-
-	public void setTabs(String tabs) {
-		this.tabs = tabs;
 	}
 
 	public int getCreatedBy() {
@@ -68,7 +67,6 @@ public class ProfDocEntity {
 		this.uploadTime = uploadTime;
 	}
 
-	
 	public Integer getId() {
 		return id;
 	}
