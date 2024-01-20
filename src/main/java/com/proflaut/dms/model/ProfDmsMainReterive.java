@@ -10,7 +10,7 @@ public class ProfDmsMainReterive {
 
 	private String name;
 	
-	private String accountNo;
+	private String accountNumber;
 	
 	private String branchName;
 
@@ -22,7 +22,7 @@ public class ProfDmsMainReterive {
 		this.prospectId = prospectId;
 	}
 
-	private String branchcode;
+	private String branchCode;
 
 	private String ifsc;
 	
@@ -46,12 +46,21 @@ public class ProfDmsMainReterive {
 		this.name = name;
 	}
 
-	public String getAccountNo() {
-		return accountNo;
+	
+	public String getAccountNumber() {
+		return accountNumber;
 	}
 
-	public void setAccountNo(String accountNo) {
-		this.accountNo = accountNo;
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	public String getBranchCode() {
+		return branchCode;
+	}
+
+	public void setBranchCode(String branchCode) {
+		this.branchCode = branchCode;
 	}
 
 	public String getBranchName() {
@@ -62,13 +71,7 @@ public class ProfDmsMainReterive {
 		this.branchName = branchName;
 	}
 
-	public String getBranchcode() {
-		return branchcode;
-	}
-
-	public void setBranchcode(String branchcode) {
-		this.branchcode = branchcode;
-	}
+	
 
 	public String getIfsc() {
 		return ifsc;

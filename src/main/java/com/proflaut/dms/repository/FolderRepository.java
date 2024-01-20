@@ -13,7 +13,9 @@ public interface FolderRepository  extends JpaRepository<FolderEntity, Integer> 
 
 	//FolderEntity findById(Integer id);
 	
-	Optional<FolderEntity> findById(Integer id);
+	FolderEntity findById(int folderId);
+	
+	//Optional<FolderEntity> findById(Integer id);
 
 	FolderEntity findByProspectId(String prospectId);
 	

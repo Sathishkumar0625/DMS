@@ -56,11 +56,10 @@ public class FileManagementServiceImpl {
 			ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
 			FolderEntity entity=folderRepository.findByProspectId(fileRequest.getProspectId());
-			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName())) {
-				ProfDocEntity profDocEnt = helper.convertFileRequesttoProfDoc(fileRequest, token,entity);
-				ProfDocEntity profDocEntity = profDocUploadRepository.save(profDocEnt);
+			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName(),token)) {
+//				ProfDocEntity profDocEnt = helper.convertFileRequesttoProfDoc(fileRequest, token,entity);
+//				ProfDocEntity profDocEntity = profDocUploadRepository.save(profDocEnt);
 				fileResponse.setFolderPath(fileRequest.getDockPath());
-				fileResponse.setProspectId(profDocEntity.getProspectId());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 			}
 		} catch (Exception e) {
@@ -71,12 +70,13 @@ public class FileManagementServiceImpl {
 		return fileResponse;
 	}
 
+	@SuppressWarnings("unused")
 	public FileRetreiveResponse retreiveFile(String token) {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 		if (userProp != null) {
 			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByCreatedBy(userProp.getUserId());
-			if (profDocEntity != null) {
+			if (profDocEntity != null) {	
 				String decrypted = null;
 				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse);
 				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
@@ -90,12 +90,14 @@ public class FileManagementServiceImpl {
 		return fileRetreiveResponse;
 	}
 
-	public FileRetreiveByResponse reteriveFileByNameAndId(String prospectId, String docName) {
+	@SuppressWarnings("unused")
+	public FileRetreiveByResponse reteriveFileByNameAndId(int id) {
 	    FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
 	    try {
-	        ProfDocEntity docEntity = profDocUploadRepository.findByProspectIdAndDocName(prospectId, docName);
+	        ProfDocEntity docEntity = profDocUploadRepository.findById(id);
+	        FolderEntity entity=folderRepository.findById(docEntity.getFolderId());
 	        if (docEntity != null) {
-	            String decrypted = helper.retrievDocument(docEntity);
+	            String decrypted = helper.retrievDocument(docEntity,entity);
 	            if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 	                fileRetreiveByResponse.setImage(decrypted);
 	                fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);

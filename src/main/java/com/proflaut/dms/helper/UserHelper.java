@@ -59,6 +59,7 @@ import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
+import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
@@ -78,6 +79,9 @@ public class UserHelper {
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
+	
+	@Autowired
+	ProfDocUploadRepository docUploadRepository;
 
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
 
@@ -108,7 +112,7 @@ public class UserHelper {
 		return isValidate;
 	}
 
-	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity) {
+	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity, String fileName) {
 		ProfDocEntity ent = new ProfDocEntity();
 		ProfUserPropertiesEntity userProp = profUserPropertiesRepository.findByToken(token);
 		if (userProp != null) {
@@ -118,6 +122,7 @@ public class UserHelper {
 		ent.setUploadTime(LocalDateTime.now().toString());
 		ent.setProspectId(fileRequest.getProspectId());
 		ent.setDocName(fileRequest.getDockName());
+		ent.setDocPath(fileName);
 		return ent;
 	}
 
@@ -145,7 +150,7 @@ public class UserHelper {
 	}
 
 	@Transactional
-	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName) {
+	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName, String token) {
 		boolean isFileCreated = false;
 		FolderEntity entity = folderRepository.findByProspectId(fileRequest.getProspectId());
 
@@ -166,6 +171,10 @@ public class UserHelper {
 			} catch (IOException e) {
 			    e.printStackTrace();
 			}
+			if (isFileCreated) {
+				ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token,entity,fileName);
+				docUploadRepository.save(profDocEnt);
+	        }
 		}
 
 		return isFileCreated;
@@ -204,15 +213,18 @@ public class UserHelper {
 			FileRetreiveResponse fileRetreiveResponse) {
 		List<DocumentDetails> document = new ArrayList<>();
 		for (int i = 0; i < profDocEntity.size(); i++) {
+			FolderEntity entity=folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
 			if (!org.springframework.util.StringUtils.isEmpty(profDocEntity.get(i).getDocPath())) {
 				try {
-					String content = new String(Files.readAllBytes(Paths.get(profDocEntity.get(i).getDocPath())));
+					
+					String content = new String(Files.readAllBytes(Paths.get(entity.getFolderPath()+File.separator+profDocEntity.get(i).getDocPath())));
 					PasswordEncDecrypt td = new PasswordEncDecrypt();
 					decrypted = td.decrypt(content);
 					if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 						DocumentDetails documentDetails = new DocumentDetails();
 						documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
 						// documentDetails.setImage(decrypted);
+						documentDetails.setId(profDocEntity.get(i).getId());
 						documentDetails.setDocName(profDocEntity.get(i).getDocName());
 						documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 						document.add(i, documentDetails);
@@ -354,8 +366,8 @@ public class UserHelper {
 
 	public ProfDmsMainReterive convertMainEntityToMainReterive(ProfDmsMainEntity dmsMainEntity) {
 		ProfDmsMainReterive dmsMainReterive = new ProfDmsMainReterive();
-		dmsMainReterive.setAccountNo(dmsMainEntity.getAccountNo());
-		dmsMainReterive.setBranchcode(dmsMainEntity.getBranchcode());
+		dmsMainReterive.setAccountNumber(dmsMainEntity.getAccountNo());
+		dmsMainReterive.setBranchCode(dmsMainEntity.getBranchcode());
 		dmsMainReterive.setBranchName(dmsMainEntity.getBranchName());
 		dmsMainReterive.setCustomerId(dmsMainEntity.getCustomerId());
 		dmsMainReterive.setIfsc(dmsMainEntity.getIfsc());
@@ -407,9 +419,9 @@ public class UserHelper {
 //	    return decrypted;
 //	}
 
-	public String retrievDocument(ProfDocEntity docEntity) {
+	public String retrievDocument(ProfDocEntity docEntity, FolderEntity entity) {
 		String decrypted = "";
-		String path = docEntity.getDocPath() ;
+		String path =entity.getFolderPath()+File.separator+docEntity.getDocPath() ;
 		try {
 			if (path != null) {
 				logger.info("File path -> {} ", path);
@@ -435,14 +447,6 @@ public class UserHelper {
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
 			ProfExecutionEntity executionEntity) {
 		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
-		mainEntity.setAccountNo("12345678");
-		mainEntity.setUserId(userId);
-		mainEntity.setBranchcode("1406");
-		mainEntity.setCustomerId(1);
-		mainEntity.setIfsc("IOB12345");
-		mainEntity.setKey(activityName);
-		mainEntity.setName("sathish");
-		mainEntity.setBranchName("Ambattur");
 		mainEntity.setProspectId(executionEntity.getProspectId());
 		return mainEntity;
 	}

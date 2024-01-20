@@ -4,12 +4,23 @@ public class DocumentDetails {
 	private String prospectId;
 
 	//private String image;
+	private int id;
 	
 	private String docName;
 	
 	private String uploadedTime;
 	
 	
+
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 
 	public String getDocName() {
 		return docName;

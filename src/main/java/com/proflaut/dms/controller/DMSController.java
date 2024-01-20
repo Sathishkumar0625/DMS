@@ -152,15 +152,14 @@ public class DMSController {
 	}
 
 	@GetMapping("/getBy")
-	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam String prospectId,
-			@RequestParam String docName) {
+	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam int id) {
 		try {
 			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl
-					.reteriveFileByNameAndId(prospectId, docName);
-			if (fileRetreiveByResponse != null) {
+					.reteriveFileByNameAndId(id);
+			if (fileRetreiveByResponse.getImage() != null) {
 				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(fileRetreiveByResponse,HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
