@@ -5,36 +5,26 @@ public class ProfGetExecutionFinalResponse {
 	private String accountNumber;
 	private String branchName;
 	private String branchCode;
-	private int customerId;
+	private String customerId;
 	private String ifsc;
 	private String key;
 	private String name;
 	private String prospectId;
-	
-	
 
 	public ProfGetExecutionFinalResponse() {
 	}
 
-
-
-	public ProfGetExecutionFinalResponse(String accountNumber, String branchName, String branchCode, int customerId) {
+	public ProfGetExecutionFinalResponse(String accountNumber, String branchName, String branchCode, String customerId,
+			String ifsc, String key, String name, String prospectId) {
 		this.accountNumber = accountNumber;
 		this.branchName = branchName;
 		this.branchCode = branchCode;
 		this.customerId = customerId;
-	}
-	
-	
-
-	public ProfGetExecutionFinalResponse(String ifsc, String key, String name, String prospectId) {
 		this.ifsc = ifsc;
 		this.key = key;
 		this.name = name;
 		this.prospectId = prospectId;
 	}
-
-
 
 	public String getAccountNumber() {
 		return accountNumber;
@@ -60,11 +50,11 @@ public class ProfGetExecutionFinalResponse {
 		this.branchCode = branchCode;
 	}
 
-	public int getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

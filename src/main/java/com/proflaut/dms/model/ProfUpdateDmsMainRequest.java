@@ -7,7 +7,7 @@ public class ProfUpdateDmsMainRequest {
 	private String branch;
 	private String branchCode;
 	private String ifsc;
-	private int prospectId;
+	private String prospectId;
 
 	
 	public String getCustomerId() {
@@ -58,12 +58,13 @@ public class ProfUpdateDmsMainRequest {
 		this.ifsc = ifsc;
 	}
 
-	public int getProspectId() {
+	public String getProspectId() {
 		return prospectId;
 	}
 
-	public void setProspectId(int prospectId) {
+	public void setProspectId(String prospectId) {
 		this.prospectId = prospectId;
 	}
 
+	
 }

@@ -448,6 +448,7 @@ public class UserHelper {
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
 			ProfExecutionEntity executionEntity) {
 		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
+		mainEntity.setKey(activityName);
 		mainEntity.setUserId(userId);
 		mainEntity.setProspectId(executionEntity.getProspectId());
 		return mainEntity;

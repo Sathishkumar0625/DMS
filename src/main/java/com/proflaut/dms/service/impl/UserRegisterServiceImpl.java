@@ -318,7 +318,7 @@ public class UserRegisterServiceImpl {
 	public ProfUpdateDmsMainResponse updateDmsMain(ProfUpdateDmsMainRequest dmsMainRequest) {
 		ProfUpdateDmsMainResponse dmsMainResponse = new ProfUpdateDmsMainResponse();
 		try {
-			ProfDmsMainEntity dmsMainEntity = dmsMainRepository.findById(dmsMainRequest.getProspectId());
+			ProfDmsMainEntity dmsMainEntity = dmsMainRepository.findByProspectId(dmsMainRequest.getProspectId());
 			if (dmsMainEntity != null) {
 				ProfDmsMainEntity mainEntity = helper.convertUpdateDmsReqToDmsEntity(dmsMainRequest, dmsMainEntity);
 				dmsMainRepository.save(mainEntity);

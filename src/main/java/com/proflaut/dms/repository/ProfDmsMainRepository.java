@@ -14,9 +14,11 @@ public interface ProfDmsMainRepository extends JpaRepository<ProfDmsMainEntity, 
 
 	List<ProfDmsMainEntity> findByUserIdAndKey(int userId,String key);
 
+	ProfDmsMainEntity findByProspectId(String prospectId);
 
-	ProfDmsMainEntity findById(int id);
 
-	List<ProfDmsMainEntity> findByProspectId(String prospectId);
+	
+
+	//List<ProfDmsMainEntity> findByProspectIds(String prospectId);
 
 }

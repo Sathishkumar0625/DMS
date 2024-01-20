@@ -298,12 +298,15 @@ public class DMSController {
 		try {
 			dmsMainResponse = userRegisterServiceImpl.updateDmsMain(dmsMainRequest);
 			if (dmsMainResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
+				logger.info("Updated SuccessFully");
 				return new ResponseEntity<>(dmsMainResponse, HttpStatus.OK);
 			} else {
+				logger.info("Updation Failed");
 				return new ResponseEntity<>(dmsMainResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.info("Error At Backend");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
