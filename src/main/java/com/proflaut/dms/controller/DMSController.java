@@ -120,6 +120,7 @@ public class DMSController {
 	@PostMapping("/upload")
 	public ResponseEntity<FileResponse> fileUpload(@RequestHeader(value = "token") String token,
 			@RequestBody FileRequest fileRequest) {
+		logger.info("getting in to Upload");
 		FileResponse fileResponse = null;
 		try {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token);
@@ -129,6 +130,7 @@ public class DMSController {
 		}
 
 		if (fileResponse != null && (!fileResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE))) {
+			logger.info("getting in to Upload Success");
 			return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -137,16 +139,19 @@ public class DMSController {
 
 	@GetMapping("/download")
 	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token) {
+		logger.info("getting in to Download");
 		FileRetreiveResponse fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token);
 
 		List<DocumentDetails> document = fileRetreiveResponse.getDocument();
 
 		if (document.get(0).getDocName() != null
 				&& fileRetreiveResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
+			logger.info("getting in to Download List Success");
 
 			return new ResponseEntity<>(fileRetreiveResponse, HttpStatus.OK);
 		} else {
 			fileRetreiveResponse.setStatus(DMSConstant.FAILURE);
+			logger.info("getting in to Download List Failure");
 			return new ResponseEntity<>(fileRetreiveResponse, HttpStatus.NOT_FOUND);
 		}
 	}
@@ -154,11 +159,15 @@ public class DMSController {
 	@GetMapping("/getBy")
 	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam int id) {
 		try {
+			logger.info("getting in to Download By");
 			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl
 					.reteriveFileByNameAndId(id);
 			if (fileRetreiveByResponse.getImage() != null) {
+				logger.info("getting in to Download BY Success");
 				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
+				
 			} else {
+				logger.info("getting in to Download List Failure");
 				return new ResponseEntity<>(fileRetreiveByResponse,HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
