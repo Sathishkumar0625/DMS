@@ -160,15 +160,14 @@ public class DMSController {
 	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam int id) {
 		try {
 			logger.info("getting in to Download By");
-			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl
-					.reteriveFileByNameAndId(id);
+			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl.reteriveFileByNameAndId(id);
 			if (fileRetreiveByResponse.getImage() != null) {
-				logger.info("getting in to Download BY Success");
+				logger.info(" Download BY Success");
 				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.OK);
-				
+
 			} else {
-				logger.info("getting in to Download List Failure");
-				return new ResponseEntity<>(fileRetreiveByResponse,HttpStatus.NOT_FOUND);
+				logger.info(" Download BY is Failure");
+				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

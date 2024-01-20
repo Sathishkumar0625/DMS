@@ -1,6 +1,5 @@
 package com.proflaut.dms.helper;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,8 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -30,8 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfAccountDetailsEntity;
@@ -49,13 +44,11 @@ import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
-import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
-import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
@@ -215,7 +208,7 @@ public class UserHelper {
 //	}
 
 	public String retrievDocument(List<ProfDocEntity> profDocEntity, String decrypted,
-			FileRetreiveResponse fileRetreiveResponse) {
+			FileRetreiveResponse fileRetreiveResponse, ProfUserInfoEntity infoEntity) {
 		List<DocumentDetails> document = new ArrayList<>();
 		for (int i = 0; i < profDocEntity.size(); i++) {
 			FolderEntity entity=folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
@@ -228,7 +221,7 @@ public class UserHelper {
 					if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 						DocumentDetails documentDetails = new DocumentDetails();
 						documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
-						// documentDetails.setImage(decrypted);
+						documentDetails.setUploadedBy(infoEntity.getUserName());
 						documentDetails.setId(profDocEntity.get(i).getId());
 						documentDetails.setDocName(profDocEntity.get(i).getDocName());
 						documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
@@ -239,7 +232,7 @@ public class UserHelper {
 					e.printStackTrace();
 					DocumentDetails documentDetails = new DocumentDetails();
 					documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
-					// documentDetails.setImage(decrypted);
+				
 					documentDetails.setDocName(profDocEntity.get(i).getDocName());
 					documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 					document.add(i, documentDetails);
@@ -328,7 +321,7 @@ public class UserHelper {
 
 	}
 
-	public ProfOldImageEntity moveDetailsToOldImage(ProfDocEntity existingDocEntity, FileRequest fileRequest) {
+	public ProfOldImageEntity moveDetailsToOldImage(ProfDocEntity existingDocEntity) {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
@@ -397,7 +390,7 @@ public class UserHelper {
 
 	public ProfDmsHeader convertjsontoHeaderEntity(String jsonData) {
 		ProfDmsHeader dmsHeader = new ProfDmsHeader();
-		dmsHeader.setKey("checker");
+		dmsHeader.setKey("maker");
 		dmsHeader.setFields(convertToJsonString(jsonData));
 		return dmsHeader;
 	}

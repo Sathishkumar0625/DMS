@@ -16,7 +16,6 @@ import com.proflaut.dms.service.impl.UserRegisterServiceImpl;
 public class LogInterceptor implements HandlerInterceptor {
 	 	@Autowired
 	    UserRegisterServiceImpl userService;
-//	    private Logger logger = LoggerFactory.getLogger(LogInterceptor.class);
 
 	    @Override
 	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -45,13 +44,13 @@ public class LogInterceptor implements HandlerInterceptor {
 	    @Override
 	    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 	            ModelAndView modelAndView) throws Exception {
-//	        System.out.println("Hello durai");
-	    }
+	    	// TODO document why this method is empty
+     }
 
 	    @Override
 	    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 	            throws Exception {
-//	        System.out.println("Hello durai");
-	    }
+	    	// TODO document why this method is empty
+     }
 
 }

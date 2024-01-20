@@ -8,7 +8,19 @@ public class DocumentDetails {
 	
 	private String docName;
 	
+	public String getUploadedBy() {
+		return uploadedBy;
+	}
+
+
+	public void setUploadedBy(String uploadedBy) {
+		this.uploadedBy = uploadedBy;
+	}
+
+
 	private String uploadedTime;
+	
+	private String uploadedBy;
 	
 	
 

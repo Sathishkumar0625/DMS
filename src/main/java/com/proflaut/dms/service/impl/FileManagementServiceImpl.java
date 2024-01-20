@@ -2,7 +2,6 @@ package com.proflaut.dms.service.impl;
 
 import java.util.List;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	UserHelper helper;
-	
+
 	@Autowired
 	FolderRepository folderRepository;
 
@@ -55,10 +54,8 @@ public class FileManagementServiceImpl {
 			logger.info("Encrypted File Value ---> {}", encrypted);
 			ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
-			FolderEntity entity=folderRepository.findByProspectId(fileRequest.getProspectId());
-			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName(),token)) {
-//				ProfDocEntity profDocEnt = helper.convertFileRequesttoProfDoc(fileRequest, token,entity);
-//				ProfDocEntity profDocEntity = profDocUploadRepository.save(profDocEnt);
+			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName(),
+					token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 			}
@@ -74,11 +71,12 @@ public class FileManagementServiceImpl {
 	public FileRetreiveResponse retreiveFile(String token) {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
+		ProfUserInfoEntity infoEntity=profUserInfoRepository.findByUserId(userProp.getUserId());
 		if (userProp != null) {
 			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByCreatedBy(userProp.getUserId());
-			if (profDocEntity != null) {	
+			if (profDocEntity != null) {
 				String decrypted = null;
-				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse);
+				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse,infoEntity);
 				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 					fileRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 				}
@@ -92,25 +90,25 @@ public class FileManagementServiceImpl {
 
 	@SuppressWarnings("unused")
 	public FileRetreiveByResponse reteriveFileByNameAndId(int id) {
-	    FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
-	    try {
-	        ProfDocEntity docEntity = profDocUploadRepository.findById(id);
-	        FolderEntity entity=folderRepository.findById(docEntity.getFolderId());
-	        if (docEntity != null) {
-	            String decrypted = helper.retrievDocument(docEntity,entity);
-	            if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
-	                fileRetreiveByResponse.setImage(decrypted);
-	                fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-	            } else {
-	                fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-	            }
-	        } else {
-	            fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-	    }
-	    return fileRetreiveByResponse;
+		FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
+		try {
+			ProfDocEntity docEntity = profDocUploadRepository.findById(id);
+			FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
+			if (docEntity != null) {
+				String decrypted = helper.retrievDocument(docEntity, entity);
+				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
+					fileRetreiveByResponse.setImage(decrypted);
+					fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
+					fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+				}
+			} else {
+				fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+		}
+		return fileRetreiveByResponse;
 	}
 }

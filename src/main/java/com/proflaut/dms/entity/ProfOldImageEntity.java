@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "PROF_OLD_IMAGE_DETAILS")
 public class ProfOldImageEntity {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "DOC_ID")
@@ -18,14 +18,23 @@ public class ProfOldImageEntity {
 
 	@Column(name = "DOCUMENT_NAME")
 	private String docName;
-	
+
 	@Column(name = "DOCUMENT_PATH")
 	private String docPath;
-	
+
 	@Column(name = "USER_NAME")
 	private String userName;
-	
-	
+
+	@Column(name = "PROSPECT_ID")
+	private String prospectId;
+
+	public String getProspectId() {
+		return prospectId;
+	}
+
+	public void setProspectId(String prospectId) {
+		this.prospectId = prospectId;
+	}
 
 	public String getUserName() {
 		return userName;
