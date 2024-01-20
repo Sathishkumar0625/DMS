@@ -138,9 +138,9 @@ public class DMSController {
 	}
 
 	@GetMapping("/download")
-	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token) {
+	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token,@RequestParam String prospectId) {
 		logger.info("getting in to Download");
-		FileRetreiveResponse fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token);
+		FileRetreiveResponse fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token,prospectId);
 
 		List<DocumentDetails> document = fileRetreiveResponse.getDocument();
 

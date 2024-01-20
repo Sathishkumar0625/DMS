@@ -68,12 +68,12 @@ public class FileManagementServiceImpl {
 	}
 
 	@SuppressWarnings("unused")
-	public FileRetreiveResponse retreiveFile(String token) {
+	public FileRetreiveResponse retreiveFile(String token, String prospectId) {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 		ProfUserInfoEntity infoEntity=profUserInfoRepository.findByUserId(userProp.getUserId());
 		if (userProp != null) {
-			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByCreatedBy(userProp.getUserId());
+			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByProspectId(prospectId);
 			if (profDocEntity != null) {
 				String decrypted = null;
 				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse,infoEntity);

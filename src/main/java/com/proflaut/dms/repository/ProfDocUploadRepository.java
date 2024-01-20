@@ -33,4 +33,6 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 
 	ProfDocEntity findByFolderId(int id);
 
+	List<ProfDocEntity> findByProspectId(String prospectId);
+
 }
