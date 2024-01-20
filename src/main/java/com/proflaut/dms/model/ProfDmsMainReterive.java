@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class ProfDmsMainReterive {
 	
-	private int customerId;
+	private String customerId;
 
 	private String name;
 	
@@ -30,11 +30,13 @@ public class ProfDmsMainReterive {
 	
 	
 
-	public int getCustomerId() {
+	
+
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

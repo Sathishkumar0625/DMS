@@ -2,7 +2,7 @@ package com.proflaut.dms.model;
 
 public class ProfDmsMainRequest {
 
-	private int customerId;
+	private String customerId;
 
 	private String name;
 
@@ -34,11 +34,12 @@ public class ProfDmsMainRequest {
 		this.userId = userId;
 	}
 
-	public int getCustomerId() {
+
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

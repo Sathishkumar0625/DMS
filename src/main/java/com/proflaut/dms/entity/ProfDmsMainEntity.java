@@ -17,7 +17,7 @@ public class ProfDmsMainEntity {
 	@Column(name="PROSPECT_ID" , unique = true)
 	private String prospectId;
 	@Column(name = "CUSTOMER_ID")
-	private int customerId;
+	private String customerId;
 	@Column(name = "NAME")
 	private String name;
 	@Column(name = "ACCOUNT_NUMBER")
@@ -67,11 +67,13 @@ public class ProfDmsMainEntity {
 		this.id = id;
 	}
 
-	public int getCustomerId() {
+	
+
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

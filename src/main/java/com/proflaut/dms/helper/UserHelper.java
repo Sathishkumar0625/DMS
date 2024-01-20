@@ -365,12 +365,10 @@ public class UserHelper {
 		mainEntity.setUserId(mainRequest.getUserId());
 		mainEntity.setKey(mainRequest.getKey());
 		String uniqueId = generateUniqueId();
-		mainEntity.setProspectId("DMS_" + uniqueId);
-		
+		mainEntity.setProspectId("DMS_" + uniqueId);		
 		FolderFO folderFO=new FolderFO();
 		folderFO.setProspectId("DMS_"+uniqueId);
-		folderServiceImpl.saveFolder(folderFO);
-		
+		folderServiceImpl.saveFolder(folderFO);		
 		return mainEntity;
 	}
 
@@ -457,6 +455,7 @@ public class UserHelper {
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
 			ProfExecutionEntity executionEntity) {
 		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
+		mainEntity.setUserId(userId);
 		mainEntity.setProspectId(executionEntity.getProspectId());
 		return mainEntity;
 	}

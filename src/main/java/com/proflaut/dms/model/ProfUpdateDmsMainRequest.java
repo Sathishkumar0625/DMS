@@ -1,7 +1,7 @@
 package com.proflaut.dms.model;
 
 public class ProfUpdateDmsMainRequest {
-	private int customerId;
+	private String customerId;
 	private String accountNo;
 	private String name;
 	private String branch;
@@ -9,11 +9,12 @@ public class ProfUpdateDmsMainRequest {
 	private String ifsc;
 	private int prospectId;
 
-	public int getCustomerId() {
+	
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 
