@@ -44,6 +44,7 @@ import com.proflaut.dms.entity.ProfExecutionEntity;
 import com.proflaut.dms.entity.ProfOldImageEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
+import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
@@ -61,6 +62,7 @@ import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
+import com.proflaut.dms.service.impl.FolderServiceImpl;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
 @Component
@@ -82,6 +84,9 @@ public class UserHelper {
 	
 	@Autowired
 	ProfDocUploadRepository docUploadRepository;
+	
+	@Autowired
+	FolderServiceImpl folderServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
 
@@ -349,7 +354,7 @@ public class UserHelper {
 		return activitiesEntity;
 	}
 
-	public ProfDmsMainEntity convertMakerReqToMakerEntity(ProfDmsMainRequest mainRequest) {
+	public ProfDmsMainEntity convertMakerReqToMakerEntity(ProfDmsMainRequest mainRequest) throws CustomException {
 		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
 		mainEntity.setAccountNo(mainRequest.getAccountNo());
 		mainEntity.setBranchcode(mainRequest.getBranchcode());
@@ -361,6 +366,11 @@ public class UserHelper {
 		mainEntity.setKey(mainRequest.getKey());
 		String uniqueId = generateUniqueId();
 		mainEntity.setProspectId("DMS_" + uniqueId);
+		
+		FolderFO folderFO=new FolderFO();
+		folderFO.setProspectId("DMS_"+uniqueId);
+		folderServiceImpl.saveFolder(folderFO);
+		
 		return mainEntity;
 	}
 
