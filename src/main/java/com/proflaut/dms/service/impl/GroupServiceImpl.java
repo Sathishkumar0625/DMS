@@ -10,11 +10,17 @@ import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
+import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
+import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.helper.GroupHelper;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
+import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
+import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
+import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
+import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class GroupServiceImpl {
@@ -24,6 +30,12 @@ public class GroupServiceImpl {
 
 	@Autowired
 	GroupHelper groupHelper;
+	
+	@Autowired
+	ProfUserGroupMappingRepository mappingRepository;
+	
+	@Autowired
+	ProfUserInfoRepository userInfoRepository;
 
 	public String updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
 		try {
@@ -42,9 +54,15 @@ public class GroupServiceImpl {
 	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest);
-			groupInfoRepository.save(groupInfoEntity);
-			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			ProfGroupInfoEntity groupInfoEnt=groupInfoRepository.findByGroupName(groupInfoRequest.getGroupName());
+			if (!groupInfoEnt.getGroupName().equalsIgnoreCase(groupInfoRequest.getGroupName())) {
+				ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest);
+				groupInfoRepository.save(groupInfoEntity);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			}else {
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+				groupInfoResponse.setErrorMessage(DMSConstant.GROUPNAME_ALREADY_EXIST);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,5 +85,36 @@ public class GroupServiceImpl {
 			e.printStackTrace();
 		}
 		return groupInfoResponses;
+	}
+
+	public ProfGroupInfoResponse createGroup(ProfUserGroupMappingRequest mappingRequest) {
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
+		try {
+			ProfUserGroupMappingEntity mappingEntity = groupHelper.convertMappingInfoReqToMappingInfoEnt(mappingRequest);
+			mappingRepository.save(mappingEntity);
+			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			e.printStackTrace();
+		}
+		return groupInfoResponse;
+	}
+
+	public List<ProfOveralUserInfoResponse> findUsers() {
+		List<ProfOveralUserInfoResponse> infoResponses = new ArrayList<>();
+		try {
+			List<ProfUserInfoEntity> groupInfoEntities = userInfoRepository.findAll();
+
+			for (ProfUserInfoEntity profUserInfoEntity : groupInfoEntities) {
+				if (!profUserInfoEntity.getStatus().equalsIgnoreCase("I")) {
+					ProfOveralUserInfoResponse response = groupHelper.convertToOveralUserResponse(profUserInfoEntity);
+					infoResponses.add(response);
+				} 
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return infoResponses;
 	}
 }

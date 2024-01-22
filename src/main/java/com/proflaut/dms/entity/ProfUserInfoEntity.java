@@ -10,10 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-	
 @Entity
-@Table(name = "PROF_USERINFO",indexes = { @Index(columnList = "USER_ID"),
-										@Index(columnList = "USER_NAME") })
+@Table(name = "PROF_USERINFO", indexes = { @Index(columnList = "USER_ID"), @Index(columnList = "USER_NAME") })
 public class ProfUserInfoEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,19 +53,19 @@ public class ProfUserInfoEntity {
 		this.email = email;
 	}
 
-	public Timestamp getCreatedDate() {
+	public String getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(Timestamp createdDate) {
+	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
 
-	public Timestamp getUpdatedDate() {
+	public String getUpdatedDate() {
 		return updatedDate;
 	}
 
-	public void setUpdatedDate(Timestamp updatedDate) {
+	public void setUpdatedDate(String updatedDate) {
 		this.updatedDate = updatedDate;
 	}
 
@@ -78,18 +76,18 @@ public class ProfUserInfoEntity {
 	private String email;
 
 	@Column(name = "CREATED_DATE")
-	private Timestamp createdDate;
+	private String createdDate;
 
 	@Column(name = "UPDATED_DATE")
-	private Timestamp updatedDate;
-	
-	@Column(name="STATUS")
+	private String updatedDate;
+
+	@Column(name = "STATUS")
 	private String status;
-	
-	@Column(name="WEB_ACCESS")
+
+	@Column(name = "WEB_ACCESS")
 	private String webAccess;
-	
-	@Column(name="ADMIN_ACCESS")
+
+	@Column(name = "ADMIN_ACCESS")
 	private String adminAccesss;
 
 	public String getStatus() {
@@ -115,8 +113,6 @@ public class ProfUserInfoEntity {
 	public void setAdminAccesss(String adminAccesss) {
 		this.adminAccesss = adminAccesss;
 	}
-	
-	
 
 //	@OneToOne(cascade = CascadeType.ALL)
 //	@JoinColumn(name = "PROF_USERPROPERTIES_ID", referencedColumnName = "USER_ID")

@@ -15,5 +15,5 @@ public class DMSConstant {
 	public static final String FILE_NOT_FOUND="file not found Exception";
 	public static final String FOLDER_ALREADY_EXIST="folder already exists";
 	public static final String NOT_FOUND="Not Found";
-	
+	public static final String GROUPNAME_ALREADY_EXIST="Group Name Already Exist";
 }

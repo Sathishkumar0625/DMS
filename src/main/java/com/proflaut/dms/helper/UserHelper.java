@@ -11,6 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,11 @@ public class UserHelper {
 
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
 
-	private static final String currentDateAndTime = LocalDateTime.now().toString();
-
+	public static String formatCurrentDateTime() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
+        return currentDateTime.format(formatter);
+    }
 	public ProfUserInfoEntity convertUserInfotoProfUser(UserInfo userInfo) throws InvalidKeyException,
 			UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
 		PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -99,7 +103,7 @@ public class UserHelper {
 		ent.setEmail(userInfo.getEmail());
 		ent.setPassword(encrypted);
 		ent.setUserName(userInfo.getUserName());
-		ent.setCreatedDate(userInfo.getCreatedDate());
+		ent.setCreatedDate(formatCurrentDateTime());
 		return ent;
 	}
 

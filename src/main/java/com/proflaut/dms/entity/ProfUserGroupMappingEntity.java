@@ -16,7 +16,7 @@ public class ProfUserGroupMappingEntity {
 	@Column(name="ID")
 	private int id;
 	@Column(name="GROUP_ID")
-	private int groupId;
+	private String groupId;
 	@Column(name="USER_ID")
 	private int userId;
 	@Column(name="MAPPED_BY")
@@ -31,10 +31,10 @@ public class ProfUserGroupMappingEntity {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getGroupId() {
+	public String getGroupId() {
 		return groupId;
 	}
-	public void setGroupId(int groupId) {
+	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
 	public int getUserId() {
