@@ -7,4 +7,6 @@ import com.proflaut.dms.entity.ProfGroupInfoEntity;
 public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEntity, Integer> {
 
 	ProfGroupInfoEntity findByGroupName(String groupName);
+
+	ProfGroupInfoEntity findByGroupNameIgnoreCase(String groupName);
 }

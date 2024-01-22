@@ -76,8 +76,9 @@ public class GroupHelper {
 	}
 
 	public boolean usernameExists(String groupName) {
-		ProfGroupInfoEntity groupInfoEnt=groupInfoRepository.findByGroupName(groupName);
-		return groupInfoEnt != null;
+		ProfGroupInfoEntity groupInfoEnt=groupInfoRepository.findByGroupNameIgnoreCase(groupName);
+		
+		 return groupInfoEnt != null;
 	}
 
 }
