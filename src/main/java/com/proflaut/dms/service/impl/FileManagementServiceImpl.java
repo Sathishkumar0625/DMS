@@ -54,11 +54,13 @@ public class FileManagementServiceImpl {
 			logger.info("Encrypted File Value ---> {}", encrypted);
 			ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
+
 			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName(),
 					token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new CustomException(e.getMessage());
@@ -67,16 +69,15 @@ public class FileManagementServiceImpl {
 		return fileResponse;
 	}
 
-	@SuppressWarnings("unused")
 	public FileRetreiveResponse retreiveFile(String token, String prospectId) {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
-		ProfUserInfoEntity infoEntity=profUserInfoRepository.findByUserId(userProp.getUserId());
+		ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
 		if (userProp != null) {
 			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByProspectId(prospectId);
 			if (profDocEntity != null) {
 				String decrypted = null;
-				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse,infoEntity);
+				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse, infoEntity);
 				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 					fileRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 				}

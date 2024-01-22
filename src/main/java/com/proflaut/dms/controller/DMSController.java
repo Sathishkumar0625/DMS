@@ -43,6 +43,8 @@ import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
 import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
+import com.proflaut.dms.model.ProfGroupInfoRequest;
+import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -133,14 +135,16 @@ public class DMSController {
 			logger.info("getting in to Upload Success");
 			return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 		} else {
+			logger.warn("Upload Failure");
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@GetMapping("/download")
-	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token,@RequestParam String prospectId) {
+	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token,
+			@RequestParam String prospectId) {
 		logger.info("getting in to Download");
-		FileRetreiveResponse fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token,prospectId);
+		FileRetreiveResponse fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token, prospectId);
 
 		List<DocumentDetails> document = fileRetreiveResponse.getDocument();
 
@@ -151,7 +155,7 @@ public class DMSController {
 			return new ResponseEntity<>(fileRetreiveResponse, HttpStatus.OK);
 		} else {
 			fileRetreiveResponse.setStatus(DMSConstant.FAILURE);
-			logger.info("getting in to Download List Failure");
+			logger.warn("getting in to Download List Failure");
 			return new ResponseEntity<>(fileRetreiveResponse, HttpStatus.NOT_FOUND);
 		}
 	}
@@ -293,10 +297,10 @@ public class DMSController {
 
 	@PutMapping("/update")
 	private ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(
-			@RequestBody ProfUpdateDmsMainRequest dmsMainRequest) {
+			@RequestBody ProfUpdateDmsMainRequest dmsMainRequest, @RequestParam String prospectId) {
 		ProfUpdateDmsMainResponse dmsMainResponse = null;
 		try {
-			dmsMainResponse = userRegisterServiceImpl.updateDmsMain(dmsMainRequest);
+			dmsMainResponse = userRegisterServiceImpl.updateDmsMain(dmsMainRequest, prospectId);
 			if (dmsMainResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 				logger.info("Updated SuccessFully");
 				return new ResponseEntity<>(dmsMainResponse, HttpStatus.OK);
@@ -346,42 +350,6 @@ public class DMSController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-//	@GetMapping("/getExecution")
-//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution(@RequestParam String key) {
-//
-//		try {
-//			List<ProfGetExecutionResponse> executionResponse = userRegisterServiceImpl.filterByMaker(key);
-//			if (!executionResponse.isEmpty()) {
-//				List<ProfGetExecutionFinalResponse> executionFinalResponses = userRegisterServiceImpl
-//						.findByProspectId(executionResponse);
-//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
-//			} else {
-//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
-
-//	@GetMapping("/getExecutions")
-//	public ResponseEntity<List<ProfGetExecutionFinalResponse>> getExecution1(@RequestParam String key) {
-//		try {
-//			List<Object[]> resultList = executionRepository.joinQuery(key);
-//			List<ProfGetExecutionFinalResponse> executionFinalResponses = userRegisterServiceImpl
-//					.convertToResponseList(resultList);
-//
-//			if (!executionFinalResponses.isEmpty()) {
-//				return new ResponseEntity<>(executionFinalResponses, HttpStatus.OK);
-//			} else {
-//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
 
 	@GetMapping("/getExecutions")
 	public ResponseEntity<Map<String, Object>> getExecution(@RequestParam String key, @RequestParam int userId) {

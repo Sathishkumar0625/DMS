@@ -33,6 +33,7 @@ import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
 import com.proflaut.dms.entity.ProfExecutionEntity;
+import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -50,6 +51,8 @@ import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
 import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
+import com.proflaut.dms.model.ProfGroupInfoRequest;
+import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -59,6 +62,7 @@ import com.proflaut.dms.repository.ProfActivityRepository;
 import com.proflaut.dms.repository.ProfDmsHeaderRepository;
 import com.proflaut.dms.repository.ProfDmsMainRepository;
 import com.proflaut.dms.repository.ProfExecutionRepository;
+import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.util.TokenGenerator;
@@ -100,6 +104,9 @@ public class UserRegisterServiceImpl {
 
 	@Autowired
 	private final JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	ProfGroupInfoRepository groupInfoRepository;
 
 	public UserRegisterServiceImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -315,10 +322,10 @@ public class UserRegisterServiceImpl {
 		return dmsMainReterives;
 	}
 
-	public ProfUpdateDmsMainResponse updateDmsMain(ProfUpdateDmsMainRequest dmsMainRequest) {
+	public ProfUpdateDmsMainResponse updateDmsMain(ProfUpdateDmsMainRequest dmsMainRequest, String prospectId) {
 		ProfUpdateDmsMainResponse dmsMainResponse = new ProfUpdateDmsMainResponse();
 		try {
-			ProfDmsMainEntity dmsMainEntity = dmsMainRepository.findByProspectId(dmsMainRequest.getProspectId());
+			ProfDmsMainEntity dmsMainEntity = dmsMainRepository.findByProspectId(prospectId);
 			if (dmsMainEntity != null) {
 				ProfDmsMainEntity mainEntity = helper.convertUpdateDmsReqToDmsEntity(dmsMainRequest, dmsMainEntity);
 				dmsMainRepository.save(mainEntity);
@@ -412,33 +419,6 @@ public class UserRegisterServiceImpl {
 		return executionResponse;
 	}
 
-//	public List<ProfGetExecutionFinalResponse> findByProspectId(List<ProfGetExecutionResponse> executionResponse) {
-//		List<ProfGetExecutionFinalResponse> finalexecutionResponse = new ArrayList<>();
-//		try {
-//			for (ProfGetExecutionResponse response : executionResponse) {
-//				List<ProfDmsMainEntity> dmsMainEntities = dmsMainRepository.findByProspectId(response.getProspectId());
-//				ProfGetExecutionFinalResponse executionFinalResponse = helper
-//						.convertMainEntityToFinalResponse(dmsMainEntities);
-//				finalexecutionResponse.add(executionFinalResponse);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return finalexecutionResponse;
-//	}
-
-//	public List<ProfGetExecutionFinalResponse> convertToResponseList(List<Object[]> resultList) {
-//		List<ProfGetExecutionFinalResponse> executionFinalResponses = new ArrayList<>();
-//
-//		for (Object[] result : resultList) {
-//			// Check the length of the result array before accessing its elements
-//
-//			executionFinalResponses.add(new ProfGetExecutionFinalResponse((String) result[0], (String) result[1],
-//					(String) result[2], (String) result[3], (String) result[4], (String) result[5], (String) result[6],
-//					(String) result[7], (String) result[8], (String) result[9]));
-//		}
-//
-//		return executionFinalResponses;
-//	}
+	
 
 }

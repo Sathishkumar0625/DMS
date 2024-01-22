@@ -35,6 +35,17 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_ID")
 	private int folderId;
 
+	@Column(name = "EXTENTION")
+	private String extention;
+
+	public String getExtention() {
+		return extention;
+	}
+
+	public void setExtention(String extention) {
+		this.extention = extention;
+	}
+
 	public int getFolderId() {
 		return folderId;
 	}

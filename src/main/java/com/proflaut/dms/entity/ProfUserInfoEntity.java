@@ -82,6 +82,41 @@ public class ProfUserInfoEntity {
 
 	@Column(name = "UPDATED_DATE")
 	private Timestamp updatedDate;
+	
+	@Column(name="STATUS")
+	private String status;
+	
+	@Column(name="WEB_ACCESS")
+	private String webAccess;
+	
+	@Column(name="ADMIN_ACCESS")
+	private String adminAccesss;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getWebAccess() {
+		return webAccess;
+	}
+
+	public void setWebAccess(String webAccess) {
+		this.webAccess = webAccess;
+	}
+
+	public String getAdminAccesss() {
+		return adminAccesss;
+	}
+
+	public void setAdminAccesss(String adminAccesss) {
+		this.adminAccesss = adminAccesss;
+	}
+	
+	
 
 //	@OneToOne(cascade = CascadeType.ALL)
 //	@JoinColumn(name = "PROF_USERPROPERTIES_ID", referencedColumnName = "USER_ID")

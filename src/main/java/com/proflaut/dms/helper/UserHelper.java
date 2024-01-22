@@ -36,6 +36,7 @@ import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfExecutionEntity;
+import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfOldImageEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -50,6 +51,7 @@ import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
+import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
@@ -74,14 +76,16 @@ public class UserHelper {
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-	
+
 	@Autowired
 	ProfDocUploadRepository docUploadRepository;
-	
+
 	@Autowired
 	FolderServiceImpl folderServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
+
+	private static final String currentDateAndTime = LocalDateTime.now().toString();
 
 	public ProfUserInfoEntity convertUserInfotoProfUser(UserInfo userInfo) throws InvalidKeyException,
 			UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
@@ -89,6 +93,9 @@ public class UserHelper {
 		String encrypted = td.encrypt(userInfo.getPassword());
 		logger.info("USER PASSWORD ---> {}", userInfo);
 		ProfUserInfoEntity ent = new ProfUserInfoEntity();
+		ent.setStatus("A");
+		ent.setAdminAccesss("Y");
+		ent.setWebAccess("Y");
 		ent.setEmail(userInfo.getEmail());
 		ent.setPassword(encrypted);
 		ent.setUserName(userInfo.getUserName());
@@ -110,7 +117,8 @@ public class UserHelper {
 		return isValidate;
 	}
 
-	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity, String fileName) {
+	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity,
+			String fileName) {
 		ProfDocEntity ent = new ProfDocEntity();
 		ProfUserPropertiesEntity userProp = profUserPropertiesRepository.findByToken(token);
 		if (userProp != null) {
@@ -162,17 +170,17 @@ public class UserHelper {
 			// Create the file with the correct filename
 			File file = new File(path + File.separator + fileName);
 			folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
-			
+
 			try (FileWriter fileWriter = new FileWriter(file)) {
-			    fileWriter.write(encrypted);
-			    isFileCreated = true;
+				fileWriter.write(encrypted);
+				isFileCreated = true;
 			} catch (IOException e) {
-			    e.printStackTrace();
+				e.printStackTrace();
 			}
 			if (isFileCreated) {
-				ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token,entity,fileName);
+				ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName);
 				docUploadRepository.save(profDocEnt);
-	        }
+			}
 		}
 
 		return isFileCreated;
@@ -211,11 +219,12 @@ public class UserHelper {
 			FileRetreiveResponse fileRetreiveResponse, ProfUserInfoEntity infoEntity) {
 		List<DocumentDetails> document = new ArrayList<>();
 		for (int i = 0; i < profDocEntity.size(); i++) {
-			FolderEntity entity=folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
+			FolderEntity entity = folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
 			if (!org.springframework.util.StringUtils.isEmpty(profDocEntity.get(i).getDocPath())) {
 				try {
-					
-					String content = new String(Files.readAllBytes(Paths.get(entity.getFolderPath()+File.separator+profDocEntity.get(i).getDocPath())));
+
+					String content = new String(Files.readAllBytes(
+							Paths.get(entity.getFolderPath() + File.separator + profDocEntity.get(i).getDocPath())));
 					PasswordEncDecrypt td = new PasswordEncDecrypt();
 					decrypted = td.decrypt(content);
 					if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
@@ -232,7 +241,7 @@ public class UserHelper {
 					e.printStackTrace();
 					DocumentDetails documentDetails = new DocumentDetails();
 					documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
-				
+
 					documentDetails.setDocName(profDocEntity.get(i).getDocName());
 					documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 					document.add(i, documentDetails);
@@ -358,10 +367,10 @@ public class UserHelper {
 		mainEntity.setUserId(mainRequest.getUserId());
 		mainEntity.setKey(mainRequest.getKey());
 		String uniqueId = generateUniqueId();
-		mainEntity.setProspectId("DMS_" + uniqueId);		
-		FolderFO folderFO=new FolderFO();
-		folderFO.setProspectId("DMS_"+uniqueId);
-		folderServiceImpl.saveFolder(folderFO);		
+		mainEntity.setProspectId("DMS_" + uniqueId);
+		FolderFO folderFO = new FolderFO();
+		folderFO.setProspectId("DMS_" + uniqueId);
+		folderServiceImpl.saveFolder(folderFO);
 		return mainEntity;
 	}
 
@@ -422,7 +431,7 @@ public class UserHelper {
 
 	public String retrievDocument(ProfDocEntity docEntity, FolderEntity entity) {
 		String decrypted = "";
-		String path =entity.getFolderPath()+File.separator+docEntity.getDocPath() ;
+		String path = entity.getFolderPath() + File.separator + docEntity.getDocPath();
 		try {
 			if (path != null) {
 				logger.info("File path -> {} ", path);
@@ -430,7 +439,7 @@ public class UserHelper {
 					logger.info("File does not exist");
 					return decrypted;
 				}
-				
+
 				System.out.println("Paths.get(path) --" + Paths.get(path));
 				String content = new String(Files.readAllBytes(Paths.get(path)));
 				PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -443,7 +452,7 @@ public class UserHelper {
 			e.printStackTrace();
 		}
 		return decrypted;
-}
+	}
 
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
 			ProfExecutionEntity executionEntity) {
@@ -464,25 +473,11 @@ public class UserHelper {
 		executionEntity.setStatus("IN PROGRESS");
 		return executionEntity;
 	}
+
 	public ProfGetExecutionResponse convertExecutionToGetExecution(ProfExecutionEntity profExecutionEntity) {
-		ProfGetExecutionResponse executionResponse=new ProfGetExecutionResponse();
+		ProfGetExecutionResponse executionResponse = new ProfGetExecutionResponse();
 		executionResponse.setKey(profExecutionEntity.getActivityName());
-		executionResponse.setProspectId(profExecutionEntity.getProspectId());		
+		executionResponse.setProspectId(profExecutionEntity.getProspectId());
 		return executionResponse;
 	}
-
-//	public ProfGetExecutionFinalResponse convertMainEntityToFinalResponse(List<ProfDmsMainEntity> dmsMainEntities) {
-//		ProfGetExecutionFinalResponse executionFinalResponse=new ProfGetExecutionFinalResponse();
-//		if (!dmsMainEntities.isEmpty()) {
-//			executionFinalResponse.setAccountNumber(dmsMainEntities.get(0).getAccountNo());
-//			executionFinalResponse.setBranchCode(dmsMainEntities.get(0).getBranchcode());
-//			executionFinalResponse.setBranchName(dmsMainEntities.get(0).getBranchName());
-//			executionFinalResponse.setCustomerId(dmsMainEntities.get(0).getCustomerId());
-//			executionFinalResponse.setIfsc(dmsMainEntities.get(0).getIfsc());
-//			executionFinalResponse.setKey(dmsMainEntities.get(0).getKey());
-//			executionFinalResponse.setName(dmsMainEntities.get(0).getName());
-//			executionFinalResponse.setProspectId(dmsMainEntities.get(0).getProspectId());
-//		}
-//		return executionFinalResponse;
-//	}
 }
