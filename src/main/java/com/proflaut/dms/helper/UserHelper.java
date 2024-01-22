@@ -102,8 +102,8 @@ public class UserHelper {
 		logger.info("USER PASSWORD ---> {}", userInfo);
 		ProfUserInfoEntity ent = new ProfUserInfoEntity();
 		ent.setStatus("A");
-		ent.setAdminAccesss("Y");
-		ent.setWebAccess("Y");
+		ent.setAdminAccesss(userInfo.getAdminAccess());
+		ent.setWebAccess(userInfo.getWebAccess());
 		ent.setEmail(userInfo.getEmail());
 		ent.setPassword(encrypted);
 		ent.setUserName(userInfo.getUserName());

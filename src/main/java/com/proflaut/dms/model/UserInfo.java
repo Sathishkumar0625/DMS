@@ -56,6 +56,30 @@ public class UserInfo {
 	private String userId;
 
 	private Timestamp createdDate;
+	
+	private String adminAccess;
+	
+	private String webAccess;
+	
+	
+
+	public String getAdminAccess() {
+		return adminAccess;
+	}
+
+	public void setAdminAccess(String adminAccess) {
+		this.adminAccess = adminAccess;
+	}
+
+	
+
+	public String getWebAccess() {
+		return webAccess;
+	}
+
+	public void setWebAccess(String webAccess) {
+		this.webAccess = webAccess;
+	}
 
 	public String getUserId() {
 		return userId;
