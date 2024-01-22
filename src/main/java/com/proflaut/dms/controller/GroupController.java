@@ -32,17 +32,15 @@ public class GroupController {
 
 	@PostMapping("/create")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestBody ProfGroupInfoRequest groupInfoRequest) {
-		ProfGroupInfoResponse groupInfoResponse = null;
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
 			groupInfoResponse = groupServiceImpl.createGroup(groupInfoRequest);
-			if (groupInfoResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
-				return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(groupInfoResponse, HttpStatus.NOT_FOUND);
-			}
+			return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			groupInfoResponse.setErrorMessage(DMSConstant.GROUPNAME_ALREADY_EXIST);
+			groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			return new ResponseEntity<>(groupInfoResponse,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

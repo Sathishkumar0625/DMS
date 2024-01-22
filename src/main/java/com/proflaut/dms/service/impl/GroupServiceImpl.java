@@ -3,7 +3,6 @@ package com.proflaut.dms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,7 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
+import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.GroupHelper;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
@@ -51,22 +51,22 @@ public class GroupServiceImpl {
 
 	}
 
-	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest) {
+	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest) throws CustomException{
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			ProfGroupInfoEntity groupInfoEnt=groupInfoRepository.findByGroupName(groupInfoRequest.getGroupName());
-			if (!groupInfoEnt.getGroupName().equalsIgnoreCase(groupInfoRequest.getGroupName())) {
-				ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest);
-				groupInfoRepository.save(groupInfoEntity);
-				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
-			}else {
-				groupInfoResponse.setStatus(DMSConstant.FAILURE);
-				groupInfoResponse.setErrorMessage(DMSConstant.GROUPNAME_ALREADY_EXIST);
-			}
+			if (groupHelper.usernameExists(groupInfoRequest.getGroupName())) {
+				throw new CustomException("Group Name already exists");
+	        }
+			
+			ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest);
+			groupInfoRepository.save(groupInfoEntity);
+			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new CustomException(e.getMessage());
 		}
 		return groupInfoResponse;
+		
 	}
 
 	public List<ProfOverallGroupInfoResponse> find() {

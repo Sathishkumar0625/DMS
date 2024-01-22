@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import   java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
@@ -15,10 +17,13 @@ import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
+import com.proflaut.dms.repository.ProfGroupInfoRepository;
 
 @Component
 public class GroupHelper {
 	
+	@Autowired
+	ProfGroupInfoRepository groupInfoRepository;
 	
     public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoEntity entity=new ProfGroupInfoEntity();
@@ -68,6 +73,11 @@ public class GroupHelper {
 		response.setUserName(profUserInfoEntity.getUserName());
 		response.setWebAccess(profUserInfoEntity.getWebAccess());
 		return response;
+	}
+
+	public boolean usernameExists(String groupName) {
+		ProfGroupInfoEntity groupInfoEnt=groupInfoRepository.findByGroupName(groupName);
+		return groupInfoEnt != null;
 	}
 
 }

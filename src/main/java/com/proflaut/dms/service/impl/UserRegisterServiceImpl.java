@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.customException.CustomExcep;
 import com.proflaut.dms.entity.ProfAccountRequestEntity;
 import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
@@ -104,7 +105,7 @@ public class UserRegisterServiceImpl {
 
 	@Autowired
 	private final JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
 
@@ -137,7 +138,9 @@ public class UserRegisterServiceImpl {
 	public UserRegResponse saveUser(UserInfo userInfo) throws CustomException {
 		UserRegResponse userRegResponse = new UserRegResponse();
 		try {
-
+			if (helper.usernameExists(userInfo.getUserName())) {
+				throw new CustomExcep("Username already exists");
+	        }
 			userInfo.setCreatedDate(Timestamp.from(Instant.now()));
 			logger.info("USER INFO --->{}", userInfo);
 			userRegResponse.setEmail(userInfo.getEmail());
@@ -156,6 +159,7 @@ public class UserRegisterServiceImpl {
 		}
 		return userRegResponse;
 	}
+
 
 	public LoginResponse getUser(UserInfo userInfo) throws Exception {
 		LoginResponse loginResponse = new LoginResponse();
@@ -418,7 +422,5 @@ public class UserRegisterServiceImpl {
 		}
 		return executionResponse;
 	}
-
-	
 
 }

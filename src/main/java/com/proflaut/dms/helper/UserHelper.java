@@ -57,6 +57,7 @@ import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
@@ -71,7 +72,10 @@ public class UserHelper {
 	private String folderLocation;
 
 	private final Random random = new Random();
-
+	
+	@Autowired
+	ProfUserInfoRepository userInfoRepository;
+	
 	@Autowired
 	FolderRepository folderRepository;
 
@@ -483,5 +487,9 @@ public class UserHelper {
 		executionResponse.setKey(profExecutionEntity.getActivityName());
 		executionResponse.setProspectId(profExecutionEntity.getProspectId());
 		return executionResponse;
+	}
+	public boolean usernameExists(String userName) {
+		ProfUserInfoEntity entity=userInfoRepository.findByUserName(userName);
+		return entity != null;
 	}
 }

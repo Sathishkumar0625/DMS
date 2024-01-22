@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.customException.CustomExcep;
 import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.AccountDetailsResponse;
 import com.proflaut.dms.model.DocumentDetails;
@@ -88,19 +89,14 @@ public class DMSController {
 		try {
 			userRegResponse = userRegisterServiceImpl.saveUser(userInfo);
 			return new ResponseEntity<>(userRegResponse, HttpStatus.CREATED);
-		} catch (Exception e) {
-			userRegResponse.setStatus(DMSConstant.FAILURE);
-			if (e.getMessage().contains(DMSConstant.HIBERNATEEXCEPTION)) {
-				userRegResponse.setErrorMessage(DMSConstant.ERRORMESSAGE);
-			} else {
-				userRegResponse.setErrorMessage(e.getMessage());
-
-			}
-			userRegResponse.setUserId(0);
-			userRegResponse.setEmail(userInfo.getEmail());
-			userRegResponse.setUserName(userInfo.getUserName());
-			return new ResponseEntity<>(userRegResponse, HttpStatus.NOT_ACCEPTABLE);
-		}
+		}  catch (Exception e) {
+	        userRegResponse.setStatus(DMSConstant.FAILURE);
+	        userRegResponse.setErrorMessage(DMSConstant.ERRORMESSAGE);
+	        userRegResponse.setUserId(0);
+	        userRegResponse.setEmail(userInfo.getEmail());
+	        userRegResponse.setUserName(userInfo.getUserName());
+	        return new ResponseEntity<>(userRegResponse, HttpStatus.NOT_ACCEPTABLE);
+	    }
 	}
 
 	@PostMapping("/login")
