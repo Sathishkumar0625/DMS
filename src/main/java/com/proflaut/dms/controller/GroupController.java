@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
+import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
@@ -113,5 +114,18 @@ public class GroupController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	@PostMapping("/createTable")
+	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestBody CreateTableRequest createTableRequest) {
+		ProfMetaDataResponse metaDataResponse=new ProfMetaDataResponse();
+	    try {
+	    	metaDataResponse=  groupServiceImpl.createTableFromFieldDefinitions(createTableRequest);
+	        return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        metaDataResponse.setStatus(DMSConstant.FAILURE);
+	        metaDataResponse.setErrorMessage(e.getMessage());
+	        return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 }

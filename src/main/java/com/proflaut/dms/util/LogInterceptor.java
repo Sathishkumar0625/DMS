@@ -23,7 +23,7 @@ public class LogInterceptor implements HandlerInterceptor {
 	        String path = request.getRequestURI().substring(request.getContextPath().length());
 	        System.out.println(path);
 //	        path.equals("/dmsCheck/signup") ||
-	        if ( path.equals("/dmsCheck/login")) {
+	        if (path.equals("/dmsCheck/signup") || path.equals("/dmsCheck/login")) {
 	            return true;
 	        } else {
 

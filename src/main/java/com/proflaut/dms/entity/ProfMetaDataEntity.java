@@ -19,9 +19,9 @@ public class ProfMetaDataEntity {
 	private String tableName;
 	@Column(name="FILE_EXTENSION")
 	private String fileExtension;
-	@Column(name="CREATED BY")
+	@Column(name="CREATED_BY")
 	private String createdBy;
-	@Column(name="CREATED AT")
+	@Column(name="CREATED_AT")
 	private String createdAt;
 
 	public int getId() {

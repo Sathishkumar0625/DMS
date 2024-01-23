@@ -1,9 +1,10 @@
 package com.proflaut.dms.service.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.sql.Clob;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -15,17 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.customException.CustomExcep;
@@ -34,7 +33,6 @@ import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
 import com.proflaut.dms.entity.ProfExecutionEntity;
-import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -46,14 +44,10 @@ import com.proflaut.dms.model.LoginResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfActivityResponse;
 import com.proflaut.dms.model.ProfActivityReterive;
-import com.proflaut.dms.model.ProfDmsHeaderReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
-import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
-import com.proflaut.dms.model.ProfGroupInfoRequest;
-import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -104,14 +98,7 @@ public class UserRegisterServiceImpl {
 	ProfExecutionRepository executionRepository;
 
 	@Autowired
-	private final JdbcTemplate jdbcTemplate;
-
-	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
-
-	public UserRegisterServiceImpl(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
 
 	private static final Logger logger = LogManager.getLogger(UserRegisterServiceImpl.class);
 
@@ -140,7 +127,7 @@ public class UserRegisterServiceImpl {
 		try {
 			if (helper.usernameExists(userInfo.getUserName())) {
 				throw new CustomExcep("Username already exists");
-	        }
+			}
 			userInfo.setCreatedDate(Timestamp.from(Instant.now()));
 			logger.info("USER INFO --->{}", userInfo);
 			userRegResponse.setEmail(userInfo.getEmail());
@@ -160,8 +147,7 @@ public class UserRegisterServiceImpl {
 		return userRegResponse;
 	}
 
-
-	public LoginResponse getUser(UserInfo userInfo) throws Exception {
+	public LoginResponse getUser(UserInfo userInfo)  {
 		LoginResponse loginResponse = new LoginResponse();
 		try {
 
@@ -181,7 +167,8 @@ public class UserRegisterServiceImpl {
 	}
 
 	private void validation(UserInfo userInfo, ProfUserInfoEntity profUserInfoEntity, LoginResponse loginResponse)
-			throws Exception {
+			throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidKeySpecException {
 		String token = "";
 		boolean isValidate = helper.validatePassword(profUserInfoEntity, userInfo);
 		if (isValidate) {

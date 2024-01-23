@@ -1,18 +1,24 @@
 package com.proflaut.dms.helper;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,6 +27,7 @@ import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -72,10 +79,10 @@ public class UserHelper {
 	private String folderLocation;
 
 	private final Random random = new Random();
-	
+
 	@Autowired
 	ProfUserInfoRepository userInfoRepository;
-	
+
 	@Autowired
 	FolderRepository folderRepository;
 
@@ -91,10 +98,11 @@ public class UserHelper {
 	private static final Logger logger = LogManager.getLogger(UserHelper.class);
 
 	public static String formatCurrentDateTime() {
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
-        return currentDateTime.format(formatter);
-    }
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
+		return currentDateTime.format(formatter);
+	}
+
 	public ProfUserInfoEntity convertUserInfotoProfUser(UserInfo userInfo) throws InvalidKeyException,
 			UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
 		PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -164,7 +172,8 @@ public class UserHelper {
 	}
 
 	@Transactional
-	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName, String token) {
+	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName, String token)
+			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
 		boolean isFileCreated = false;
 		FolderEntity entity = folderRepository.findByProspectId(fileRequest.getProspectId());
 
@@ -175,23 +184,61 @@ public class UserHelper {
 			UUID uuid = UUID.randomUUID();
 			String fileName = uuid.toString();
 
-			// Create the file with the correct filename
+			ProfDocEntity existingDocEntity = docUploadRepository.findByDocNameAndProspectId(fileRequest.getDockName(),
+					fileRequest.getProspectId());
+
+			if (existingDocEntity != null) {
+				moveDocumentToBackup(existingDocEntity, entity.getProspectId(), entity);
+				isFileCreated = true;
+			}
+
+			byte[] decodedBytes = Base64.getDecoder().decode(fileRequest.getImage());
 			File file = new File(path + File.separator + fileName);
 			folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
 
 			try (FileWriter fileWriter = new FileWriter(file)) {
-				fileWriter.write(encrypted);
+				BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(decodedBytes));
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+				ImageIO.write(originalImage, "jpg", baos);
+
+				byte[] compressedBytes = baos.toByteArray();
+				String base64EncodedString = Base64.getEncoder().encodeToString(compressedBytes);
+				PasswordEncDecrypt td = new PasswordEncDecrypt();
+				String encryptede = td.encrypt(base64EncodedString);
+				fileWriter.write(encryptede);
+
 				isFileCreated = true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
 			if (isFileCreated) {
 				ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName);
 				docUploadRepository.save(profDocEnt);
 			}
 		}
-
 		return isFileCreated;
+	}
+
+	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, String string, FolderEntity entity) {
+		String backupFolderPath = folderLocation + "Backup_" + string;
+		Path existingPath = Paths.get(entity.getFolderPath(), existingDocEntity.getDocPath());
+		Path backupFolder = Paths.get(backupFolderPath);
+
+		if (!Files.exists(backupFolder)) {
+			try {
+				Files.createDirectories(backupFolder);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		Path backupFilePath = backupFolder.resolve(existingPath.getFileName());
+		try {
+			Files.move(existingPath, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 //	public String retrievDocument(List<ProfDocEntity> profDocEntity, String decrypted,
@@ -342,7 +389,6 @@ public class UserHelper {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
-		// oldImageEntity.setUserName(existingDocEntity.getUserName());
 		return oldImageEntity;
 	}
 
@@ -488,8 +534,9 @@ public class UserHelper {
 		executionResponse.setProspectId(profExecutionEntity.getProspectId());
 		return executionResponse;
 	}
+
 	public boolean usernameExists(String userName) {
-		ProfUserInfoEntity entity=userInfoRepository.findByUserName(userName);
+		ProfUserInfoEntity entity = userInfoRepository.findByUserName(userName);
 		return entity != null;
 	}
 }
