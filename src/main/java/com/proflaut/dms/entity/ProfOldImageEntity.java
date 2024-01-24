@@ -27,6 +27,18 @@ public class ProfOldImageEntity {
 
 	@Column(name = "PROSPECT_ID")
 	private String prospectId;
+	
+	@Column(name = "CREATED_BY")
+	private String createdBy;
+
+	
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 
 	public String getProspectId() {
 		return prospectId;

@@ -1,8 +1,4 @@
 package com.proflaut.dms.helper;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,7 +14,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -27,7 +22,6 @@ import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +38,6 @@ import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfExecutionEntity;
-import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfOldImageEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -59,15 +52,16 @@ import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
-import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
+import com.proflaut.dms.util.CompressionUtil;
 
 @Component
 public class UserHelper {
@@ -79,6 +73,9 @@ public class UserHelper {
 	private String folderLocation;
 
 	private final Random random = new Random();
+
+	@Autowired
+	ProfOldImageRepository imageRepository;
 
 	@Autowired
 	ProfUserInfoRepository userInfoRepository;
@@ -172,7 +169,7 @@ public class UserHelper {
 	}
 
 	@Transactional
-	public boolean storeDocument(FileRequest fileRequest, String encrypted, int uId, String uName, String token)
+	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token)
 			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
 		boolean isFileCreated = false;
 		FolderEntity entity = folderRepository.findByProspectId(fileRequest.getProspectId());
@@ -188,37 +185,57 @@ public class UserHelper {
 					fileRequest.getProspectId());
 
 			if (existingDocEntity != null) {
+				File newFile = new File(path + File.separator + fileName);
+
+				try (FileWriter fileWriter = new FileWriter(newFile)) {
+					String compressedBytes = CompressionUtil.compressAndReturnB64(fileRequest.getImage());
+					PasswordEncDecrypt td = new PasswordEncDecrypt();
+					String encrypted = td.encrypt(compressedBytes);
+
+					fileWriter.write(encrypted);
+					isFileCreated = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName, fileRequest);	
+				imageRepository.save(imageEntity);
 				moveDocumentToBackup(existingDocEntity, entity.getProspectId(), entity);
-				isFileCreated = true;
-			}
+								
+				existingDocEntity.setDocPath(fileName);
+				docUploadRepository.save(existingDocEntity);
+			} else {
+				File file = new File(path + File.separator + fileName);
+				folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
 
-			byte[] decodedBytes = Base64.getDecoder().decode(fileRequest.getImage());
-			File file = new File(path + File.separator + fileName);
-			folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
+				try (FileWriter fileWriter = new FileWriter(file)) {
+					String compressedBytes = CompressionUtil.compressAndReturnB64(fileRequest.getImage());
+					PasswordEncDecrypt td = new PasswordEncDecrypt();
+					String encrypted = td.encrypt(compressedBytes);
 
-			try (FileWriter fileWriter = new FileWriter(file)) {
-				BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(decodedBytes));
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					fileWriter.write(encrypted);
+					isFileCreated = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
-				ImageIO.write(originalImage, "jpg", baos);
-
-				byte[] compressedBytes = baos.toByteArray();
-				String base64EncodedString = Base64.getEncoder().encodeToString(compressedBytes);
-				PasswordEncDecrypt td = new PasswordEncDecrypt();
-				String encryptede = td.encrypt(base64EncodedString);
-				fileWriter.write(encryptede);
-
-				isFileCreated = true;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			if (isFileCreated) {
-				ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName);
-				docUploadRepository.save(profDocEnt);
+				if (isFileCreated) {
+					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName);
+					docUploadRepository.save(profDocEnt);
+				}
 			}
 		}
 		return isFileCreated;
+	}
+
+	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName,
+			FileRequest fileRequest) {
+		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
+		oldImageEntity.setDocName(existingDocEntity.getDocName());
+		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
+		oldImageEntity.setUserName(uName);
+		oldImageEntity.setProspectId(fileRequest.getProspectId());
+		oldImageEntity.setCreatedBy(String.valueOf(uId));
+		return oldImageEntity;
 	}
 
 	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, String string, FolderEntity entity) {
@@ -235,10 +252,15 @@ public class UserHelper {
 		}
 		Path backupFilePath = backupFolder.resolve(existingPath.getFileName());
 		try {
-			Files.move(existingPath, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	        if (Files.exists(backupFilePath)) {
+	            Files.copy(existingPath, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
+	        } else {
+	            Files.move(existingPath, backupFilePath, StandardCopyOption.REPLACE_EXISTING);
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+		
 	}
 
 //	public String retrievDocument(List<ProfDocEntity> profDocEntity, String decrypted,
@@ -273,16 +295,19 @@ public class UserHelper {
 	public String retrievDocument(List<ProfDocEntity> profDocEntity, String decrypted,
 			FileRetreiveResponse fileRetreiveResponse, ProfUserInfoEntity infoEntity) {
 		List<DocumentDetails> document = new ArrayList<>();
+
 		for (int i = 0; i < profDocEntity.size(); i++) {
 			FolderEntity entity = folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
+
 			if (!org.springframework.util.StringUtils.isEmpty(profDocEntity.get(i).getDocPath())) {
 				try {
-
-					String content = new String(Files.readAllBytes(
-							Paths.get(entity.getFolderPath() + File.separator + profDocEntity.get(i).getDocPath())));
+					String filePath = entity.getFolderPath() + File.separator + profDocEntity.get(i).getDocPath();
+					String encryptedContent = new String(Files.readAllBytes(Paths.get(filePath)));
 					PasswordEncDecrypt td = new PasswordEncDecrypt();
-					decrypted = td.decrypt(content);
+					decrypted = td.decrypt(encryptedContent);
+
 					if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
+
 						DocumentDetails documentDetails = new DocumentDetails();
 						documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
 						documentDetails.setUploadedBy(infoEntity.getUserName());
@@ -296,17 +321,14 @@ public class UserHelper {
 					e.printStackTrace();
 					DocumentDetails documentDetails = new DocumentDetails();
 					documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
-
 					documentDetails.setDocName(profDocEntity.get(i).getDocName());
 					documentDetails.setUploadedTime(profDocEntity.get(i).getUploadTime());
 					document.add(i, documentDetails);
 					fileRetreiveResponse.setDocument(document);
 					fileRetreiveResponse.setStatus(DMSConstant.FILE_NOT_FOUND);
-
 				}
 			} else {
 				fileRetreiveResponse.setStatus(DMSConstant.FAILURE);
-
 			}
 		}
 		return decrypted;
@@ -453,7 +475,7 @@ public class UserHelper {
 
 	public ProfDmsHeader convertjsontoHeaderEntity(String jsonData) {
 		ProfDmsHeader dmsHeader = new ProfDmsHeader();
-		dmsHeader.setKey("maker");
+		dmsHeader.setKey("checker");
 		dmsHeader.setFields(convertToJsonString(jsonData));
 		return dmsHeader;
 	}
@@ -468,44 +490,35 @@ public class UserHelper {
 		}
 	}
 
-//	public String retrievDocument(ProfDocEntity docEntity) {
-//	    String decrypted = "";
-//	    String path = docEntity.getDocPath();
-//	    try {
-//	        if (path != null) {
-//	            String content = new String(Files.readAllBytes(Paths.get(path)));
-//	            PasswordEncDecrypt td = new PasswordEncDecrypt();
-//	            decrypted = td.decrypt(content);
-//	        }
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	    }
-//	    return decrypted;
-//	}
+
 
 	public String retrievDocument(ProfDocEntity docEntity, FolderEntity entity) {
+		String decompressedBytes = "";
 		String decrypted = "";
 		String path = entity.getFolderPath() + File.separator + docEntity.getDocPath();
+
 		try {
 			if (path != null) {
 				logger.info("File path -> {} ", path);
+
 				if (!Files.exists(Paths.get(path))) {
 					logger.info("File does not exist");
 					return decrypted;
 				}
 
-				System.out.println("Paths.get(path) --" + Paths.get(path));
 				String content = new String(Files.readAllBytes(Paths.get(path)));
 				PasswordEncDecrypt td = new PasswordEncDecrypt();
 				decrypted = td.decrypt(content);
+
+				decompressedBytes = CompressionUtil.decompressB64(decrypted);
 			}
 		} catch (AccessDeniedException e) {
-			logger.info("Access denied ->{} ", e.getMessage());
+			logger.info("Access denied -> {} ", e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return decrypted;
+		return decompressedBytes;
 	}
 
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,

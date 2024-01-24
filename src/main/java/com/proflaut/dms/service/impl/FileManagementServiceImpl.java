@@ -49,13 +49,10 @@ public class FileManagementServiceImpl {
 	public FileResponse storeFile(FileRequest fileRequest, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
-			PasswordEncDecrypt td = new PasswordEncDecrypt();
-			String encrypted = td.encrypt(fileRequest.getImage());
-			logger.info("Encrypted File Value ---> {}", encrypted);
 			ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
 			
-			if (helper.storeDocument(fileRequest, encrypted, userProp.getUserId(), profUserInfoEntity.getUserName(),
+			if (helper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(),
 					token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
@@ -89,27 +86,29 @@ public class FileManagementServiceImpl {
 		return fileRetreiveResponse;
 	}
 
-	@SuppressWarnings("unused")
+
 	public FileRetreiveByResponse reteriveFileByNameAndId(int id) {
-		FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
-		try {
-			ProfDocEntity docEntity = profDocUploadRepository.findById(id);
-			FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
-			if (docEntity != null) {
-				String decrypted = helper.retrievDocument(docEntity, entity);
-				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
-					fileRetreiveByResponse.setImage(decrypted);
-					fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-				} else {
-					fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-				}
-			} else {
-				fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-		}
-		return fileRetreiveByResponse;
+	    FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
+	    try {
+	        ProfDocEntity docEntity = profDocUploadRepository.findById(id);
+	        if (docEntity != null) {
+	            FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
+	            String decrypted = helper.retrievDocument(docEntity, entity);
+	            
+	            if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
+	                fileRetreiveByResponse.setImage(decrypted);
+	                fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
+	            } else {
+	                fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+	            }
+	        } else {
+	            fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+	    }
+	    return fileRetreiveByResponse;
 	}
+
 }

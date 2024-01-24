@@ -6,9 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Index;
 
 @Entity
-@Table(name = "PROF_DMS_MAIN")
+@Table(name = "PROF_DMS_MAIN",indexes = { @Index(columnList = "PROSPECT_ID")})
 public class ProfDmsMainEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

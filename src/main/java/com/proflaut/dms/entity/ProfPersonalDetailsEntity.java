@@ -7,13 +7,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import javax.persistence.Index;
 	
 @Entity
-@Table(name = "PROF_CUSTOMERPERSONALINFO")
+@Table(name = "PROF_CUSTOMERPERSONALINFO",indexes = { @Index(columnList = "ID")})
 public class ProfPersonalDetailsEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "ID")
 	private Long id;
 
 	@Column(name = "CUSTOMER_ID")

@@ -347,9 +347,6 @@ public class UserRegisterServiceImpl {
 		return mainResponse;
 	}
 
-//	public List<ProfDmsHeader> retrieveHeadersByKey(String key) {
-//		return headerRepository.findByKey(key);
-//	}
 	public List<Map<String, Object>> retrieveHeadersByKey(String key) {
 		List<ProfDmsHeader> headers = headerRepository.findByKey(key);
 		List<Map<String, Object>> headerList = new ArrayList<>();

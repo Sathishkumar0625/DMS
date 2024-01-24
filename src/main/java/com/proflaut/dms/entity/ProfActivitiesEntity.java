@@ -7,8 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import javax.persistence.Index;
 @Entity
-@Table(name = "PROF_ACTIVITIES")
+@Table(name = "PROF_ACTIVITIES",indexes = { @Index(columnList = "KEY")})
 public class ProfActivitiesEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

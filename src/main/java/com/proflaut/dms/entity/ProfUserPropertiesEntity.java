@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "PROF_USER_CONNECTION",indexes = { @Index(columnList = "TOKEN"),
-												@Index(columnList = "USER_ID")})
+											@Index(columnList = "USER_ID")})
 public class ProfUserPropertiesEntity {
 	
 	@Id

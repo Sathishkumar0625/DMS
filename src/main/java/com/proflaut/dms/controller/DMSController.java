@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.customException.CustomExcep;
 import com.proflaut.dms.model.AccountDetailsRequest;
 import com.proflaut.dms.model.AccountDetailsResponse;
 import com.proflaut.dms.model.DocumentDetails;
@@ -44,8 +43,6 @@ import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
 import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
-import com.proflaut.dms.model.ProfGroupInfoRequest;
-import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -53,6 +50,7 @@ import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfExecutionRepository;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.UserRegisterServiceImpl;
+import com.proflaut.dms.util.AppConfiguration;
 
 @RestController
 @RequestMapping("/dmsCheck")
@@ -60,6 +58,7 @@ import com.proflaut.dms.service.impl.UserRegisterServiceImpl;
 public class DMSController {
 
 	private final UserRegisterServiceImpl userRegisterServiceImpl;
+	private final AppConfiguration appConfiguration;
 
 	@Autowired
 	ProfExecutionRepository executionRepository;
@@ -67,12 +66,13 @@ public class DMSController {
 	private final JdbcTemplate jdbcTemplate;
 
 	private static final Logger logger = LogManager.getLogger(DMSController.class);
+	
 
 	@Autowired
-	public DMSController(UserRegisterServiceImpl userRegisterServiceImpl, JdbcTemplate jdbcTemplate) {
+	public DMSController(UserRegisterServiceImpl userRegisterServiceImpl, JdbcTemplate jdbcTemplate,AppConfiguration appConfiguration) {
 		this.userRegisterServiceImpl = userRegisterServiceImpl;
 		this.jdbcTemplate = jdbcTemplate;
-
+		this.appConfiguration = appConfiguration;
 	}
 
 	@Autowired
@@ -218,7 +218,7 @@ public class DMSController {
 	public ResponseEntity<ProfActivityResponse> save() {
 		ProfActivityResponse activityResponse = null;
 		try {
-			String filePath = "C:/Users/BILLPC01/Desktop/jsonStructure.json";
+			String filePath=appConfiguration.getJsonFilePath();
 			File file = new File(filePath);
 			ObjectMapper objectMapper = new ObjectMapper();
 			ProfActivityRequest activityRequest = objectMapper.readValue(file, ProfActivityRequest.class);
@@ -317,7 +317,7 @@ public class DMSController {
 		ProfUpdateDmsMainResponse dmsMainResponsedmsMainResponse = null;
 
 		try {
-			String filePath = "C:/Users/BILLPC01/Desktop/jsonStructureHeader.json";
+			String filePath=appConfiguration.getJsonHeaderFilePath();
 			String jsonData = new String(Files.readAllBytes(Paths.get(filePath)));
 			dmsMainResponsedmsMainResponse = userRegisterServiceImpl.saveJsonData(jsonData);
 			if (dmsMainResponsedmsMainResponse != null) {

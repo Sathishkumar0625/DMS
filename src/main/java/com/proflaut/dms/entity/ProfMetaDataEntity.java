@@ -6,9 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Index;
 
 @Entity
-@Table(name = "PROF_METADATA")
+@Table(name = "PROF_METADATA",indexes = { @Index(columnList = "ID")})
 public class ProfMetaDataEntity {
 
 	@Id

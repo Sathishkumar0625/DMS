@@ -7,8 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import javax.persistence.Index;
+
 @Entity
-@Table(name = "PROF_EXCECUTION")
+@Table(name = "PROF_EXCECUTION",indexes = { @Index(columnList = "PROSPECT_ID")})
 public class ProfExecutionEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

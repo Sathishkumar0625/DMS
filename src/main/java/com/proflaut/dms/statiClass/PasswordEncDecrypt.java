@@ -12,10 +12,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.proflaut.dms.service.impl.FileManagementServiceImpl;
+import java.io.ByteArrayOutputStream;
 
 public class PasswordEncDecrypt {
 	private static final Logger logger = LogManager.getLogger(PasswordEncDecrypt.class);
@@ -28,9 +28,10 @@ public class PasswordEncDecrypt {
 	private String myEncryptionKey;
 	private String myEncryptionScheme;
 	SecretKey key;
-	
-	public PasswordEncDecrypt() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException  {
-		
+
+	public PasswordEncDecrypt() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeySpecException {
+
 		myEncryptionKey = "ThisIsSpartaThisIsSparta";
 		myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
 		arrayBytes = myEncryptionKey.getBytes(StandardCharsets.UTF_8);
@@ -49,9 +50,9 @@ public class PasswordEncDecrypt {
 			encryptedString = new String(Base64.encodeBase64(encryptedText));
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 		return encryptedString;
-	}	
+	}
 
 	public String decrypt(String encryptedString) {
 		String decryptedText = null;
@@ -72,7 +73,7 @@ public class PasswordEncDecrypt {
 		String target = "imparator";
 		String encrypted = td.encrypt(target);
 		String decrypted = td.decrypt(encrypted);
-		
+
 		System.out.println("String To Encrypt: " + target);
 		System.out.println("Encrypted String:" + encrypted);
 		System.out.println("Decrypted String:" + decrypted);
