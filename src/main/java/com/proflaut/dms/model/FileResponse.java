@@ -13,6 +13,18 @@ public class FileResponse {
 	private String folderPath;
 
 	private String errorMessage;
+	
+	private String extention;
+	
+	
+
+	public String getExtention() {
+		return extention;
+	}
+
+	public void setExtention(String extention) {
+		this.extention = extention;
+	}
 
 	public String getErrorMessage() {
 		return errorMessage;

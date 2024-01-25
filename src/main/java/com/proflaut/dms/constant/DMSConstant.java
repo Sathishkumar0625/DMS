@@ -17,4 +17,5 @@ public class DMSConstant {
 	public static final String NOT_FOUND="Not Found";
 	public static final String GROUPNAME_ALREADY_EXIST="Group Name Already Exist";
 	public static final String USERNAME_ALREADY_EXIST="User Name Already Exist";
+	public static final String VALIDATION_FAILED="Validation Failed : ";
 }

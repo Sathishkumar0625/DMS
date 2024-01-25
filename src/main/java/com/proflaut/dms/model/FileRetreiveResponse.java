@@ -5,8 +5,20 @@ import java.util.List;
 public class FileRetreiveResponse {
 
 	private String status;
+	
+	private String errorMessage;
 
 	private List<DocumentDetails> document;
+
+	
+	
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 
 	public String getStatus() {
 		return status;

@@ -2,6 +2,9 @@ package com.proflaut.dms.model;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -40,13 +43,15 @@ public class UserInfo {
 	public void setUseForceLogin(String useForceLogin) {
 		this.useForceLogin = useForceLogin;
 	}
-
+	@NotBlank(message = "Username cannot be blank")
+	@Size(min = 4, max = 10, message = "Username must be between 4 and 10 characters")
 	@JsonProperty("userName")
 	private String userName;
-
+	
+	@Size(min = 4, max = 10, message = "Password must be between 4 and 10 characters")
 	@JsonProperty("password")
 	private String password;
-
+	
 	@JsonProperty("email")
 	private String email;
 	

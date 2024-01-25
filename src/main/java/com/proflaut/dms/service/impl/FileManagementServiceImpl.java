@@ -2,27 +2,31 @@ package com.proflaut.dms.service.impl;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
-import com.proflaut.dms.helper.UserHelper;
+import com.proflaut.dms.helper.FileHelper;
+import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
-import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
 @Service
 public class FileManagementServiceImpl {
@@ -36,7 +40,7 @@ public class FileManagementServiceImpl {
 	ProfUserInfoRepository profUserInfoRepository;
 
 	@Autowired
-	UserHelper helper;
+	FileHelper fileHelper;
 
 	@Autowired
 	FolderRepository folderRepository;
@@ -44,15 +48,17 @@ public class FileManagementServiceImpl {
 	@Autowired
 	ProfOldImageRepository imageRepository;
 
-	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
+	@PersistenceContext
+	private EntityManager entityManager;
+
 
 	public FileResponse storeFile(FileRequest fileRequest, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
-			ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
+			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
 			
-			if (helper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(),
+			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(),
 					token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
@@ -68,13 +74,13 @@ public class FileManagementServiceImpl {
 
 	public FileRetreiveResponse retreiveFile(String token, String prospectId) {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
-		ProfUserPropertiesEntity userProp = helper.callProfUserConnection(token);
+		ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 		ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
 		if (userProp != null) {
 			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByProspectId(prospectId);
 			if (profDocEntity != null) {
 				String decrypted = null;
-				decrypted = helper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse, infoEntity);
+				decrypted = fileHelper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse, infoEntity);
 				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 					fileRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 				}
@@ -93,10 +99,11 @@ public class FileManagementServiceImpl {
 	        ProfDocEntity docEntity = profDocUploadRepository.findById(id);
 	        if (docEntity != null) {
 	            FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
-	            String decrypted = helper.retrievDocument(docEntity, entity);
+	            String decrypted = fileHelper.retrieveDocument(docEntity, entity);
 	            
 	            if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 	                fileRetreiveByResponse.setImage(decrypted);
+	                fileRetreiveByResponse.setExtention(docEntity.getExtention());
 	                fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
 	            } else {
 	                fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
@@ -109,6 +116,21 @@ public class FileManagementServiceImpl {
 	        fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
 	    }
 	    return fileRetreiveByResponse;
+	}
+	
+	@Transactional
+	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest) {
+		ProfMetaDataResponse metaDataResponse=new ProfMetaDataResponse();
+	    try {
+	    		String tableName=fileHelper.createTable(createTableRequest.getFields(),createTableRequest);
+	    		ProfMetaDataEntity dataEntity=fileHelper.convertTableReqToMetaEntity(createTableRequest,tableName);
+		        entityManager.persist(dataEntity);
+		        metaDataResponse.setStatus(DMSConstant.SUCCESS);
+			
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return metaDataResponse;
 	}
 
 }

@@ -1,8 +1,14 @@
 package com.proflaut.dms.helper;
 
+import java.io.File;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FolderFO;
@@ -12,14 +18,14 @@ import com.proflaut.dms.repository.FolderRepository;
 @Component
 public class FolderHelper {
 	@Autowired
-	UserHelper userhelper;
-	@Autowired
 	FolderRepository folderRepository;
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
 	@Autowired
 	FolderRepository folderRepo;
+	
+	private static final Logger logger = LogManager.getLogger(FolderHelper.class);
 
 	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse) {
 
@@ -27,7 +33,7 @@ public class FolderHelper {
 		ent.setProspectId(folderFO.getProspectId());
 		ent.setIsParent(folderLocation);
 		String folderPath = "";
-		folderPath = userhelper.storeFolder(fileResponse, folderFO);
+		folderPath = storeFolder(fileResponse, folderFO);
 		ent.setFolderPath(folderPath);
 		return ent;
 	}	
@@ -51,5 +57,26 @@ public class FolderHelper {
 
 		return entity;
 	}
+	public String storeFolder(FileResponse fileResponse, FolderFO folderFO) {
+		String folderPath = folderLocation + folderFO.getProspectId();
+
+		File file = new File(folderPath);
+
+		if (file.exists()) {
+			fileResponse.setStatus(DMSConstant.FAILURE);
+			fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
+			return folderPath; // Return the existing folder path
+		}
+
+		if (file.mkdirs()) {
+			logger.info("Directory is created");
+		} else {
+			logger.info("Failed to create directory");
+			fileResponse.setStatus(DMSConstant.FAILURE);
+		}
+
+		return folderPath;
+	}
+
 
 }

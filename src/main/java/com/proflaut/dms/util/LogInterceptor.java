@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.proflaut.dms.service.impl.UserRegisterServiceImpl;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 
 @Component
 public class LogInterceptor implements HandlerInterceptor {
 	 	@Autowired
-	    UserRegisterServiceImpl userService;
+	 	AccessServiceImpl accessServiceImpl;
 
 	    @Override
 	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -23,13 +23,13 @@ public class LogInterceptor implements HandlerInterceptor {
 	        String path = request.getRequestURI().substring(request.getContextPath().length());
 	        System.out.println(path);
 //	        path.equals("/dmsCheck/signup") ||
-	        if (path.equals("/dmsCheck/signup") || path.equals("/dmsCheck/login")) {
+	        if (path.equals("/access/signup") || path.equals("/access/login")) {
 	            return true;
 	        } else {
 
 	            String token = request.getHeader("token");
 	            System.out.println("hEadER token -- " + token);
-	            Map<String, String> userData = userService.validateToken(token);
+	            Map<String, String> userData = accessServiceImpl.validateToken(token);
 	            if (userData.get("status").equals("success")) {
 	                return true;
 	            } else {

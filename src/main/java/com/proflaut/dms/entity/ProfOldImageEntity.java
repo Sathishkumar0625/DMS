@@ -30,8 +30,21 @@ public class ProfOldImageEntity {
 	
 	@Column(name = "CREATED_BY")
 	private String createdBy;
+	
+	@Column(name = "EXTENTION")
+	private String extention;
+	
+	
 
 	
+	public String getExtention() {
+		return extention;
+	}
+
+	public void setExtention(String extention) {
+		this.extention = extention;
+	}
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
