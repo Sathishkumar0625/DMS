@@ -1,33 +1,57 @@
 package com.proflaut.dms.helper;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
+import org.apache.poi.hpsf.Date;
+import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
+import org.apache.poi.xwpf.usermodel.BreakType;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFHeader;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
 import com.proflaut.dms.entity.ProfExecutionEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.exception.CustomException;
+import com.proflaut.dms.model.AssociateConcerns;
+import com.proflaut.dms.model.BankingCreditFacilities;
+import com.proflaut.dms.model.CreditFacilities;
 import com.proflaut.dms.model.FolderFO;
+import com.proflaut.dms.model.InvoiceRequest;
+import com.proflaut.dms.model.InvoiceResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
+import com.proflaut.dms.model.ProprietorParDirRequest;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
 
 @Component
 public class TransactionHelper {
-	
+
 	private final Random random = new Random();
-	
+
 	@Autowired
 	FolderServiceImpl folderServiceImpl;
-	
+
 	private String generateUniqueId() {
 		return String.format("%04d", this.random.nextInt(999));
 	}
@@ -103,6 +127,7 @@ public class TransactionHelper {
 			return "Something Went Wrong";
 		}
 	}
+
 	public ProfDmsMainEntity convertRequestToProfMain(int userId, String activityName,
 			ProfExecutionEntity executionEntity) {
 		ProfDmsMainEntity mainEntity = new ProfDmsMainEntity();
@@ -128,5 +153,117 @@ public class TransactionHelper {
 		executionResponse.setKey(profExecutionEntity.getActivityName());
 		executionResponse.setProspectId(profExecutionEntity.getProspectId());
 		return executionResponse;
+	}
+
+	public InvoiceResponse invoicegenerator(InvoiceRequest invoiceRequest) throws IOException {
+		String inputFilename = "C:/Users/BILLPC01/Downloads/Application_Loans.docx";
+		String outputfilename = "C:/Users/BILLPC01/Downloads/Application_Loans_output.docx";
+
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat dateOnly = new SimpleDateFormat("dd/MM/yyyy");
+
+		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)))) {
+
+			doc.getTables().get(0).getRow(0).getCell(2).setText(" " + invoiceRequest.getApplicantName());
+			doc.getTables().get(0).getRow(1).getCell(2).setText(invoiceRequest.getOfficeAddress());
+			doc.getTables().get(0).getRow(2).getCell(2).setText(invoiceRequest.getAddressOfFactory());
+			doc.getTables().get(0).getRow(3).getCell(2).setText(invoiceRequest.getCommunity());
+			doc.getTables().get(0).getRow(4).getCell(2).setText(invoiceRequest.getMobileNo());
+			doc.getTables().get(0).getRow(5).getCell(2).setText(invoiceRequest.geteMailAddress());
+			doc.getTables().get(0).getRow(6).getCell(2).setText(invoiceRequest.getMobileNo());
+			doc.getTables().get(0).getRow(7).getCell(2).setText(invoiceRequest.getPanCardNo());
+			doc.getTables().get(0).getRow(9).getCell(2).setText(invoiceRequest.getDob());
+			doc.getTables().get(0).getRow(10).getCell(2).setText(invoiceRequest.getState());
+			doc.getTables().get(0).getRow(12).getCell(2).setText(invoiceRequest.getDistrict());
+			int getIndex = 1;
+			List<ProprietorParDirRequest> persons = invoiceRequest.getProprietorParDirRequests();
+			if (persons != null && !persons.isEmpty()) {
+				for (int i = 0; i < persons.size(); i++) {
+
+					int rowOffset = 2 + i;
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2).setText(persons.get(i).getName());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3).setText(persons.get(i).getDateOfBirth());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+							.setText(persons.get(i).getFatherSpouse());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+							.setText(persons.get(i).getAcademicQualification());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(6).setText(persons.get(i).getMobileNo());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(7).setText(persons.get(i).getPanNo());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(8)
+							.setText(persons.get(i).getResidentialAddress());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(9).setText(persons.get(i).getTelNoRes());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(10).setText(persons.get(i).getExperience());
+
+				}
+			}
+
+			List<AssociateConcerns> associateConcerns = invoiceRequest.getAssociateConcerns();
+			if (associateConcerns != null && !associateConcerns.isEmpty()) {
+				for (int i = 0; i < associateConcerns.size(); i++) {
+
+					int rowOffset = 10 + i;
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
+							.setText(associateConcerns.get(i).getNameOfAssociate());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
+							.setText(associateConcerns.get(i).getAddressOfAssoc());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+							.setText(associateConcerns.get(i).getBankingWih());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+							.setText(associateConcerns.get(i).getNatureOfAssociation());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(6)
+							.setText(associateConcerns.get(i).getDirector());
+				}
+			}
+			List<BankingCreditFacilities> creditFacilities = invoiceRequest.getBankingCreditFacilities();
+			if (creditFacilities != null && !creditFacilities.isEmpty()) {
+				for (int i = 0; i < creditFacilities.size(); i++) {
+					int rowOffset = 18+i;
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
+							.setText(creditFacilities.get(i).getLimit());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
+							.setText(creditFacilities.get(i).getOutstanding());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+							.setText(creditFacilities.get(i).getBankNameAndBranch());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+							.setText(creditFacilities.get(i).getSecurities());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(6)
+							.setText(creditFacilities.get(i).getInterestRate());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(7)
+							.setText(creditFacilities.get(i).getRepaymentTerms());
+				}
+			}
+			List<CreditFacilities> facilities = invoiceRequest.getCreditFacilities();
+			if (facilities != null && !facilities.isEmpty()) {
+				for (int i = 0; i < facilities.size(); i++) {
+					int rowOffset = 7+i;
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
+							.setText(facilities.get(i).getType());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
+							.setText(facilities.get(i).getAmount());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+							.setText(facilities.get(i).getPurpose());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+//							.setText(facilities.get(i).getPrimarySecurity());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+//							.setText(facilities.get(i).getCollateralSecurityOffered());
+					
+				}
+			}
+			try (FileOutputStream out = new FileOutputStream(outputfilename)) {
+				doc.write(out);
+				InvoiceResponse invoiceResponse = new InvoiceResponse();
+				invoiceResponse.setStatus(DMSConstant.SUCCESS);
+				invoiceResponse.setFilePath(outputfilename);
+				return invoiceResponse;
+			} catch (IOException e) {
+				e.printStackTrace();
+				InvoiceResponse invoiceResponse = new InvoiceResponse();
+				invoiceResponse.setStatus(DMSConstant.FAILURE);
+				invoiceResponse.setErrorMessage("Failed to update invoice");
+				return invoiceResponse;
+			}
+
+		}
+
 	}
 }

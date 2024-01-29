@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.InvoiceRequest;
+import com.proflaut.dms.model.InvoiceResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfActivityResponse;
 import com.proflaut.dms.model.ProfActivityReterive;
@@ -245,6 +247,23 @@ public class TransactionController {
 				return new ResponseEntity<>(map, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/generate")
+	public ResponseEntity<InvoiceResponse> invoiceGenerator(@RequestBody InvoiceRequest invoiceRequest) {
+		InvoiceResponse invoiceResponse = null;
+		try {
+			invoiceResponse = transactionImpl.invoice(invoiceRequest);
+			if (invoiceResponse.getStatus() != null) {
+				return new ResponseEntity<>(invoiceResponse, HttpStatus.OK);
+			}else {
+				invoiceResponse.setStatus(DMSConstant.FAILURE);
+			return new ResponseEntity<>(invoiceResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

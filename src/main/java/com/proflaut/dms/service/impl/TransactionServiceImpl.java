@@ -23,6 +23,8 @@ import com.proflaut.dms.entity.ProfExecutionEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.helper.TransactionHelper;
 import com.proflaut.dms.model.FolderFO;
+import com.proflaut.dms.model.InvoiceRequest;
+import com.proflaut.dms.model.InvoiceResponse;
 import com.proflaut.dms.model.ProfActivityRequest;
 import com.proflaut.dms.model.ProfActivityResponse;
 import com.proflaut.dms.model.ProfActivityReterive;
@@ -40,37 +42,38 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class TransactionServiceImpl {
-	
+
 	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
-	
+
 	@Autowired
 	ProfActivityRepository activityRepository;
-	
+
 	@Autowired
 	ProfDmsMainRepository dmsMainRepository;
-	
+
 	@Autowired
 	FolderServiceImpl folderServiceImpl;
-	
+
 	@Autowired
 	ProfExecutionRepository executionRepository;
-	
+
 	@Autowired
 	private EntityManager entityManager;
-	
+
 	@Autowired
 	ProfDmsHeaderRepository headerRepository;
-	
+
 	@Autowired
 	TransactionHelper transactionHelper;
-	
+
 	public ProfActivityResponse saveActivity(ProfActivityRequest activityRequest) {
 		ProfActivityResponse activityResponse = new ProfActivityResponse();
 		try {
 			ProfUserInfoEntity entity = profUserInfoRepository.findByUserId(activityRequest.getUserID());
 			if (entity != null) {
-				ProfActivitiesEntity activitiesEntity = transactionHelper.convertReqtoProfActEnti(activityRequest, entity);
+				ProfActivitiesEntity activitiesEntity = transactionHelper.convertReqtoProfActEnti(activityRequest,
+						entity);
 				activityRepository.save(activitiesEntity);
 				activityResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
@@ -140,7 +143,8 @@ public class TransactionServiceImpl {
 		try {
 			ProfDmsMainEntity dmsMainEntity = dmsMainRepository.findByProspectId(prospectId);
 			if (dmsMainEntity != null) {
-				ProfDmsMainEntity mainEntity = transactionHelper.convertUpdateDmsReqToDmsEntity(dmsMainRequest, dmsMainEntity);
+				ProfDmsMainEntity mainEntity = transactionHelper.convertUpdateDmsReqToDmsEntity(dmsMainRequest,
+						dmsMainEntity);
 				dmsMainRepository.save(mainEntity);
 				dmsMainResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
@@ -201,7 +205,8 @@ public class TransactionServiceImpl {
 			// Do something with the EntityManager such as persist(), merge() or remove()
 			ProfExecutionEntity executionEntity = transactionHelper.convertRequestToProfHeader(activityName, entity);
 			entityManager.persist(executionEntity);
-			ProfDmsMainEntity mainEntity = transactionHelper.convertRequestToProfMain(userId, activityName, executionEntity);
+			ProfDmsMainEntity mainEntity = transactionHelper.convertRequestToProfMain(userId, activityName,
+					executionEntity);
 			entityManager.persist(mainEntity);
 			FolderFO folderFO = new FolderFO();
 			folderFO.setProspectId(executionEntity.getProspectId());
@@ -229,4 +234,16 @@ public class TransactionServiceImpl {
 		return executionResponse;
 	}
 
+	public InvoiceResponse invoice(InvoiceRequest invoiceRequest) {
+		InvoiceResponse invoiceResponse = new InvoiceResponse();
+
+		try {
+			invoiceResponse = transactionHelper.invoicegenerator(invoiceRequest);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return invoiceResponse;
+
+	}
 }

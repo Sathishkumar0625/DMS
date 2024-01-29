@@ -8,7 +8,6 @@ import java.util.Base64;
 
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 
 public class CompressionUtil {
 	
