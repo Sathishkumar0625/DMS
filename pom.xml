@@ -87,12 +87,13 @@
 			<artifactId>xz</artifactId>
 			<version>1.9</version>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>com.prof</groupId>
-			<artifactId>CRM</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>5.0.0</version> <!-- Use the latest version available -->
+</dependency>
+
 	</dependencies>
 
 	<build>
