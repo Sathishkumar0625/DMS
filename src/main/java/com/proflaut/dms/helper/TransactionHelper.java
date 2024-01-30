@@ -242,10 +242,10 @@ public class TransactionHelper {
 							.setText(facilities.get(i).getAmount());
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
 							.setText(facilities.get(i).getPurpose());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
-//							.setText(facilities.get(i).getPrimarySecurity());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
-//							.setText(facilities.get(i).getCollateralSecurityOffered());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+							.setText(facilities.get(i).getPrimarySecurity());
+					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+							.setText(facilities.get(i).getCollateralSecurityOffered());
 					
 				}
 			}
