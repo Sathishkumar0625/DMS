@@ -27,9 +27,15 @@ import com.proflaut.dms.service.impl.AccessServiceImpl;
 public class AccessController {
 	
 	
-	@Autowired
 	AccessServiceImpl accessServiceImpl;
 	
+	
+	@Autowired
+	public AccessController(AccessServiceImpl accessServiceImpl) {
+		
+		this.accessServiceImpl = accessServiceImpl;
+	}
+
 	@PostMapping("/signup")
 	public ResponseEntity<UserRegResponse> createUser(@Valid @RequestBody UserInfo userInfo,
 			BindingResult bindingResult) {

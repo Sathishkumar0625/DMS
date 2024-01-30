@@ -87,15 +87,14 @@
 			<artifactId>xz</artifactId>
 			<version>1.9</version>
 		</dependency>
-<<<<<<< HEAD
+
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.0.0</version> <!-- Use the latest version available -->
 		</dependency>
-=======
->>>>>>> 3151185dfb082000104a250e66e165583e082f52
+
 
 		
 	</dependencies>
