@@ -26,6 +26,7 @@ public class EncryptionDecryptionAES {
 		logger.info(encodedKey);
 		
 		byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+		@SuppressWarnings("unused")
 		SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 		
 	

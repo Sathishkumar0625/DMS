@@ -16,6 +16,7 @@
 	<description>DMS Spring boot project</description>
 	<properties>
 		<java.version>1.8</java.version>
+		<sonar.token>sqp_2d9dea08bc7db060188f325fedbdda03888bf5b9</sonar.token>
 	</properties>
 	<dependencies>
 
@@ -94,13 +95,41 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.0.0</version> <!-- Use the latest version available -->
 		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>3.2.5</version>
+			<type>maven-plugin</type>
+		</dependency>
 
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.5.5</version>
+		</dependency>
+		<!-- Apache PDFBox -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.24</version>
+		</dependency>
+
+
+		<!-- Apache POI -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 
 		
+
+
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- Spring Boot Maven Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -113,7 +142,29 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- Maven SonarQube Plugin -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.10.0.2594</version> <!-- Replace with the latest
+				version -->
+				<configuration>
+					<sonar.host.url>http://localhost:9000</sonar.host.url>
+					<!-- Specify the SonarQube token -->
+					<sonar.login>${sonar.token}</sonar.login>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>AsposeJavaAPI</id>
+			<name>Aspose Java API</name>
+			<url>https://releases.aspose.cloud/java/repo/</url>
+		</repository>
+	</repositories>
+
 
 </project>

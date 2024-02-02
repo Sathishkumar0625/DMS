@@ -4,22 +4,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.poi.hpsf.Date;
-import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.BreakType;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFHeader;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -159,8 +148,6 @@ public class TransactionHelper {
 		String inputFilename = "C:/Users/BILLPC01/Downloads/Application_Loans.docx";
 		String outputfilename = "C:/Users/BILLPC01/Downloads/Application_Loans_output.docx";
 
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat dateOnly = new SimpleDateFormat("dd/MM/yyyy");
 
 		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)))) {
 

@@ -20,12 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.BasePdf;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.ProfEmailShareRequest;
+import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 
@@ -121,6 +124,35 @@ public class FileController {
 	        metaDataResponse.setStatus(DMSConstant.FAILURE);
 	        metaDataResponse.setErrorMessage(e.getMessage());
 	        return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+
+	@PostMapping("/share")
+	public ResponseEntity<ProfEmailShareResponse> uploadFile(@RequestBody ProfEmailShareRequest emailShareRequest) {
+
+		ProfEmailShareResponse emailShareResponse = null;
+
+		try {
+			emailShareResponse=fileManagementServiceImpl.emailReader(emailShareRequest);
+			if (!emailShareResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(emailShareResponse, HttpStatus.OK);
+			}else {
+				emailShareResponse.setStatus(DMSConstant.FAILURE);
+			return new ResponseEntity<>(emailShareResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>( HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+	@PostMapping("/convert")
+	public ResponseEntity<String> convertPdfToWord(@RequestBody BasePdf pdfBase) {
+	    String wordBase64 = fileManagementServiceImpl.convertPdfBase64ToWordBase64(pdfBase);
+	    if (wordBase64 != null) {
+	        return ResponseEntity.ok(wordBase64);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error converting PDF to Word.");
 	    }
 	}
 }

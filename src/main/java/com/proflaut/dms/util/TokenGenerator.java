@@ -13,15 +13,11 @@ import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Component;
 
-import ch.qos.logback.classic.Logger;
-
 @Component
 public class TokenGenerator {
 
 	static Cipher cipher;
-	
-	
-	
+
 	public Map<String, String> generateToken(String userName) {
 		String encryptedText = "";
 		Map<String, String> resp = new HashMap<>();
@@ -30,8 +26,8 @@ public class TokenGenerator {
 			keyGenerator.init(128); // block size is 128bits
 			SecretKey secretKey = keyGenerator.generateKey();
 			String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-			
-			cipher = Cipher.getInstance("AES"); 
+
+			cipher = Cipher.getInstance("AES");
 
 			encryptedText = encrypt(userName, secretKey);
 			System.out.println("Encrypted Text After Encryption: " + encryptedText);
@@ -43,15 +39,17 @@ public class TokenGenerator {
 		return resp;
 	}
 
-	public static String encrypt(String plainText, SecretKey secretKey) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException  {
+	public static String encrypt(String plainText, SecretKey secretKey)
+			throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		byte[] plainTextByte = plainText.getBytes();
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 		byte[] encryptedByte = cipher.doFinal(plainTextByte);
 		Base64.Encoder encoder = Base64.getEncoder();
-		return  encoder.encodeToString(encryptedByte);
+		return encoder.encodeToString(encryptedByte);
 	}
 
-	public static String decrypt(String encryptedText, SecretKey secretKey) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	public static String decrypt(String encryptedText, SecretKey secretKey)
+			throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		Base64.Decoder decoder = Base64.getDecoder();
 		byte[] encryptedTextByte = decoder.decode(encryptedText);
 		cipher.init(Cipher.DECRYPT_MODE, secretKey);

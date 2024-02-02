@@ -12,14 +12,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.io.ByteArrayOutputStream;
 
 public class PasswordEncDecrypt {
-	private static final Logger logger = LogManager.getLogger(PasswordEncDecrypt.class);
-	private static final String UNICODE_FORMAT = "UTF8";
 	public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
 	private KeySpec ks;
 	private SecretKeyFactory skf;

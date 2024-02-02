@@ -38,6 +38,30 @@ public class ProfDocEntity {
 	@Column(name = "EXTENTION")
 	private String extention;
 
+	@Column(name = "IS_EMAIL")
+	private String isEmail;
+	
+	@Column(name="EMAIL_RES_ID")
+	private String emilResId;
+	
+	
+
+	public String getEmilResId() {
+		return emilResId;
+	}
+
+	public void setEmilResId(String emilResId) {
+		this.emilResId = emilResId;
+	}
+
+	public String getIsEmail() {
+		return isEmail;
+	}
+
+	public void setIsEmail(String isEmail) {
+		this.isEmail = isEmail;
+	}
+
 	public String getExtention() {
 		return extention;
 	}

@@ -18,4 +18,5 @@ public class DMSConstant {
 	public static final String GROUPNAME_ALREADY_EXIST="Group Name Already Exist";
 	public static final String USERNAME_ALREADY_EXIST="User Name Already Exist";
 	public static final String VALIDATION_FAILED="Validation Failed : ";
+	public static final String MESSAGE="Email Send Successfully";
 }

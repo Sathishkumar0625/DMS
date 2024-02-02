@@ -2,21 +2,16 @@ package com.proflaut.dms.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.customException.CustomExcep;
 import com.proflaut.dms.entity.FolderEntity;
-import com.proflaut.dms.entity.ProfDocEntity;
-import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.FolderHelper;
 import com.proflaut.dms.model.FileResponse;
-import com.proflaut.dms.model.FileRetreiveResponse;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;

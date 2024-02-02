@@ -13,8 +13,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.BodyPart;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -28,22 +36,28 @@ import org.springframework.stereotype.Component;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfMailConfigEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfOldImageEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
+import com.proflaut.dms.model.BulkEmailSender;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.MailInfoRequest;
+import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 import com.proflaut.dms.util.Compression;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 @Component
 public class FileHelper {
@@ -71,7 +85,7 @@ public class FileHelper {
 
 	private static final Logger logger = LogManager.getLogger(FileHelper.class);
 
-	private String formatCurrentDateTime() {
+	public String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
 		return currentDateTime.format(formatter);
@@ -152,6 +166,7 @@ public class FileHelper {
 		ent.setDocName(fileRequest.getDockName());
 		ent.setDocPath(fileName);
 		ent.setExtention(fileRequest.getExtention());
+		ent.setIsEmail("N");
 		return ent;
 	}
 
@@ -323,6 +338,69 @@ public class FileHelper {
 
 	private void handleGenericException(Exception e) throws CustomException {
 		throw new CustomException("An unexpected error occurred: " + e.getMessage());
+	}
+
+	public boolean sendMail(MailInfoRequest mailInfoRequest, byte[] fileBytes, String extension,
+			ProfDocEntity docEntity) throws MessagingException {
+		boolean isMail = false;
+		String host = "smtp.gmail.com";
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", "587");
+
+		BulkEmailSender bulkEmailSender = new BulkEmailSender(mailInfoRequest, props);
+		MimeMessage mimeMessage = bulkEmailSender.getMimeMessage();
+		Multipart multipart = new MimeMultipart();
+
+		BodyPart textPart = new MimeBodyPart();
+		textPart.setContent("Please find the attachment in the email regarding ....", "text/html;charset=utf-8");
+		multipart.addBodyPart(textPart);
+
+		if (fileBytes != null && fileBytes.length > 0) {
+			BodyPart filePart = new MimeBodyPart();
+			DataSource source = new ByteArrayDataSource(fileBytes, getContentType(extension));
+			filePart.setDataHandler(new DataHandler(source));
+			filePart.setFileName(docEntity.getDocName() + "." + extension);
+			multipart.addBodyPart(filePart);
+			isMail = true;
+		}
+
+		mimeMessage.setContent(multipart);
+
+		bulkEmailSender.sendEmail(mimeMessage);
+		return isMail;
+	}
+
+	private String getContentType(String extension) {
+		switch (extension.toLowerCase()) {
+		case "pdf":
+			return "application/pdf";
+		case "jpg":
+		case "jpeg":
+			return "image/jpeg";
+		case "png":
+			return "image/png";
+		case "xlsx":
+			return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+		case "xls":
+			return "application/vnd.ms-excel";
+		case "text":
+			return "text/plain";
+		default:
+			return "application/octet-stream";
+		}
+	}
+
+	public ProfMailConfigEntity convertemailShareReqToMailConf(ProfEmailShareRequest emailShareRequest) {
+		ProfMailConfigEntity configEntity = new ProfMailConfigEntity();
+		configEntity.setSender(emailShareRequest.getFrom());
+		configEntity.setReceiver(emailShareRequest.getTo());
+		configEntity.setIsEmail("Y");
+		configEntity.setSendAt(formatCurrentDateTime());
+		return configEntity;
 	}
 
 }

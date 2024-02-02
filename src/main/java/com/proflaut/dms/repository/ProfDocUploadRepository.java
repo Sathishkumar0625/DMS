@@ -12,23 +12,23 @@ import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.model.FileRequest;
 
 @Repository
-public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, Integer>{
+public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, Integer> {
 
 	ProfDocEntity save(FileRequest fileRequest);
 
 	List<ProfDocEntity> findByCreatedBy(Integer id);
 
-	//ProfDocEntity findByDocName(String dockName);
-	
-	@Modifying
-	@Query(nativeQuery = true,value="UPDATE PROF_DOCUMENT_PROPERTY SET document_name = :docName"
-			+ " WHERE created_by = :createdBy ")
-	void updatedocName(@Param("docName") String dockName,@Param("createdBy") int createdBy);
+	// ProfDocEntity findByDocName(String dockName);
 
-	//ProfDocEntity findByUserName(String userName);
+	@Modifying
+	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET document_name = :docName"
+			+ " WHERE created_by = :createdBy ")
+	void updatedocName(@Param("docName") String dockName, @Param("createdBy") int createdBy);
+
+	// ProfDocEntity findByUserName(String userName);
 
 	ProfDocEntity findByProspectIdAndDocName(String prospectId, String docName);
-	
+
 	ProfDocEntity findById(int id);
 
 	ProfDocEntity findByFolderId(int id);
@@ -36,5 +36,15 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	List<ProfDocEntity> findByProspectId(String prospectId);
 
 	ProfDocEntity findByDocNameAndProspectId(String dockName, String prospectId);
+
+	ProfDocEntity findByDocName(String docName);
+
+	@Modifying
+	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET is_email = :isEmail" + " WHERE id = :id ")
+	void updateIsEmail(@Param("isEmail") String isEmail, @Param("id") int id);
+
+	@Modifying
+	@Query("UPDATE ProfDocEntity p SET p.emilResId = :emilResId WHERE p.id = :docId")
+	void updateEmailResId(@Param("emilResId") String emilResId, @Param("docId") Integer docId);
 
 }
