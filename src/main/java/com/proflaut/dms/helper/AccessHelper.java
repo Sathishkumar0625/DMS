@@ -48,6 +48,8 @@ public class AccessHelper {
 		ent.setPassword(encrypted);
 		ent.setUserName(userInfo.getUserName());
 		ent.setCreatedDate(formatCurrentDateTime());
+		ent.setMobileNo(userInfo.getMobileNo());
+		ent.setLocation(userInfo.getLocation());
 		return ent;
 	}
 

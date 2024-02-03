@@ -66,7 +66,27 @@ public class UserInfo {
 	
 	private String webAccess;
 	
+	private String mobileNo;
 	
+	private String location;
+	
+	
+
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
 
 	public String getAdminAccess() {
 		return adminAccess;
@@ -101,6 +121,5 @@ public class UserInfo {
 	public void setCreatedDate(Timestamp createdDate) {
 		this.createdDate = createdDate;
 	}
-
 
 }

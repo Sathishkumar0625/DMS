@@ -18,8 +18,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +38,6 @@ import com.proflaut.dms.model.ProfActivityReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
-import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
 import com.proflaut.dms.service.impl.TransactionServiceImpl;
@@ -49,53 +47,51 @@ import com.proflaut.dms.util.AppConfiguration;
 @RequestMapping("/transaction")
 @CrossOrigin
 public class TransactionController {
-	
-	private final JdbcTemplate jdbcTemplate;
+
 	private final AppConfiguration appConfiguration;
+
 	@Autowired
-	public TransactionController (JdbcTemplate jdbcTemplate,AppConfiguration appConfiguration){
-		this.jdbcTemplate=jdbcTemplate;
-		this.appConfiguration=appConfiguration;
+	public TransactionController( AppConfiguration appConfiguration) {
+		this.appConfiguration = appConfiguration;
 	}
-	
+
 	@Autowired
 	TransactionServiceImpl transactionImpl;
-	
+
 	private static final Logger logger = LogManager.getLogger(TransactionController.class);
-	
+
 	@SuppressWarnings("unchecked")
 	@PostMapping("/loadActivity")
 	public ResponseEntity<ProfActivityResponse> save1() throws ParseException {
-		ProfActivityResponse activityResponse=null;
+		ProfActivityResponse activityResponse = null;
 		JSONParser jsonParser = new JSONParser();
 		try (FileReader reader = new FileReader("C:/Users/BILLPC01/Desktop/jsonStructure.json")) {
-			
-				Object obj = jsonParser.parse(reader);
-				JSONArray actLst = (JSONArray) obj;
-				actLst.forEach(activity -> {
-					
-					JSONObject act = (JSONObject) activity;
-					
-					ProfActivityRequest req = new ProfActivityRequest();
-					req.setKey(act.get("key").toString());
-					req.setTitle(act.get("title").toString());
-					req.setProcessId(act.get("processId").toString());
-					req.setUserID(Integer.parseInt(act.get("userID").toString()));
-					req.setGroupId(act.get("groupId").toString());
-					transactionImpl.saveActivity(req);
-				});
 
-				return new ResponseEntity<>(activityResponse, HttpStatus.OK);
-			
+			Object obj = jsonParser.parse(reader);
+			JSONArray actLst = (JSONArray) obj;
+			actLst.forEach(activity -> {
+
+				JSONObject act = (JSONObject) activity;
+
+				ProfActivityRequest req = new ProfActivityRequest();
+				req.setKey(act.get("key").toString());
+				req.setTitle(act.get("title").toString());
+				req.setProcessId(act.get("processId").toString());
+				req.setUserID(Integer.parseInt(act.get("userID").toString()));
+				req.setGroupId(act.get("groupId").toString());
+				transactionImpl.saveActivity(req);
+			});
+
+			return new ResponseEntity<>(activityResponse, HttpStatus.OK);
+
 		} catch (IOException e) {
 
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		} 
+		}
 
 	}
 
-	
 	@PostMapping("/save")
 	public ResponseEntity<ProfActivityResponse> save() {
 		ProfActivityResponse activityResponse = null;
@@ -120,6 +116,10 @@ public class TransactionController {
 
 	@GetMapping("/retrieve/{userId}")
 	public ResponseEntity<List<ProfActivityReterive>> retrieveActivitiesByUserId(@PathVariable int userId) {
+		if (StringUtils.isEmpty(userId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		try {
 			List<ProfActivityReterive> activitiesList = transactionImpl.retrieveActivitiesByUserId(userId);
 			if (!activitiesList.isEmpty()) {
@@ -154,6 +154,10 @@ public class TransactionController {
 	@GetMapping("/findBy")
 	@CrossOrigin
 	public ResponseEntity<Map<String, Object>> retrieveByKey(@RequestParam String key, @RequestParam int userid) {
+		if (StringUtils.isEmpty(key) || StringUtils.isEmpty(userid)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		try {
 			List<ProfDmsMainReterive> dmsMainReterives = transactionImpl.retrieveByMainUserId(key, userid);
 			if (!dmsMainReterives.isEmpty()) {
@@ -176,6 +180,10 @@ public class TransactionController {
 	@PutMapping("/update")
 	private ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(
 			@RequestBody ProfUpdateDmsMainRequest dmsMainRequest, @RequestParam String prospectId) {
+		if (StringUtils.isEmpty(prospectId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfUpdateDmsMainResponse dmsMainResponse = null;
 		try {
 			dmsMainResponse = transactionImpl.updateDmsMain(dmsMainRequest, prospectId);
@@ -216,6 +224,10 @@ public class TransactionController {
 	@PostMapping("/saveExecution")
 	public ResponseEntity<ProfExecutionResponse> saveExcution(@RequestParam int userId,
 			@RequestParam String activityName) {
+		if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(activityName)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfExecutionResponse executionResponse = null;
 		try {
 			executionResponse = transactionImpl.saveData(userId, activityName);
@@ -231,20 +243,17 @@ public class TransactionController {
 
 	@GetMapping("/getExecutions")
 	public ResponseEntity<Map<String, Object>> getExecution(@RequestParam String key, @RequestParam int userId) {
+		if (StringUtils.isEmpty(key) || StringUtils.isEmpty(userId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		try {
+			logger.info("Entering into getExecution -> {}", key);
 
-			logger.info("Entering in to getExecution -> {}", key);
-			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.*  " + "        FROM PROF_EXCECUTION e "
-					+ "        JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
-					+ "        WHERE e.activity_name = ? And d.user_id= ?";
-			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
-					new Object[] { key, userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
-			List<Map<String, Object>> headers = transactionImpl.retrieveHeadersByKey(key);
-			Map<String, Object> map = new HashMap<>();
-			map.put("headers", headers);
-			map.put(key, executionFinalResponses);
-			if (!map.isEmpty()) {
-				return new ResponseEntity<>(map, HttpStatus.OK);
+			Map<String, Object> result = transactionImpl.getExecutionResults(key, userId);
+
+			if (result != null && !result.isEmpty()) {
+				return new ResponseEntity<>(result, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
@@ -253,7 +262,7 @@ public class TransactionController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/generate")
 	public ResponseEntity<InvoiceResponse> invoiceGenerator(@RequestBody InvoiceRequest invoiceRequest) {
 		InvoiceResponse invoiceResponse = null;
@@ -261,9 +270,9 @@ public class TransactionController {
 			invoiceResponse = transactionImpl.invoice(invoiceRequest);
 			if (invoiceResponse.getStatus() != null) {
 				return new ResponseEntity<>(invoiceResponse, HttpStatus.OK);
-			}else {
+			} else {
 				invoiceResponse.setStatus(DMSConstant.FAILURE);
-			return new ResponseEntity<>(invoiceResponse, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(invoiceResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -88,6 +88,28 @@ public class ProfUserInfoEntity {
 	@Column(name = "ADMIN_ACCESS")
 	private String adminAccesss;
 
+	@Column(name = "MOBILE_NUMBER")
+	private String mobileNo;
+
+	@Column(name = "LOCATION")
+	private String location;
+
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -111,17 +133,4 @@ public class ProfUserInfoEntity {
 	public void setAdminAccesss(String adminAccesss) {
 		this.adminAccesss = adminAccesss;
 	}
-
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "PROF_USERPROPERTIES_ID", referencedColumnName = "USER_ID")
-//	private ProfUserPropertiesEntity profUserPropertiesEntity;
-
-//	public ProfUserPropertiesEntity getProfUserPropertiesEntity() {
-//		return profUserPropertiesEntity;
-//	}
-//
-//	public void setProfUserPropertiesEntity(ProfUserPropertiesEntity profUserPropertiesEntity) {
-//		this.profUserPropertiesEntity = profUserPropertiesEntity;
-//	}
-
 }

@@ -32,6 +32,7 @@ import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProprietorParDirRequest;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
+import com.proflaut.dms.util.AppConfiguration;
 
 @Component
 public class TransactionHelper {
@@ -40,6 +41,13 @@ public class TransactionHelper {
 
 	@Autowired
 	FolderServiceImpl folderServiceImpl;
+
+	private final AppConfiguration appConfiguration;
+
+	@Autowired
+	public TransactionHelper(AppConfiguration appConfiguration) {
+		this.appConfiguration = appConfiguration;
+	}
 
 	private String generateUniqueId() {
 		return String.format("%04d", this.random.nextInt(999));
@@ -145,8 +153,8 @@ public class TransactionHelper {
 	}
 
 	public InvoiceResponse invoicegenerator(InvoiceRequest invoiceRequest) throws IOException {
-		String inputFilename = "C:/Users/BILLPC01/Downloads/Application_Loans.docx";
-		String outputfilename = "C:/Users/BILLPC01/Downloads/Application_Loans_output.docx";
+		String inputFilename =appConfiguration.getInvoiceInputFileName() ;
+		String outputfilename =appConfiguration.getInvoiceOutputFileName() ;
 
 
 		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)))) {
@@ -204,7 +212,7 @@ public class TransactionHelper {
 			List<BankingCreditFacilities> creditFacilities = invoiceRequest.getBankingCreditFacilities();
 			if (creditFacilities != null && !creditFacilities.isEmpty()) {
 				for (int i = 0; i < creditFacilities.size(); i++) {
-					int rowOffset = 18+i;
+					int rowOffset = 17+i;
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
 							.setText(creditFacilities.get(i).getLimit());
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
@@ -219,23 +227,23 @@ public class TransactionHelper {
 							.setText(creditFacilities.get(i).getRepaymentTerms());
 				}
 			}
-			List<CreditFacilities> facilities = invoiceRequest.getCreditFacilities();
-			if (facilities != null && !facilities.isEmpty()) {
-				for (int i = 0; i < facilities.size(); i++) {
-					int rowOffset = 7+i;
-					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
-							.setText(facilities.get(i).getType());
-					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
-							.setText(facilities.get(i).getAmount());
-					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
-							.setText(facilities.get(i).getPurpose());
-					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
-							.setText(facilities.get(i).getPrimarySecurity());
-					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
-							.setText(facilities.get(i).getCollateralSecurityOffered());
-					
-				}
-			}
+//			List<CreditFacilities> facilities = invoiceRequest.getCreditFacilities();
+//			if (facilities != null && !facilities.isEmpty()) {
+//				for (int i = 0; i < facilities.size(); i++) {
+//					int rowOffset = 7+i;
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
+//							.setText(facilities.get(i).getType());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
+//							.setText(facilities.get(i).getAmount());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+//							.setText(facilities.get(i).getPurpose());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
+//							.setText(facilities.get(i).getPrimarySecurity());
+//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
+//							.setText(facilities.get(i).getCollateralSecurityOffered());
+//					
+//				}
+//			}
 			try (FileOutputStream out = new FileOutputStream(outputfilename)) {
 				doc.write(out);
 				InvoiceResponse invoiceResponse = new InvoiceResponse();

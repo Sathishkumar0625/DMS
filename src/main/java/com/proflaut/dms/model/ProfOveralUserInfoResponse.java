@@ -15,6 +15,26 @@ public class ProfOveralUserInfoResponse {
 
 	private String adminAccesss;
 
+	private String location;
+
+	private String mobileNo;
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
 	public Integer getUserId() {
 		return userId;
 	}

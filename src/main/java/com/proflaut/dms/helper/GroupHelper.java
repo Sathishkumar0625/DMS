@@ -28,12 +28,14 @@ import com.proflaut.dms.repository.ProfMetaDataRepository;
 public class GroupHelper {
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
 	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
-	
+
 	@Autowired
 	ProfMetaDataRepository metaDataRepository;
+
+	private static int tableCount = 0;
 
 	public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoEntity entity = new ProfGroupInfoEntity();
@@ -83,6 +85,8 @@ public class GroupHelper {
 		response.setStatus(profUserInfoEntity.getStatus());
 		response.setUserName(profUserInfoEntity.getUserName());
 		response.setWebAccess(profUserInfoEntity.getWebAccess());
+		response.setMobileNo(profUserInfoEntity.getMobileNo());
+		response.setLocation(profUserInfoEntity.getLocation());
 		return response;
 	}
 
@@ -94,8 +98,8 @@ public class GroupHelper {
 
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
 		StringBuilder queryBuilder = new StringBuilder();
-		int count=1;
-		String tableName =createTableRequest.getTableName()+"_"+count;
+
+		String tableName = createTableRequest.getTableName() + "_" + tableCount;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 
@@ -116,10 +120,9 @@ public class GroupHelper {
 		}
 		queryBuilder.append(")");
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
-		count++;
+		tableCount++;
 		return tableName;
 	}
-
 
 	private String getDatabaseType(String fieldType, int maxLength) {
 		if ("String".equalsIgnoreCase(fieldType)) {
@@ -133,11 +136,11 @@ public class GroupHelper {
 
 	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName) {
 		ProfMetaDataEntity metaDataEntity = new ProfMetaDataEntity();
-		
-        metaDataEntity.setTableName(tableName);
-        metaDataEntity.setFileExtension(createTableRequest.getFileExtension());
-        metaDataEntity.setCreatedBy("Sathish");
-        metaDataEntity.setCreatedAt(formatCurrentDateTime());
+
+		metaDataEntity.setTableName(tableName);
+		metaDataEntity.setFileExtension(createTableRequest.getFileExtension());
+		metaDataEntity.setCreatedBy("Sathish");
+		metaDataEntity.setCreatedAt(formatCurrentDateTime());
 		return metaDataEntity;
 	}
 }

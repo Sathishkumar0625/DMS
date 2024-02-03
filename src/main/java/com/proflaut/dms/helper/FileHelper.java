@@ -90,6 +90,7 @@ public class FileHelper {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
 		return currentDateTime.format(formatter);
 	}
+	 private int tableCount = 1;
 
 	@Transactional
 	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token) throws CustomException {
@@ -287,7 +288,7 @@ public class FileHelper {
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
 		StringBuilder queryBuilder = new StringBuilder();
 		int count = 1;
-		String tableName = createTableRequest.getTableName() + "_" + count;
+		String tableName = createTableRequest.getTableName() + "_" + tableCount;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 
@@ -308,7 +309,7 @@ public class FileHelper {
 		}
 		queryBuilder.append(")");
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
-		count++;
+		tableCount++;
 		return tableName;
 	}
 

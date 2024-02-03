@@ -1,6 +1,7 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
+import org.springframework.util.StringUtils;
 
 import javax.validation.Valid;
 
@@ -70,9 +71,13 @@ public class FileController {
 	public ResponseEntity<FileRetreiveResponse> getDocumentById(@RequestHeader(value = "token") String token,
 			@RequestParam String prospectId) {
 
+		if (StringUtils.isEmpty(token) || StringUtils.isEmpty(prospectId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		logger.info("Getting into Download");
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
-
 		try {
 			fileRetreiveResponse = fileManagementServiceImpl.retreiveFile(token, prospectId);
 			List<DocumentDetails> document = fileRetreiveResponse.getDocument();
@@ -96,6 +101,11 @@ public class FileController {
 
 	@GetMapping("/downloadBy")
 	public ResponseEntity<FileRetreiveByResponse> getDocumentByName(@RequestParam int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.warn(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		try {
 			logger.info("getting in to Download By");
 			FileRetreiveByResponse fileRetreiveByResponse = fileManagementServiceImpl.reteriveFileByNameAndId(id);
@@ -112,47 +122,51 @@ public class FileController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/createTable")
 	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestBody CreateTableRequest createTableRequest) {
-		ProfMetaDataResponse metaDataResponse=new ProfMetaDataResponse();
-	    try {
-	    	metaDataResponse=fileManagementServiceImpl.createTableFromFieldDefinitions(createTableRequest);
-	        return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        metaDataResponse.setStatus(DMSConstant.FAILURE);
-	        metaDataResponse.setErrorMessage(e.getMessage());
-	        return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
+		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
+		try {
+			metaDataResponse = fileManagementServiceImpl.createTableFromFieldDefinitions(createTableRequest);
+			return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			metaDataResponse.setStatus(DMSConstant.FAILURE);
+			metaDataResponse.setErrorMessage(e.getMessage());
+			return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping("/share")
 	public ResponseEntity<ProfEmailShareResponse> uploadFile(@RequestBody ProfEmailShareRequest emailShareRequest) {
-
+		if (StringUtils.isEmpty(emailShareRequest.getTo()) || StringUtils.isEmpty(emailShareRequest.getDocName())) {
+			logger.warn(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfEmailShareResponse emailShareResponse = null;
 
 		try {
-			emailShareResponse=fileManagementServiceImpl.emailReader(emailShareRequest);
+			emailShareResponse = fileManagementServiceImpl.emailReader(emailShareRequest);
 			if (!emailShareResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(emailShareResponse, HttpStatus.OK);
-			}else {
+			} else {
 				emailShareResponse.setStatus(DMSConstant.FAILURE);
-			return new ResponseEntity<>(emailShareResponse, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(emailShareResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>( HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
+
 	@PostMapping("/convert")
 	public ResponseEntity<String> convertPdfToWord(@RequestBody BasePdf pdfBase) {
-	    String wordBase64 = fileManagementServiceImpl.convertPdfBase64ToWordBase64(pdfBase);
-	    if (wordBase64 != null) {
-	        return ResponseEntity.ok(wordBase64);
-	    } else {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error converting PDF to Word.");
-	    }
+		String wordBase64 = fileManagementServiceImpl.convertPdfBase64ToWordBase64(pdfBase);
+		if (wordBase64 != null) {
+			return ResponseEntity.ok(wordBase64);
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error converting PDF to Word.");
+		}
 	}
 }

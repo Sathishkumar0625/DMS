@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +34,7 @@ import com.proflaut.dms.model.ProfActivityReterive;
 import com.proflaut.dms.model.ProfDmsMainRequest;
 import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
+import com.proflaut.dms.model.ProfGetExecutionFinalResponse;
 import com.proflaut.dms.model.ProfGetExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
@@ -42,6 +46,9 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class TransactionServiceImpl {
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
@@ -236,14 +243,33 @@ public class TransactionServiceImpl {
 
 	public InvoiceResponse invoice(InvoiceRequest invoiceRequest) {
 		InvoiceResponse invoiceResponse = new InvoiceResponse();
-
 		try {
 			invoiceResponse = transactionHelper.invoicegenerator(invoiceRequest);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return invoiceResponse;
+	}
 
+	public Map<String, Object> getExecutionResults(String key, int userId) {
+		try {
+			String sqlQuery = "SELECT e.prospect_id, e.activity_name, d.* " + "FROM PROF_EXCECUTION e "
+					+ "JOIN PROF_DMS_MAIN d ON e.prospect_id = d.prospect_id "
+					+ "WHERE e.activity_name = ? AND d.user_id= ?";
+
+			List<ProfGetExecutionFinalResponse> executionFinalResponses = jdbcTemplate.query(sqlQuery,
+					new Object[] { key, userId }, new BeanPropertyRowMapper<>(ProfGetExecutionFinalResponse.class));
+
+			List<Map<String, Object>> headers = retrieveHeadersByKey(key);
+
+			Map<String, Object> result = new HashMap<>();
+			result.put("headers", headers);
+			result.put(key, executionFinalResponses);
+
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyMap();
+		}
 	}
 }
