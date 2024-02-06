@@ -45,11 +45,15 @@ import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.model.BulkEmailSender;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.DocumentDetails;
+import com.proflaut.dms.model.FieldDefinitionResponse;
 import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
+import com.proflaut.dms.model.ProfMetaDataResponse;
+import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
@@ -90,7 +94,8 @@ public class FileHelper {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
 		return currentDateTime.format(formatter);
 	}
-	 private int tableCount = 1;
+
+	private int tableCount = 1;
 
 	@Transactional
 	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token) throws CustomException {
@@ -162,7 +167,7 @@ public class FileHelper {
 			ent.setCreatedBy(userProp.getUserId());
 		}
 		ent.setFolderId(entity.getId());
-		ent.setUploadTime(LocalDateTime.now().toString());
+		ent.setUploadTime(formatCurrentDateTime());
 		ent.setProspectId(fileRequest.getProspectId());
 		ent.setDocName(fileRequest.getDockName());
 		ent.setDocPath(fileName);
@@ -257,20 +262,18 @@ public class FileHelper {
 		String path = entity.getFolderPath() + File.separator + docEntity.getDocPath();
 
 		try {
-			if (path != null) {
-				logger.info("File path -> {} ", path);
+			logger.info("File path -> {} ", path);
 
-				if (!Files.exists(Paths.get(path))) {
-					logger.info("File does not exist");
-					return decrypted;
-				}
-
-				String content = new String(Files.readAllBytes(Paths.get(path)));
-				PasswordEncDecrypt td = new PasswordEncDecrypt();
-				decrypted = td.decrypt(content);
-
-				decompressedBytes = Compression.decompressB64(decrypted);
+			if (!Files.exists(Paths.get(path))) {
+				logger.info("File does not exist");
+				return decrypted;
 			}
+
+			String content = new String(Files.readAllBytes(Paths.get(path)));
+			PasswordEncDecrypt td = new PasswordEncDecrypt();
+			decrypted = td.decrypt(content);
+
+			decompressedBytes = Compression.decompressB64(decrypted);
 		} catch (AccessDeniedException e) {
 			logger.info("Access denied -> {} ", e.getMessage());
 			e.printStackTrace();
@@ -287,11 +290,11 @@ public class FileHelper {
 
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
 		StringBuilder queryBuilder = new StringBuilder();
-		int count = 1;
 		String tableName = createTableRequest.getTableName() + "_" + tableCount;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
-
+		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
+		queryBuilder.append("DOC_ID INTEGER, ");
 		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
 			String fieldName = field.getFieldName();
@@ -323,13 +326,15 @@ public class FileHelper {
 		}
 	}
 
-	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName) {
+	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName,
+			ProfUserInfoEntity entity) {
 		ProfMetaDataEntity metaDataEntity = new ProfMetaDataEntity();
-
 		metaDataEntity.setTableName(tableName);
 		metaDataEntity.setFileExtension(createTableRequest.getFileExtension());
-		metaDataEntity.setCreatedBy("Sathish");
+		metaDataEntity.setCreatedBy(entity.getUserName());
 		metaDataEntity.setCreatedAt(formatCurrentDateTime());
+		metaDataEntity.setName(createTableRequest.getTableName());
+		metaDataEntity.setStatus("A");
 		return metaDataEntity;
 	}
 
@@ -402,6 +407,108 @@ public class FileHelper {
 		configEntity.setIsEmail("Y");
 		configEntity.setSendAt(formatCurrentDateTime());
 		return configEntity;
+	}
+
+	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager) {
+		GetAllTableResponse allTableResponse = new GetAllTableResponse();
+		allTableResponse.setId(dataEntity.getId());
+		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
+		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
+		allTableResponse.setFileExtention(dataEntity.getFileExtension());
+		String tableName = dataEntity.getTableName().toLowerCase();
+		if (tableName != null) {
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, entityManager);
+			allTableResponse.setFieldNames(definitionResponses);
+		}
+		return allTableResponse;
+	}
+
+	private List<FieldDefinitionResponse> getColumnDetails(String tableName, EntityManager entityManager) {
+		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
+
+		try {
+			String sqlQuery = "SELECT column_name, data_type, is_nullable, character_maximum_length "
+					+ "FROM information_schema.columns " + "WHERE table_name = :tableName";
+
+			@SuppressWarnings("unchecked")
+			List<Object[]> result = entityManager.createNativeQuery(sqlQuery).setParameter("tableName", tableName)
+					.getResultList();
+
+			for (Object[] row : result) {
+				String columnName = (String) row[0];
+				String dataType = (String) row[1];
+				String isNullable = (String) row[2];
+				Integer characterMaxLength = (Integer) row[3];
+
+				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
+				fieldDefinitionResponse.setFieldName(columnName);
+				fieldDefinitionResponse
+						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
+				fieldDefinitionResponse.setMandatory("NO".equalsIgnoreCase(isNullable) ? "Y" : "N");
+				fieldDefinitionResponse.setMaxLength(characterMaxLength != null ? characterMaxLength.toString() : null);
+
+				definitionResponses.add(fieldDefinitionResponse);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return definitionResponses;
+	}
+
+	@Transactional
+	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id) {
+	    ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
+	    StringBuilder insertQueryBuilder = new StringBuilder();
+	    insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
+	    for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
+	        FieldDefnition field = it.next();
+	        insertQueryBuilder.append(field.getFieldName());
+	        if (it.hasNext()) {
+	            insertQueryBuilder.append(", ");
+	        }
+	    }
+	    insertQueryBuilder.append(", doc_id");
+	    insertQueryBuilder.append(") VALUES (");
+	    for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
+	        FieldDefnition fieldValue = it.next();
+	        insertQueryBuilder.append(getFormattedValue(fieldValue));
+	        if (it.hasNext()) {
+	            insertQueryBuilder.append(", ");
+	        }
+	    }
+	    insertQueryBuilder.append(", ").append(id);
+
+	    insertQueryBuilder.append(")");
+
+	    try {
+	        entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
+	        dataResponse.setStatus(DMSConstant.SUCCESS);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        dataResponse.setStatus(DMSConstant.FAILURE);
+	    }
+	    return dataResponse;
+	}
+
+	private String getFormattedValue(FieldDefnition fieldValue) {
+		if ("String".equalsIgnoreCase(fieldValue.getFieldType())) {
+			return "'" + fieldValue.getValue() + "'";
+		} else {
+			return fieldValue.getValue();
+		}
+	}
+
+	public ProfOverallMetaDataResponse convertToResponse(ProfMetaDataEntity metaDataEntity) {
+	    ProfOverallMetaDataResponse metaDataResponse = new ProfOverallMetaDataResponse();
+	    metaDataResponse.setId(metaDataEntity.getId());
+	    metaDataResponse.setCreatedAt(metaDataEntity.getCreatedAt());
+	    metaDataResponse.setFileExtenion(metaDataEntity.getFileExtension());
+	    metaDataResponse.setName(metaDataEntity.getName());
+	    metaDataResponse.setStatus(metaDataEntity.getStatus());
+	    metaDataResponse.setTableName(metaDataEntity.getTableName());
+	    metaDataResponse.setCreatedBy(metaDataEntity.getCreatedBy());
+	    return metaDataResponse;
 	}
 
 }

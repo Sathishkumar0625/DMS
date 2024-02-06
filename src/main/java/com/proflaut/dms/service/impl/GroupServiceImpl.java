@@ -24,12 +24,14 @@ import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
+import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
+@Transactional
 public class GroupServiceImpl {
 
 	@PersistenceContext
@@ -47,18 +49,21 @@ public class GroupServiceImpl {
 	@Autowired
 	ProfUserInfoRepository userInfoRepository;
 
-	public String updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
+	public ProfGroupInfoResponse updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
+		ProfGroupInfoResponse groupInfoResponse=new ProfGroupInfoResponse();
 		try {
-			Optional<ProfGroupInfoEntity> groupInfo = groupInfoRepository.findById(id);
-			groupInfo.get().setStatus("I");
-			groupInfoRepository.save(groupInfo.get());
-			return DMSConstant.SUCCESS;
-//			groupInfoRepository.findById(id);
+			 Optional<ProfGroupInfoEntity> groupInfo = groupInfoRepository.findById(id);
+			if (!groupInfo.isEmpty()) {
+				 ProfGroupInfoEntity updatedGroupInfo = groupHelper.updateGroupInfoEnt(groupInfoRequest, groupInfo.get());
+		         groupInfoRepository.save(updatedGroupInfo);
+		         groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			}else {
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return DMSConstant.FAILURE;
 		}
-
+		return groupInfoResponse;
 	}
 
 	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest) throws CustomException {
@@ -129,7 +134,6 @@ public class GroupServiceImpl {
 		return infoResponses;
 	}
 
-	@Transactional
 	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest) {
 		ProfMetaDataResponse metaDataResponse=new ProfMetaDataResponse();
 	    try {
@@ -142,6 +146,23 @@ public class GroupServiceImpl {
 	        e.printStackTrace();
 	    }
 	    return metaDataResponse;
+	}
+
+	public ProfGroupInfoResponse updateSignupUser(ProfSignupUserRequest userRequest, int userId) {
+		ProfGroupInfoResponse groupInfoResponse=new ProfGroupInfoResponse();
+		try {
+			ProfUserInfoEntity entity=userInfoRepository.findByUserId(userId);
+			if (entity != null) {
+				ProfUserInfoEntity infoEntity=groupHelper.convertRequestToUser(userRequest,entity);
+				userInfoRepository.save(infoEntity);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			}else {
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponse;
 	}
 
 }

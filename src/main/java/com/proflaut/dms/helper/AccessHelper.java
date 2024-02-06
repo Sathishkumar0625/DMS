@@ -80,6 +80,7 @@ public class AccessHelper {
 		ent.setUserId(profUserInfoEntity.getUserId());
 		String localdateandtime = LocalDateTime.now().toString();
 		ent.setLastLogin(localdateandtime);
+		ent.setUserName(profUserInfoEntity.getUserName());
 		return ent;
 	}
 

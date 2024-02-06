@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROF_OLD_IMAGE_DETAILS")
+@Table(name = "PROF_BACKUP_DOCUMENT_DETAILS")
 public class ProfOldImageEntity {
 
 	@Id

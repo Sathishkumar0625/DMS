@@ -3,17 +3,12 @@ package com.proflaut.dms.service.impl;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.stereotype.Service;
-
-import java.io.ByteArrayOutputStream;
+import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -29,19 +24,21 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.FileHelper;
-import com.proflaut.dms.model.BasePdf;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
+import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
+import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -49,6 +46,7 @@ import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 import com.proflaut.dms.util.Compression;
 
 @Service
+@Transactional
 public class FileManagementServiceImpl {
 	@Autowired
 	ProfDocUploadRepository profDocUploadRepository;
@@ -74,12 +72,17 @@ public class FileManagementServiceImpl {
 	@Autowired
 	ProfMailConfigRepository configRepository;
 
+	@Autowired
+	ProfMetaDataRepository metaDataRepository;
+
 	public FileResponse storeFile(FileRequest fileRequest, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
 			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
-
+			if (profUserInfoEntity == null) {
+				throw new CustomException("ProfUserInfoEntity not found for userId: " + userProp.getUserId());
+			}
 			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
@@ -93,21 +96,20 @@ public class FileManagementServiceImpl {
 		return fileResponse;
 	}
 
-	public FileRetreiveResponse retreiveFile(String token, String prospectId) {
+	public FileRetreiveResponse retreiveFile(String token, String prospectId) throws CustomException {
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 		ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
-		if (userProp != null) {
-			List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByProspectId(prospectId);
-			if (profDocEntity != null) {
-				String decrypted = null;
-				decrypted = fileHelper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse, infoEntity);
-				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
-					fileRetreiveResponse.setStatus(DMSConstant.SUCCESS);
-				}
-			} else {
-				fileRetreiveResponse.setStatus(DMSConstant.FAILURE);
-			}
+		List<ProfDocEntity> profDocEntity = profDocUploadRepository.findByProspectId(prospectId);
+		if (profDocEntity == null) {
+			throw new CustomException("ProfDocEntity not found for prospectId: " + prospectId);
+		}
+		String decrypted = null;
+		decrypted = fileHelper.retrievDocument(profDocEntity, decrypted, fileRetreiveResponse, infoEntity);
+		if (!StringUtils.isEmpty(decrypted)) {
+			fileRetreiveResponse.setStatus(DMSConstant.SUCCESS);
+		} else {
+			fileRetreiveResponse.setStatus(DMSConstant.FAILURE);
 		}
 
 		return fileRetreiveResponse;
@@ -117,17 +119,18 @@ public class FileManagementServiceImpl {
 		FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
 		try {
 			ProfDocEntity docEntity = profDocUploadRepository.findById(id);
-			if (docEntity != null) {
-				FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
-				String decrypted = fileHelper.retrieveDocument(docEntity, entity);
-
-				if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
-					fileRetreiveByResponse.setImage(decrypted);
-					fileRetreiveByResponse.setExtention(docEntity.getExtention());
-					fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-				} else {
-					fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-				}
+			if (docEntity == null) {
+				throw new CustomException("ProfDocEntity not found for ID: " + id);
+			}
+			FolderEntity entity = folderRepository.findById(docEntity.getFolderId());
+			if (entity == null) {
+				throw new CustomException("FolderEntity not found for ID: " + docEntity.getFolderId());
+			}
+			String decrypted = fileHelper.retrieveDocument(docEntity, entity);
+			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
+				fileRetreiveByResponse.setImage(decrypted);
+				fileRetreiveByResponse.setExtention(docEntity.getExtention());
+				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
 				fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
 			}
@@ -138,22 +141,38 @@ public class FileManagementServiceImpl {
 		return fileRetreiveByResponse;
 	}
 
-	@Transactional
-	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest) {
+	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest, String token) {
 		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
 		try {
-			String tableName = fileHelper.createTable(createTableRequest.getFields(), createTableRequest);
-			ProfMetaDataEntity dataEntity = fileHelper.convertTableReqToMetaEntity(createTableRequest, tableName);
-			entityManager.persist(dataEntity);
-			metaDataResponse.setStatus(DMSConstant.SUCCESS);
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
+			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(entity.getUserId());
 
+			if (entity.getToken() != null && infoEntity.getUserName() != null) {
+				String tableName = fileHelper.createTable(createTableRequest.getFields(), createTableRequest);
+				ProfMetaDataEntity dataEntity = fileHelper.convertTableReqToMetaEntity(createTableRequest, tableName,
+						infoEntity);
+				if (dataEntity != null) {
+					entityManager.persist(dataEntity);
+					metaDataResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
+					throw new CustomException("ProfMetaDataEntity is Null");
+				}
+			} else {
+				metaDataResponse.setStatus(DMSConstant.FAILURE);
+				throw new CustomException("Token or userName is null");
+			}
+		} catch (CustomException ce) {
+			ce.printStackTrace();
+			metaDataResponse.setStatus(DMSConstant.FAILURE);
+			metaDataResponse.setErrorMessage(ce.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
+			metaDataResponse.setStatus(DMSConstant.FAILURE);
+			metaDataResponse.setErrorMessage("An error occurred");
 		}
 		return metaDataResponse;
 	}
 
-	@Transactional
 	public ProfEmailShareResponse emailReader(ProfEmailShareRequest emailShareRequest) {
 		ProfEmailShareResponse emailShareResponse = new ProfEmailShareResponse();
 		try {
@@ -161,7 +180,6 @@ public class FileManagementServiceImpl {
 			ProfDocEntity docEntity = profDocUploadRepository.findByDocNameAndProspectId(emailShareRequest.getDocName(),
 					folderEntity.getProspectId());
 			String extension = docEntity.getExtention();
-
 			if (docEntity.getDocName() != null && folderEntity.getFolderPath() != null) {
 				MailInfoRequest mailInfoRequest = new MailInfoRequest(emailShareRequest.getFrom(),
 						Arrays.asList(emailShareRequest.getTo()), "Subject");
@@ -174,7 +192,6 @@ public class FileManagementServiceImpl {
 				if (fileHelper.sendMail(mailInfoRequest, fileBytes, extension, docEntity)) {
 					ProfMailConfigEntity configEntity = fileHelper.convertemailShareReqToMailConf(emailShareRequest);
 					configRepository.save(configEntity);
-					// Set EMAIL_RES_ID in ProfDocEntity
 					docEntity.setEmilResId(String.valueOf(configEntity.getId()));
 					profDocUploadRepository.updateEmailResId(String.valueOf(configEntity.getId()), docEntity.getId());
 
@@ -186,9 +203,13 @@ public class FileManagementServiceImpl {
 					emailShareResponse.setStatus(DMSConstant.FAILURE);
 				}
 			} else {
-				emailShareResponse.setStatus(DMSConstant.FAILURE);
+				throw new CustomException("docName or folderPath is null");
 			}
 
+		} catch (CustomException ce) {
+			ce.printStackTrace();
+			emailShareResponse.setStatus(DMSConstant.FAILURE);
+			emailShareResponse.setMessage(ce.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			emailShareResponse.setStatus(DMSConstant.FAILURE);
@@ -197,38 +218,52 @@ public class FileManagementServiceImpl {
 		return emailShareResponse;
 	}
 
-	public String convertPdfBase64ToWordBase64(BasePdf basePdf) {
-		 try {
-		         // Decode PDF Base64
-		        byte[] pdfBytes = Base64.getDecoder().decode(basePdf.getPdf());
-		        PDDocument document = PDDocument.load(pdfBytes);
-		        PDFTextStripper stripper = new PDFTextStripper();
-		        String pdfText = stripper.getText(document);
-
-		        // Create Word document
-		        @SuppressWarnings("resource")
-				XWPFDocument wordDocument = new XWPFDocument();
-		        XWPFParagraph paragraph = wordDocument.createParagraph();
-
-		        // Apply styles or adjust formatting as needed
-		        // Example: Set font size
-		        XWPFRun run = paragraph.createRun();
-		        run.setFontSize(12);
-		        run.setText(pdfText);
-
-		        // Convert Word document to Base64
-		        ByteArrayOutputStream out = new ByteArrayOutputStream();
-		        wordDocument.write(out);
-		        byte[] wordBytes = out.toByteArray();
-		        String wordBase64 = Base64.getEncoder().encodeToString(wordBytes);
-
-		        // Close resources
-		        document.close();
-
-		        return wordBase64;
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		        return null;
-		    }
+	public GetAllTableResponse getAll(String name) {
+		GetAllTableResponse getAllTableResponse = new GetAllTableResponse();
+		try {
+			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(name);
+			if (dataEntity != null) {
+				getAllTableResponse = fileHelper.convertEntityToResponse(dataEntity, entityManager);
+			} else {
+				throw new CustomException("DataEntity not found for name: " + name);
+			}
+		} catch (CustomException ce) {
+			ce.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (entityManager != null && entityManager.isOpen()) {
+				entityManager.close();
+			}
+		}
+		return getAllTableResponse;
 	}
+
+	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id) {
+		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
+		try {
+			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(createTableRequest.getTableName());
+			dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dataResponse;
+	}
+	public List<ProfOverallMetaDataResponse> getAllData() {
+	    List<ProfOverallMetaDataResponse> metaResponses = new ArrayList<>();
+	    try {
+	        List<ProfMetaDataEntity> dataEntities = metaDataRepository.findAll();
+
+	        for (ProfMetaDataEntity metaDataEntity : dataEntities) {
+	            if (!metaDataEntity.getStatus().equalsIgnoreCase("I")) {
+	                ProfOverallMetaDataResponse response = fileHelper.convertToResponse(metaDataEntity);
+	                metaResponses.add(response);
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return metaResponses;
+	}
+
 }

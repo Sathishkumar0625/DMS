@@ -44,11 +44,11 @@ public class UserInfo {
 		this.useForceLogin = useForceLogin;
 	}
 	@NotBlank(message = "Username cannot be blank")
-	@Size(min = 4, max = 10, message = "Username must be between 4 and 10 characters")
+	@Size(min = 3, max = 15, message = "Username must be between 4 and 10 characters")
 	@JsonProperty("userName")
 	private String userName;
 	
-	@Size(min = 4, max = 10, message = "Password must be between 4 and 10 characters")
+	@Size(min = 4, max = 15, message = "Password must be between 4 and 10 characters")
 	@JsonProperty("password")
 	private String password;
 	

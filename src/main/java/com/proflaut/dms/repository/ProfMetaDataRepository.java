@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 
 @Repository
-public interface ProfMetaDataRepository extends JpaRepository<ProfMetaDataEntity, Integer>{
+public interface ProfMetaDataRepository extends JpaRepository<ProfMetaDataEntity, Integer> {
+	ProfMetaDataEntity findByName(String tableName);
+
+	ProfMetaDataEntity findByNameIgnoreCase(String name);
 }

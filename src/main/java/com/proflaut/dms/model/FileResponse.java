@@ -13,10 +13,18 @@ public class FileResponse {
 	private String folderPath;
 
 	private String errorMessage;
-	
+
 	private String extention;
-	
-	
+
+	private int id;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getExtention() {
 		return extention;
@@ -58,5 +66,4 @@ public class FileResponse {
 		this.prospectId = prospectId;
 	}
 
-	
 }

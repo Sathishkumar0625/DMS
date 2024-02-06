@@ -1,6 +1,10 @@
 package com.proflaut.dms.model;
 
-public class FieldDefnition {
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
+public class FieldDefinitionResponse {
 	private String fieldName;
 	private String fieldType;
 	private String mandatory;
@@ -46,4 +50,5 @@ public class FieldDefnition {
 	public void setMaxLength(String maxLength) {
 		this.maxLength = maxLength;
 	}
+
 }

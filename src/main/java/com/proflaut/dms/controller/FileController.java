@@ -21,16 +21,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.model.BasePdf;
+import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
+import com.proflaut.dms.model.ProfOverallMetaDataResponse;
+import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 
 @RestController
@@ -41,22 +44,37 @@ public class FileController {
 	@Autowired
 	FileManagementServiceImpl fileManagementServiceImpl;
 	private static final Logger logger = LogManager.getLogger(FileController.class);
+	
+	@Autowired
+	ProfDocUploadRepository uploadRepository;
 
 	@PostMapping("/upload")
 	public ResponseEntity<FileResponse> fileUpload(@RequestHeader(value = "token") String token,
 			@Valid @RequestBody FileRequest fileRequest, BindingResult bindingResult) {
-		logger.info("getting in to Upload");
+		logger.info("Getting into Upload");
 		FileResponse fileResponse = new FileResponse();
-		if (bindingResult.hasErrors() && bindingResult.getFieldError() != null) {
-			fileResponse.setErrorMessage("Validation error: " + bindingResult.getFieldError().getDefaultMessage());
+		if (bindingResult.hasErrors()) {
+			StringBuilder errorMessage = new StringBuilder("Validation error(s): ");
+			bindingResult.getFieldErrors()
+					.forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
+			fileResponse.setErrorMessage(errorMessage.toString());
 			return new ResponseEntity<>(fileResponse, HttpStatus.BAD_REQUEST);
 		}
 
 		try {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token);
 			if (fileResponse != null && (!fileResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE))) {
-				logger.info("getting in to Upload Success");
-				return new ResponseEntity<>(fileResponse, HttpStatus.OK);
+				logger.info("Upload Success");
+				ProfDocEntity docEntity=uploadRepository.findByDocNameAndProspectId(fileRequest.getDockName(),fileRequest.getProspectId());
+				ProfMetaDataResponse metaDataResponse = fileManagementServiceImpl
+						.save(fileRequest.getCreateTableRequests().get(0),docEntity.getId());
+				fileResponse.setId(docEntity.getId());
+				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
+					return new ResponseEntity<>(fileResponse, HttpStatus.OK);
+				} else {
+					logger.error("Failed to create meta table");
+					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				}
 			} else {
 				logger.warn("Upload Failure");
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -124,11 +142,16 @@ public class FileController {
 	}
 
 	@PostMapping("/createTable")
-	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestBody CreateTableRequest createTableRequest) {
+	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,
+			@RequestBody CreateTableRequest createTableRequest) {
 		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
 		try {
-			metaDataResponse = fileManagementServiceImpl.createTableFromFieldDefinitions(createTableRequest);
-			return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+			metaDataResponse = fileManagementServiceImpl.createTableFromFieldDefinitions(createTableRequest, token);
+			if (!metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(metaDataResponse, HttpStatus.NOT_ACCEPTABLE);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			metaDataResponse.setStatus(DMSConstant.FAILURE);
@@ -160,13 +183,47 @@ public class FileController {
 
 	}
 
-	@PostMapping("/convert")
-	public ResponseEntity<String> convertPdfToWord(@RequestBody BasePdf pdfBase) {
-		String wordBase64 = fileManagementServiceImpl.convertPdfBase64ToWordBase64(pdfBase);
-		if (wordBase64 != null) {
-			return ResponseEntity.ok(wordBase64);
-		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error converting PDF to Word.");
+	@GetMapping("/getAllTables")
+	public ResponseEntity<GetAllTableResponse> getAllMetaTables(@RequestParam String tableName) {
+		GetAllTableResponse getAllTableResponse = null;
+		try {
+			getAllTableResponse = fileManagementServiceImpl.getAll(tableName);
+			if (getAllTableResponse.getCreatedBy() != null) {
+				return new ResponseEntity<>(getAllTableResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PostMapping("/saveTableData")
+	public ResponseEntity<ProfMetaDataResponse> saveData(@RequestBody CreateTableRequest createTableRequest) {
+		ProfMetaDataResponse metaDataResponse = null;
+		try {
+			//metaDataResponse = fileManagementServiceImpl.save(createTableRequest);
+			return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getAllMetaEntity")
+	public ResponseEntity<List<ProfOverallMetaDataResponse>> getAllMetaData() {
+		try {
+			List<ProfOverallMetaDataResponse> dataResponse = fileManagementServiceImpl.getAllData();
+			if (!dataResponse.isEmpty()) {
+				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

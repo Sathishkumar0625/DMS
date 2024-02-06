@@ -47,6 +47,17 @@ public class ProfUserPropertiesEntity {
 	@Column(name = "LOCKED_DATE")
 	private Timestamp lockedDate;
 	
+	@Column(name = "USER_NAME")
+	private String userName;
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public Integer getUserId() {
 		return userId;
 	}

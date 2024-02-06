@@ -9,21 +9,41 @@ import javax.persistence.Table;
 import javax.persistence.Index;
 
 @Entity
-@Table(name = "PROF_METADATA",indexes = { @Index(columnList = "ID")})
+@Table(name = "PROF_METADATA", indexes = { @Index(columnList = "ID") })
 public class ProfMetaDataEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="ID")
+	@Column(name = "ID")
 	private int id;
-	@Column(name="TABLE_NAME")
+	@Column(name = "TABLE_NAME")
 	private String tableName;
-	@Column(name="FILE_EXTENSION")
+	@Column(name = "NAME")
+	private String name;
+	@Column(name = "FILE_EXTENSION")
 	private String fileExtension;
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
-	@Column(name="CREATED_AT")
+	@Column(name = "CREATED_AT")
 	private String createdAt;
+	@Column(name = "STATUS")
+	private String status;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public int getId() {
 		return id;

@@ -20,6 +20,7 @@ import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
+import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.service.impl.GroupServiceImpl;
 
@@ -31,7 +32,7 @@ public class GroupController {
 	@Autowired
 	GroupServiceImpl groupServiceImpl;
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
-	
+
 	@PostMapping("/create")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestBody ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
@@ -43,17 +44,18 @@ public class GroupController {
 			e.printStackTrace();
 			groupInfoResponse.setErrorMessage(DMSConstant.GROUPNAME_ALREADY_EXIST);
 			groupInfoResponse.setStatus(DMSConstant.FAILURE);
-			return new ResponseEntity<>(groupInfoResponse,HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(groupInfoResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<String> hideGroup(@PathVariable String id,
+	public ResponseEntity<ProfGroupInfoResponse> hideGroup(@PathVariable String id,
 			@RequestBody ProfGroupInfoRequest groupInfoRequest) {
-		String groupInfoResponse = null;
+		ProfGroupInfoResponse groupInfoResponse = null;
 		try {
-			groupInfoResponse = groupServiceImpl.updateStatus(Integer.parseInt(id), groupInfoRequest);
-			if (groupInfoResponse.equalsIgnoreCase(DMSConstant.SUCCESS)) {
+			int groupId = Integer.parseInt(id);
+			groupInfoResponse = groupServiceImpl.updateStatus(groupId, groupInfoRequest);
+			if (groupInfoResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 				return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(groupInfoResponse, HttpStatus.NOT_FOUND);
@@ -112,5 +114,23 @@ public class GroupController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@PutMapping("/updateUsers/{userId}")
+	public ResponseEntity<ProfGroupInfoResponse> updateSignup(@RequestBody ProfSignupUserRequest userRequest,
+			@PathVariable int userId) {
+		ProfGroupInfoResponse infoResponse = null;
+		try {
+			infoResponse = groupServiceImpl.updateSignupUser(userRequest, userId);
+			if (!infoResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(infoResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(infoResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
 	}
 }

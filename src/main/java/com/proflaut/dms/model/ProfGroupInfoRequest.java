@@ -4,6 +4,15 @@ public class ProfGroupInfoRequest {
 
 	private String createdBy;
 	private String groupName;
+	private String status;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	public String getCreatedBy() {
 		return createdBy;

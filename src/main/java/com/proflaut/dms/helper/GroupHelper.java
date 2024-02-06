@@ -4,13 +4,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
@@ -20,6 +17,7 @@ import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
+import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
@@ -142,5 +140,20 @@ public class GroupHelper {
 		metaDataEntity.setCreatedBy("Sathish");
 		metaDataEntity.setCreatedAt(formatCurrentDateTime());
 		return metaDataEntity;
+	}
+
+	public ProfGroupInfoEntity updateGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
+			ProfGroupInfoEntity groupInfo) {
+		groupInfo.setStatus(groupInfoRequest.getStatus());
+		return groupInfo;
+	}
+
+	public ProfUserInfoEntity convertRequestToUser(ProfSignupUserRequest userRequest, ProfUserInfoEntity entity) {
+		entity.setAdminAccesss(userRequest.getAdminAccess());
+		entity.setEmail(userRequest.getEmail());
+		entity.setWebAccess(userRequest.getWebAccess());
+		entity.setUserName(userRequest.getUserName());
+		entity.setStatus(userRequest.getStatus());
+		return entity;
 	}
 }

@@ -21,7 +21,6 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.model.AssociateConcerns;
 import com.proflaut.dms.model.BankingCreditFacilities;
-import com.proflaut.dms.model.CreditFacilities;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.InvoiceRequest;
 import com.proflaut.dms.model.InvoiceResponse;
