@@ -5,8 +5,17 @@ import java.util.List;
 public class CreateTableRequest {
 
 	private String fileExtension;
+	private String metadataId;
 	private String tableName;
 	private List<FieldDefnition> fields;
+
+	public String getMetadataId() {
+		return metadataId;
+	}
+
+	public void setMetadataId(String metadataId) {
+		this.metadataId = metadataId;
+	}
 
 	public String getTableName() {
 		return tableName;

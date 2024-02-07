@@ -9,5 +9,7 @@ import com.proflaut.dms.entity.ProfMetaDataEntity;
 public interface ProfMetaDataRepository extends JpaRepository<ProfMetaDataEntity, Integer> {
 	ProfMetaDataEntity findByName(String tableName);
 
+	ProfMetaDataEntity findByIdAndNameIgnoreCase(Integer id, String name);
+
 	ProfMetaDataEntity findByNameIgnoreCase(String name);
 }

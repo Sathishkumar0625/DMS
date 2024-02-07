@@ -1,0 +1,12 @@
+package com.proflaut.dms.controller;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/meta")
+@CrossOrigin
+public class MetaController {
+
+}

@@ -16,11 +16,11 @@ public class ProfMetaDataEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "TABLE_NAME")
+	@Column(name = "TABLE_NAME",unique =true)
 	private String tableName;
-	@Column(name = "NAME")
+	@Column(name = "NAME",unique =true)
 	private String name;
-	@Column(name = "FILE_EXTENSION")
+	@Column(name = "FILE_EXTENSION",nullable = false)
 	private String fileExtension;
 	@Column(name = "CREATED_BY")
 	private String createdBy;

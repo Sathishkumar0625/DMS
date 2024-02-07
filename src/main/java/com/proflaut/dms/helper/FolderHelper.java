@@ -30,7 +30,7 @@ public class FolderHelper {
 	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse) {
 
 		FolderEntity ent = new FolderEntity();
-		ent.setProspectId(folderFO.getProspectId());
+		//ent.setProspectId(folderFO.getProspectId());
 		ent.setIsParent(folderLocation);
 		String folderPath = "";
 		folderPath = storeFolder(fileResponse, folderFO);
@@ -58,14 +58,14 @@ public class FolderHelper {
 		return entity;
 	}
 	public String storeFolder(FileResponse fileResponse, FolderFO folderFO) {
-		String folderPath = folderLocation + folderFO.getProspectId();
+		String folderPath = folderLocation + folderFO.getFolderName();
 
 		File file = new File(folderPath);
 
 		if (file.exists()) {
 			fileResponse.setStatus(DMSConstant.FAILURE);
 			fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
-			return folderPath; // Return the existing folder path
+			return folderPath; 
 		}
 
 		if (file.mkdirs()) {

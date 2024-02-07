@@ -3,6 +3,7 @@ package com.proflaut.dms.controller;
 import java.util.List;
 import org.springframework.util.StringUtils;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,11 +46,12 @@ public class FileController {
 	@Autowired
 	FileManagementServiceImpl fileManagementServiceImpl;
 	private static final Logger logger = LogManager.getLogger(FileController.class);
-	
+
 	@Autowired
 	ProfDocUploadRepository uploadRepository;
 
 	@PostMapping("/upload")
+	@Transactional
 	public ResponseEntity<FileResponse> fileUpload(@RequestHeader(value = "token") String token,
 			@Valid @RequestBody FileRequest fileRequest, BindingResult bindingResult) {
 		logger.info("Getting into Upload");
@@ -65,14 +68,16 @@ public class FileController {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token);
 			if (fileResponse != null && (!fileResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE))) {
 				logger.info("Upload Success");
-				ProfDocEntity docEntity=uploadRepository.findByDocNameAndProspectId(fileRequest.getDockName(),fileRequest.getProspectId());
+				ProfDocEntity docEntity = uploadRepository.findByDocNameAndProspectId(fileRequest.getDockName(),
+						fileRequest.getProspectId());
 				ProfMetaDataResponse metaDataResponse = fileManagementServiceImpl
-						.save(fileRequest.getCreateTableRequests().get(0),docEntity.getId());
+						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId());
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 					return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 				} else {
 					logger.error("Failed to create meta table");
+					TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			} else {
@@ -193,18 +198,6 @@ public class FileController {
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@PostMapping("/saveTableData")
-	public ResponseEntity<ProfMetaDataResponse> saveData(@RequestBody CreateTableRequest createTableRequest) {
-		ProfMetaDataResponse metaDataResponse = null;
-		try {
-			//metaDataResponse = fileManagementServiceImpl.save(createTableRequest);
-			return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

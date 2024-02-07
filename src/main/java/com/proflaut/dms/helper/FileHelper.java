@@ -291,7 +291,6 @@ public class FileHelper {
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
 		StringBuilder queryBuilder = new StringBuilder();
 		String tableName = createTableRequest.getTableName() + "_" + tableCount;
-
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
 		queryBuilder.append("DOC_ID INTEGER, ");
@@ -442,11 +441,12 @@ public class FileHelper {
 
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
 				fieldDefinitionResponse.setFieldName(columnName);
+				String value = fetchDataFromTable(columnName, tableName);
+				fieldDefinitionResponse.setValue(value);
 				fieldDefinitionResponse
 						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
 				fieldDefinitionResponse.setMandatory("NO".equalsIgnoreCase(isNullable) ? "Y" : "N");
 				fieldDefinitionResponse.setMaxLength(characterMaxLength != null ? characterMaxLength.toString() : null);
-
 				definitionResponses.add(fieldDefinitionResponse);
 			}
 		} catch (Exception e) {
@@ -456,39 +456,53 @@ public class FileHelper {
 		return definitionResponses;
 	}
 
+	private String fetchDataFromTable(String columnName, String tableName) {
+		String value = null;
+		try {
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+			Object result = entityManager.createNativeQuery(sqlQuery).getSingleResult();
+			if (result != null) {
+				value = result.toString();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return value;
+	}
+
 	@Transactional
 	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id) {
-	    ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
-	    StringBuilder insertQueryBuilder = new StringBuilder();
-	    insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
-	    for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
-	        FieldDefnition field = it.next();
-	        insertQueryBuilder.append(field.getFieldName());
-	        if (it.hasNext()) {
-	            insertQueryBuilder.append(", ");
-	        }
-	    }
-	    insertQueryBuilder.append(", doc_id");
-	    insertQueryBuilder.append(") VALUES (");
-	    for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
-	        FieldDefnition fieldValue = it.next();
-	        insertQueryBuilder.append(getFormattedValue(fieldValue));
-	        if (it.hasNext()) {
-	            insertQueryBuilder.append(", ");
-	        }
-	    }
-	    insertQueryBuilder.append(", ").append(id);
+		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
+		StringBuilder insertQueryBuilder = new StringBuilder();
+		insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
+		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
+			FieldDefnition field = it.next();
+			insertQueryBuilder.append(field.getFieldName());
+			if (it.hasNext()) {
+				insertQueryBuilder.append(", ");
+			}
+		}
+		insertQueryBuilder.append(", doc_id");
+		insertQueryBuilder.append(") VALUES (");
+		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
+			FieldDefnition fieldValue = it.next();
+			insertQueryBuilder.append(getFormattedValue(fieldValue));
+			if (it.hasNext()) {
+				insertQueryBuilder.append(", ");
+			}
+		}
+		insertQueryBuilder.append(", ").append(id);
 
-	    insertQueryBuilder.append(")");
+		insertQueryBuilder.append(")");
 
-	    try {
-	        entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
-	        dataResponse.setStatus(DMSConstant.SUCCESS);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        dataResponse.setStatus(DMSConstant.FAILURE);
-	    }
-	    return dataResponse;
+		try {
+			entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
+			dataResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			e.printStackTrace();
+			dataResponse.setStatus(DMSConstant.FAILURE);
+		}
+		return dataResponse;
 	}
 
 	private String getFormattedValue(FieldDefnition fieldValue) {
@@ -500,15 +514,15 @@ public class FileHelper {
 	}
 
 	public ProfOverallMetaDataResponse convertToResponse(ProfMetaDataEntity metaDataEntity) {
-	    ProfOverallMetaDataResponse metaDataResponse = new ProfOverallMetaDataResponse();
-	    metaDataResponse.setId(metaDataEntity.getId());
-	    metaDataResponse.setCreatedAt(metaDataEntity.getCreatedAt());
-	    metaDataResponse.setFileExtenion(metaDataEntity.getFileExtension());
-	    metaDataResponse.setName(metaDataEntity.getName());
-	    metaDataResponse.setStatus(metaDataEntity.getStatus());
-	    metaDataResponse.setTableName(metaDataEntity.getTableName());
-	    metaDataResponse.setCreatedBy(metaDataEntity.getCreatedBy());
-	    return metaDataResponse;
+		ProfOverallMetaDataResponse metaDataResponse = new ProfOverallMetaDataResponse();
+		metaDataResponse.setId(metaDataEntity.getId());
+		metaDataResponse.setCreatedAt(metaDataEntity.getCreatedAt());
+		metaDataResponse.setFileExtenion(metaDataEntity.getFileExtension());
+		metaDataResponse.setName(metaDataEntity.getName());
+		metaDataResponse.setStatus(metaDataEntity.getStatus());
+		metaDataResponse.setTableName(metaDataEntity.getTableName());
+		metaDataResponse.setCreatedBy(metaDataEntity.getCreatedBy());
+		return metaDataResponse;
 	}
 
 }

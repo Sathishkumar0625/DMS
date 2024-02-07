@@ -25,11 +25,21 @@ public class FileRequest {
 	@JsonProperty("image")
 	private String image;
 
+	public String getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(String folderId) {
+		this.folderId = folderId;
+	}
+
+	private String folderId;
+
 	private String extention;
 
 	@JsonProperty("docPath")
 	private String dockPath;
-	
+
 	@JsonProperty("metadata")
 	private List<CreateTableRequest> createTableRequests;
 

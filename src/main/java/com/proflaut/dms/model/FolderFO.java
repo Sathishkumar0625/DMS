@@ -9,8 +9,25 @@ public class FolderFO {
 
 	private int parentFolderID;
 
+	private String folderName;
 
-	
+	private String metaDataId;
+
+	public String getFolderName() {
+		return folderName;
+	}
+
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
+	}
+
+	public String getMetaDataId() {
+		return metaDataId;
+	}
+
+	public void setMetaDataId(String metaDataId) {
+		this.metaDataId = metaDataId;
+	}
 
 	public String getProspectId() {
 		return prospectId;

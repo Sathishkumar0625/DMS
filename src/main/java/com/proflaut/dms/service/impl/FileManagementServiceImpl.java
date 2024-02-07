@@ -242,7 +242,8 @@ public class FileManagementServiceImpl {
 	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id) {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(createTableRequest.getTableName());
+			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(Integer.valueOf(createTableRequest.getMetadataId()),createTableRequest.getTableName());
+			//FolderEntity entity=
 			dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),id);
 		} catch (Exception e) {
 			e.printStackTrace();
