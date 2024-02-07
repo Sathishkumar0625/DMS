@@ -16,10 +16,10 @@ public class FileRequest {
 	@NotBlank(message = "Document name cannot be blank")
 	@JsonProperty("docName")
 	private String dockName;
-
-	@NotBlank(message = "ProspectId cannot be blank")
-	@JsonProperty("prospectId")
-	private String prospectId;
+//
+//	@NotBlank(message = "ProspectId cannot be blank")
+//	@JsonProperty("prospectId")
+//	private String prospectId;
 
 	@NotBlank(message = "image cannot be blank")
 	@JsonProperty("image")
@@ -83,12 +83,12 @@ public class FileRequest {
 		this.dockPath = dockPath;
 	}
 
-	public String getProspectId() {
-		return prospectId;
-	}
-
-	public void setProspectId(String prospectId) {
-		this.prospectId = prospectId;
-	}
+//	public String getProspectId() {
+//		return prospectId;
+//	}
+//
+//	public void setProspectId(String prospectId) {
+//		this.prospectId = prospectId;
+//	}
 
 }

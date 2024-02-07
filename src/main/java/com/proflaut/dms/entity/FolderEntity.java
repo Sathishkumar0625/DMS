@@ -9,7 +9,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROF_FOLDER",indexes = { @Index(columnList = "PROSPECT_ID")})
+@Table(name = "PROF_FOLDER", indexes = { @Index(columnList = "PROSPECT_ID") })
 public class FolderEntity {
 
 	@Id
@@ -17,7 +17,7 @@ public class FolderEntity {
 	@Column(name = "ID")
 	private Integer id;
 
-	@Column(name = "PROSPECT_ID" )
+	@Column(name = "PROSPECT_ID")
 	private String prospectId;
 
 	@Column(name = "PARENT_FOLDER_ID")
@@ -29,15 +29,15 @@ public class FolderEntity {
 	@Column(name = "FOLDER_PATH")
 	private String folderPath;
 
-	@Column(name = "TOKEN")
-	private String token;
+	@Column(name = "FOLDER_NAME")
+	private String folderName;
 
-	public String getToken() {
-		return token;
+	public String getFolderName() {
+		return folderName;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
 	}
 
 	public String getFolderPath() {
@@ -55,8 +55,6 @@ public class FolderEntity {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-	
 
 	public String getProspectId() {
 		return prospectId;

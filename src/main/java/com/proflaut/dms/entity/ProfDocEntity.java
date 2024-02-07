@@ -35,15 +35,16 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_ID")
 	private int folderId;
 
+
 	@Column(name = "EXTENTION")
 	private String extention;
 
 	@Column(name = "IS_EMAIL")
 	private String isEmail;
-	
-	@Column(name="EMAIL_RES_ID")
+
+	@Column(name = "EMAIL_RES_ID")
 	private String emilResId;
-	
+
 	
 
 	public String getEmilResId() {

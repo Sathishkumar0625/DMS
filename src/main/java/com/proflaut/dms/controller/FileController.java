@@ -68,10 +68,9 @@ public class FileController {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token);
 			if (fileResponse != null && (!fileResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE))) {
 				logger.info("Upload Success");
-				ProfDocEntity docEntity = uploadRepository.findByDocNameAndProspectId(fileRequest.getDockName(),
-						fileRequest.getProspectId());
+				ProfDocEntity docEntity = uploadRepository.findByDocName(fileRequest.getDockName());
 				ProfMetaDataResponse metaDataResponse = fileManagementServiceImpl
-						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId());
+						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(),fileRequest);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 					return new ResponseEntity<>(fileResponse, HttpStatus.OK);

@@ -30,11 +30,11 @@ public class FolderHelper {
 	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse) {
 
 		FolderEntity ent = new FolderEntity();
-		//ent.setProspectId(folderFO.getProspectId());
-		ent.setIsParent(folderLocation);
 		String folderPath = "";
 		folderPath = storeFolder(fileResponse, folderFO);
+		ent.setFolderName(folderFO.getFolderName());
 		ent.setFolderPath(folderPath);
+		ent.setIsParent(folderLocation);
 		return ent;
 	}	
 

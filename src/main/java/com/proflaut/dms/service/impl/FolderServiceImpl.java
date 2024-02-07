@@ -1,11 +1,13 @@
 package com.proflaut.dms.service.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.constant.DMSConstant;
@@ -24,6 +26,9 @@ import com.proflaut.dms.service.interF.FolderService;
 @Service
 public class FolderServiceImpl implements FolderService {
 
+	@Value("${create.folderlocation}")
+	private String folderLocation;
+
 	@Autowired
 	FolderRepository folderRepo;
 
@@ -41,17 +46,24 @@ public class FolderServiceImpl implements FolderService {
 		try {
 			Optional<ProfMetaDataEntity> dataEntity = dataRepository
 					.findById(Integer.parseInt(folderFO.getMetaDataId()));
-			if (!dataEntity.isEmpty()) {
+			if (dataEntity.isPresent()) {
+				String folderPath = folderLocation + folderFO.getFolderName();
+				File folder = new File(folderPath);
+
+				if (folder.exists()) {
+					fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
+					fileResponse.setStatus(DMSConstant.FAILURE);
+					return fileResponse;
+				}
+
 				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
-				fileResponse.setProspectId(folderEnt.getProspectId());
 				fileResponse.setId(folderRespEnt.getId());
 				fileResponse.setFolderPath(folderRespEnt.getFolderPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
 				fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 				fileResponse.setStatus(DMSConstant.FAILURE);
-
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

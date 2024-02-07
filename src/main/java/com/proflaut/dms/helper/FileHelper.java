@@ -101,7 +101,7 @@ public class FileHelper {
 	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token) throws CustomException {
 		boolean isFileCreated = false;
 		try {
-			FolderEntity entity = folderRepository.findByProspectId(fileRequest.getProspectId());
+			FolderEntity entity = folderRepository.findById(Integer.parseInt(fileRequest.getFolderId()));
 
 			if (entity != null) {
 				int count = entity.getParentFolderID();
@@ -111,7 +111,7 @@ public class FileHelper {
 				String fileName = uuid.toString();
 
 				ProfDocEntity existingDocEntity = docUploadRepository
-						.findByDocNameAndProspectId(fileRequest.getDockName(), fileRequest.getProspectId());
+						.findByDocNameAndFolderId(fileRequest.getDockName(),Integer.parseInt(fileRequest.getFolderId()));
 
 				if (existingDocEntity != null) {
 					File newFile = new File(path + File.separator + fileName);
@@ -130,19 +130,18 @@ public class FileHelper {
 					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName,
 							fileRequest);
 					imageRepository.save(imageEntity);
-					moveDocumentToBackup(existingDocEntity, entity.getProspectId(), entity);
+					moveDocumentToBackup(existingDocEntity, fileRequest, entity);
 
 					existingDocEntity.setDocPath(fileName);
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
-					folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
+					//folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
 
 					try (FileWriter fileWriter = new FileWriter(file)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();
 						String encrypted = td.encrypt(compressedBytes);
-
 						fileWriter.write(encrypted);
 						isFileCreated = true;
 					} catch (IOException e) {
@@ -168,7 +167,7 @@ public class FileHelper {
 		}
 		ent.setFolderId(entity.getId());
 		ent.setUploadTime(formatCurrentDateTime());
-		ent.setProspectId(fileRequest.getProspectId());
+		ent.setProspectId(entity.getFolderName());
 		ent.setDocName(fileRequest.getDockName());
 		ent.setDocPath(fileName);
 		ent.setExtention(fileRequest.getExtention());
@@ -182,15 +181,15 @@ public class FileHelper {
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
 		oldImageEntity.setUserName(uName);
-		oldImageEntity.setProspectId(fileRequest.getProspectId());
+		//oldImageEntity.setProspectId(fileRequest.getProspectId());
 		oldImageEntity.setCreatedBy(String.valueOf(uId));
 		oldImageEntity.setExtention(existingDocEntity.getExtention());
 		return oldImageEntity;
 	}
 
-	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, String string, FolderEntity entity)
+	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, FileRequest fileRequest, FolderEntity entity)
 			throws CustomException {
-		String backupFolderPath = folderLocation + "Backup_" + string;
+		String backupFolderPath = folderLocation + "Backup_" + entity.getFolderName();
 		Path existingPath = Paths.get(entity.getFolderPath(), existingDocEntity.getDocPath());
 		Path backupFolder = Paths.get(backupFolderPath);
 
@@ -441,8 +440,8 @@ public class FileHelper {
 
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
 				fieldDefinitionResponse.setFieldName(columnName);
-				String value = fetchDataFromTable(columnName, tableName);
-				fieldDefinitionResponse.setValue(value);
+				 List<String> values = fetchDataFromTable(columnName, tableName);
+		            fieldDefinitionResponse.setValue(String.join(",", values));
 				fieldDefinitionResponse
 						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
 				fieldDefinitionResponse.setMandatory("NO".equalsIgnoreCase(isNullable) ? "Y" : "N");
@@ -456,18 +455,21 @@ public class FileHelper {
 		return definitionResponses;
 	}
 
-	private String fetchDataFromTable(String columnName, String tableName) {
-		String value = null;
-		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
-			Object result = entityManager.createNativeQuery(sqlQuery).getSingleResult();
-			if (result != null) {
-				value = result.toString();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return value;
+	private List<String> fetchDataFromTable(String columnName, String tableName) {
+	    List<String> values = new ArrayList<>();
+	    try {
+	        String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+	        @SuppressWarnings("unchecked")
+			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
+	        for (Object result : results) {
+	            if (result != null) {
+	                values.add(result.toString());
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return values;
 	}
 
 	@Transactional

@@ -47,4 +47,6 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	@Query("UPDATE ProfDocEntity p SET p.emilResId = :emilResId WHERE p.id = :docId")
 	void updateEmailResId(@Param("emilResId") String emilResId, @Param("docId") Integer docId);
 
+	ProfDocEntity findByDocNameAndFolderId(String dockName, int folderId);
+
 }

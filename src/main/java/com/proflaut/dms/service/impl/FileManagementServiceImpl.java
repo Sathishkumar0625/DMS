@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -239,12 +242,16 @@ public class FileManagementServiceImpl {
 		return getAllTableResponse;
 	}
 
-	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id) {
+	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest) {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(Integer.valueOf(createTableRequest.getMetadataId()),createTableRequest.getTableName());
-			//FolderEntity entity=
-			dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),id);
+			Optional<FolderEntity> entity= folderRepository.findById(Integer.valueOf( fileRequest.getFolderId()));
+			if (dataEntity != null && !entity.isEmpty()) {
+				dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),id);
+			}else {
+				throw new CustomException("ID NOT FOUND");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
