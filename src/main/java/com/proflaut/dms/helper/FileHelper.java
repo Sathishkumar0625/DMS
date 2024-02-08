@@ -110,8 +110,8 @@ public class FileHelper {
 				UUID uuid = UUID.randomUUID();
 				String fileName = uuid.toString();
 
-				ProfDocEntity existingDocEntity = docUploadRepository
-						.findByDocNameAndFolderId(fileRequest.getDockName(),Integer.parseInt(fileRequest.getFolderId()));
+				ProfDocEntity existingDocEntity = docUploadRepository.findByDocNameAndFolderId(
+						fileRequest.getDockName(), Integer.parseInt(fileRequest.getFolderId()));
 
 				if (existingDocEntity != null) {
 					File newFile = new File(path + File.separator + fileName);
@@ -136,7 +136,7 @@ public class FileHelper {
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
-					//folderRepository.updateParentFolderIdAndFolderPath(count, entity.getProspectId());
+					folderRepository.updateParentFolderId(count, Integer.parseInt(fileRequest.getFolderId()));
 
 					try (FileWriter fileWriter = new FileWriter(file)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
@@ -181,7 +181,7 @@ public class FileHelper {
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
 		oldImageEntity.setUserName(uName);
-		//oldImageEntity.setProspectId(fileRequest.getProspectId());
+		// oldImageEntity.setProspectId(fileRequest.getProspectId());
 		oldImageEntity.setCreatedBy(String.valueOf(uId));
 		oldImageEntity.setExtention(existingDocEntity.getExtention());
 		return oldImageEntity;
@@ -315,10 +315,10 @@ public class FileHelper {
 	}
 
 	private String getDatabaseType(String fieldType, int maxLength) {
-		if ("String".equalsIgnoreCase(fieldType)) {
+		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
 			return "VARCHAR(" + maxLength + ")";
-		} else if ("Integer".equalsIgnoreCase(fieldType)) {
-			return "INT";
+		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
+			return "BIGINT";
 		} else {
 			return fieldType;
 		}
@@ -413,6 +413,7 @@ public class FileHelper {
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
 		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
 		allTableResponse.setFileExtention(dataEntity.getFileExtension());
+		allTableResponse.setTableName(dataEntity.getName());
 		String tableName = dataEntity.getTableName().toLowerCase();
 		if (tableName != null) {
 			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, entityManager);
@@ -440,8 +441,8 @@ public class FileHelper {
 
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
 				fieldDefinitionResponse.setFieldName(columnName);
-				 List<String> values = fetchDataFromTable(columnName, tableName);
-		            fieldDefinitionResponse.setValue(String.join(",", values));
+				List<String> values = fetchDataFromTable(columnName, tableName);
+				fieldDefinitionResponse.setValue(String.join(",", values));
 				fieldDefinitionResponse
 						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
 				fieldDefinitionResponse.setMandatory("NO".equalsIgnoreCase(isNullable) ? "Y" : "N");
@@ -456,20 +457,20 @@ public class FileHelper {
 	}
 
 	private List<String> fetchDataFromTable(String columnName, String tableName) {
-	    List<String> values = new ArrayList<>();
-	    try {
-	        String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
-	        @SuppressWarnings("unchecked")
+		List<String> values = new ArrayList<>();
+		try {
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
-	        for (Object result : results) {
-	            if (result != null) {
-	                values.add(result.toString());
-	            }
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return values;
+			for (Object result : results) {
+				if (result != null) {
+					values.add(result.toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return values;
 	}
 
 	@Transactional
@@ -477,6 +478,8 @@ public class FileHelper {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		StringBuilder insertQueryBuilder = new StringBuilder();
 		insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
+
+		// Append column names
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
 			insertQueryBuilder.append(field.getFieldName());
@@ -484,8 +487,9 @@ public class FileHelper {
 				insertQueryBuilder.append(", ");
 			}
 		}
-		insertQueryBuilder.append(", doc_id");
-		insertQueryBuilder.append(") VALUES (");
+		insertQueryBuilder.append(", doc_id) VALUES (");
+
+		// Append values
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition fieldValue = it.next();
 			insertQueryBuilder.append(getFormattedValue(fieldValue));
@@ -493,9 +497,8 @@ public class FileHelper {
 				insertQueryBuilder.append(", ");
 			}
 		}
-		insertQueryBuilder.append(", ").append(id);
-
-		insertQueryBuilder.append(")");
+		// Append document ID
+		insertQueryBuilder.append(", ").append(id).append(")");
 
 		try {
 			entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
@@ -508,10 +511,10 @@ public class FileHelper {
 	}
 
 	private String getFormattedValue(FieldDefnition fieldValue) {
-		if ("String".equalsIgnoreCase(fieldValue.getFieldType())) {
-			return "'" + fieldValue.getValue() + "'";
-		} else {
+		if (fieldValue.getFieldType().equalsIgnoreCase("Integer")) {
 			return fieldValue.getValue();
+		} else {
+			return "'" + fieldValue.getValue().replace("'", "''") + "'";
 		}
 	}
 

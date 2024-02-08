@@ -11,7 +11,16 @@ public class GetAllTableResponse {
 	private String createdAt;
 	private String createdBy;
 	private String fileExtention;
+	private String tableName;
 	private List<FieldDefinitionResponse> fieldNames;
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 
 	public int getId() {
 		return id;
@@ -52,7 +61,5 @@ public class GetAllTableResponse {
 	public void setFieldNames(List<FieldDefinitionResponse> fieldNames) {
 		this.fieldNames = fieldNames;
 	}
-
-	
 
 }

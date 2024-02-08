@@ -2,14 +2,17 @@ package com.proflaut.dms.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "PROF_ACCESS_RIGHTS")
-public class ProfAccessRights {
+public class ProfAccessRightsEntity {
 	@Id
 	@Column(name = "ID")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(name = "META_ID")
 	private int metaId;
@@ -25,6 +28,16 @@ public class ProfAccessRights {
 	private String createdAt;
 	@Column(name = "STATUS")
 	private String status;
+	@Column(name = "GROUP_ID")
+	private int groupId;
+
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
 
 	public int getId() {
 		return id;

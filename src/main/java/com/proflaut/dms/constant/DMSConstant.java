@@ -20,4 +20,6 @@ public class DMSConstant {
 	public static final String VALIDATION_FAILED="Validation Failed : ";
 	public static final String MESSAGE="Email Send Successfully";
 	public static final String INVALID_INPUT="Invalid input parameters";
+	public static final String INTEGER="Integer";
+	public static final String STRING="String";
 }

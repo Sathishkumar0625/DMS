@@ -18,5 +18,9 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 	@Modifying
 	@Query(value = "UPDATE PROF_FOLDER SET PARENT_FOLDER_ID = :count WHERE PROSPECT_ID = :prospectId", nativeQuery = true)
 	void updateParentFolderIdAndFolderPath(@Param("count") int count, @Param("prospectId") String prospectId);
+	
+	@Modifying
+	@Query(value = "UPDATE PROF_FOLDER SET PARENT_FOLDER_ID = :count WHERE ID = :id", nativeQuery = true)
+	void updateParentFolderId(int count, int id);
 
 }
