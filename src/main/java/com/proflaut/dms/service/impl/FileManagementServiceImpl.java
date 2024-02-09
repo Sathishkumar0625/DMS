@@ -77,14 +77,14 @@ public class FileManagementServiceImpl {
 	ProfOldImageRepository imageRepository;
 
 	@PersistenceContext
-	private EntityManager entityManager;
+	EntityManager entityManager;
 
 	@Autowired
 	ProfMailConfigRepository configRepository;
 
 	@Autowired
 	ProfMetaDataRepository metaDataRepository;
-	
+
 	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
 
 	@Transactional
@@ -262,7 +262,8 @@ public class FileManagementServiceImpl {
 		return getAllTableResponse;
 	}
 
-	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest,Path path) throws IOException {
+	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest,
+			Path path) throws IOException {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(
@@ -300,7 +301,7 @@ public class FileManagementServiceImpl {
 	}
 
 	public void delete(Path path) throws IOException {
-		logger.info("path ->{}",path);
+		logger.info("path ->{}", path);
 		boolean isDeleted = Files.deleteIfExists(path);
 		if (isDeleted) {
 			logger.info("File deleted successfully");
@@ -310,16 +311,16 @@ public class FileManagementServiceImpl {
 	}
 
 	public ProfOverallMetaDataResponse getMetaData(int id) {
-		ProfOverallMetaDataResponse dataResponse=new ProfOverallMetaDataResponse();
+		ProfOverallMetaDataResponse dataResponse = new ProfOverallMetaDataResponse();
 		try {
-			ProfMetaDataEntity dataEntity=metaDataRepository.findById(id);
+			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
 			if (dataEntity != null) {
-				dataResponse=fileHelper.convertMetaEntityToResponse(dataEntity);
+				dataResponse = fileHelper.convertMetaEntityToResponse(dataEntity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return dataResponse;
 	}
 

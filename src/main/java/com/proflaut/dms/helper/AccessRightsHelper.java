@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
+import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 
@@ -53,7 +54,7 @@ public class AccessRightsHelper {
 		return accessRightsEntity;
 	}
 
-	public ProfOverallAccessRightsResponse convertToOverallResponse(ProfAccessRightsEntity profAccessRightsEntity) {
+	public ProfOverallAccessRightsResponse convertToOverallResponse(ProfAccessRightsEntity profAccessRightsEntity, ProfMetaDataEntity dataEntity) {
 		ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
 		accessRightsResponse.setId(profAccessRightsEntity.getId());
 		accessRightsResponse.setCreatedAt(profAccessRightsEntity.getCreatedAt());
@@ -63,6 +64,9 @@ public class AccessRightsHelper {
 		accessRightsResponse.setStatus(profAccessRightsEntity.getStatus());
 		accessRightsResponse.setUserId(profAccessRightsEntity.getUserId());
 		accessRightsResponse.setView(profAccessRightsEntity.getView());
+		accessRightsResponse.setWrite(profAccessRightsEntity.getWrite());
+		accessRightsResponse.setTable(dataEntity.getTableName());
+		accessRightsResponse.setTablename(dataEntity.getName());
 		accessRightsResponse.setWrite(profAccessRightsEntity.getWrite());
 		return accessRightsResponse;
 	}

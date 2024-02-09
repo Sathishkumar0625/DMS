@@ -23,6 +23,26 @@ public class ProfOverallAccessRightsResponse {
 
 	private String groupId;
 
+	private String table;
+
+	private String tablename;
+
+	public String getTable() {
+		return table;
+	}
+
+	public void setTable(String table) {
+		this.table = table;
+	}
+
+	public String getTablename() {
+		return tablename;
+	}
+
+	public void setTablename(String tablename) {
+		this.tablename = tablename;
+	}
+
 	public int getId() {
 		return id;
 	}

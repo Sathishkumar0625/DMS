@@ -1,6 +1,7 @@
 package com.proflaut.dms.controller;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,20 +80,20 @@ public class AccessRightsController {
 	}
 
 	@GetMapping("/getAllAccess")
-	public ResponseEntity<Map<String,Object>> getAllAccess() {
-		Map<String,Object> response=new LinkedHashMap<>();
-		try {
-			response = accessRightsServiceImpl.findAccess();
-			if (!response.isEmpty()) {
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+    public ResponseEntity<List<ProfOverallAccessRightsResponse>> getAllAccess() {
+        List<ProfOverallAccessRightsResponse> accessRightsResponses = null;
+        try {
+            accessRightsResponses = accessRightsServiceImpl.findAccess();
+            if (!accessRightsResponses.isEmpty()) {
+                return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 	@GetMapping("/getAccessById")
 	public ResponseEntity<ProfOverallAccessRightsResponse> getAccess(@RequestParam String id) {
