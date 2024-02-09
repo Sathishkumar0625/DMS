@@ -1,19 +1,34 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ProfAccessRightRequest {
-	private String userId;
-	private String groupId;
+
 	private String metaId;
 	private String view;
 	private String write;
 	private String createdBy;
+	@JsonProperty("group")
+	private List<ProfAccessGroupMappingRequest> accessGroupMappingRequests;
+	@JsonProperty("user")
+	private List<ProfAccessUserMappingRequest> accessUserMappingRequests;
 
-	public String getGroupId() {
-		return groupId;
+	public List<ProfAccessGroupMappingRequest> getAccessGroupMappingRequests() {
+		return accessGroupMappingRequests;
 	}
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
+	public void setAccessGroupMappingRequests(List<ProfAccessGroupMappingRequest> accessGroupMappingRequests) {
+		this.accessGroupMappingRequests = accessGroupMappingRequests;
+	}
+
+	public List<ProfAccessUserMappingRequest> getAccessUserMappingRequests() {
+		return accessUserMappingRequests;
+	}
+
+	public void setAccessUserMappingRequests(List<ProfAccessUserMappingRequest> accessUserMappingRequests) {
+		this.accessUserMappingRequests = accessUserMappingRequests;
 	}
 
 	public String getView() {
@@ -38,14 +53,6 @@ public class ProfAccessRightRequest {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getMetaId() {

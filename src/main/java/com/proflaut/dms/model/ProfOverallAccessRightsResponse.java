@@ -1,5 +1,7 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -28,6 +30,26 @@ public class ProfOverallAccessRightsResponse {
 	private String tablename;
 
 	private String message;
+
+	List<ProfAccessGroupMappingRequest> groupMappingRequests;
+
+	List<ProfAccessUserMappingRequest> accessUserMappingRequests;
+
+	public List<ProfAccessGroupMappingRequest> getGroupMappingRequests() {
+		return groupMappingRequests;
+	}
+
+	public void setGroupMappingRequests(List<ProfAccessGroupMappingRequest> groupMappingRequests) {
+		this.groupMappingRequests = groupMappingRequests;
+	}
+
+	public List<ProfAccessUserMappingRequest> getAccessUserMappingRequests() {
+		return accessUserMappingRequests;
+	}
+
+	public void setAccessUserMappingRequests(List<ProfAccessUserMappingRequest> accessUserMappingRequests) {
+		this.accessUserMappingRequests = accessUserMappingRequests;
+	}
 
 	public String getMessage() {
 		return message;

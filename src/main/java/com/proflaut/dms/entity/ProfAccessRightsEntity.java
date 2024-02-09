@@ -1,10 +1,15 @@
 package com.proflaut.dms.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -16,8 +21,6 @@ public class ProfAccessRightsEntity {
 	private int id;
 	@Column(name = "META_ID")
 	private String metaId;
-	@Column(name = "USER_ID")
-	private String userId;
 	@Column(name = "VIEW")
 	private String view;
 	@Column(name = "WRITE")
@@ -28,8 +31,28 @@ public class ProfAccessRightsEntity {
 	private String createdAt;
 	@Column(name = "STATUS")
 	private String status;
-	@Column(name = "GROUP_ID")
-	private String groupId;
+
+	@OneToMany(mappedBy = "accessRightsEntity", cascade = CascadeType.ALL)
+	private List<ProfAccessGroupMappingEntity> accessGroupMappingEntities;
+
+	@OneToMany(mappedBy = "accessRightsEntity", cascade = CascadeType.ALL)
+	private List<ProfAccessUserMappingEntity> accessUserMappingEntities;
+
+	public List<ProfAccessGroupMappingEntity> getAccessGroupMappingEntities() {
+		return accessGroupMappingEntities;
+	}
+
+	public void setAccessGroupMappingEntities(List<ProfAccessGroupMappingEntity> accessGroupMappingEntities) {
+		this.accessGroupMappingEntities = accessGroupMappingEntities;
+	}
+
+	public List<ProfAccessUserMappingEntity> getAccessUserMappingEntities() {
+		return accessUserMappingEntities;
+	}
+
+	public void setAccessUserMappingEntities(List<ProfAccessUserMappingEntity> accessUserMappingEntities) {
+		this.accessUserMappingEntities = accessUserMappingEntities;
+	}
 
 	public int getId() {
 		return id;
@@ -45,22 +68,6 @@ public class ProfAccessRightsEntity {
 
 	public void setMetaId(String metaId) {
 		this.metaId = metaId;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 
 	public String getView() {

@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
@@ -111,12 +110,8 @@ public class AccessRightsServiceImpl {
 				ProfMetaDataEntity dataEntity = dataRepository
 						.findById(Integer.parseInt(accessRightsEntity.getMetaId()));
 				if (dataEntity != null) {
-					accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity,dataEntity);
-				}else {
-					accessRightsResponse.setMessage("ProfMetaDataEntity IS NULL");
+					accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity, dataEntity, id);
 				}
-			}else {
-				accessRightsResponse.setMessage("ProfAccessRightsEntity IS NULL");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

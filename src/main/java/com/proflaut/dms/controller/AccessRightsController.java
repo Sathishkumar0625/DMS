@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.proflaut.dms.constant.AccesssRightConstant;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
@@ -104,12 +106,10 @@ public class AccessRightsController {
 		ProfOverallAccessRightsResponse accessRightsResponses = null;
 		try {
 			accessRightsResponses = accessRightsServiceImpl.findAccessById(id);
-			if (accessRightsResponses != null
-					&& !accessRightsResponses.getMessage().equalsIgnoreCase("ProfMetaDataEntity IS NULL")
-					&& !accessRightsResponses.getMessage().equalsIgnoreCase("ProfAccessRightsEntity IS NULL")) {
+			if (accessRightsResponses != null) {
 				return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(accessRightsResponses,HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(accessRightsResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
