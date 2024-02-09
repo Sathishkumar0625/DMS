@@ -98,39 +98,40 @@ public class AccessRightsHelper {
 		return accessRightsResponse;
 	}
 
-	public ProfOverallAccessRightsResponse convertAccessEntityToResponse(ProfAccessRightsEntity accessRightsEntity,
-			ProfMetaDataEntity dataEntity, int id) {
-		ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
-		List<ProfAccessGroupMappingEntity> groupMappingEntities = groupMappingRepository.findById(id);
-		List<ProfAccessUserMappingEntity> accessUserMappingEntities = userMappingRepository.findById(id);
-		if (!groupMappingEntities.isEmpty() && accessUserMappingEntities.isEmpty()) {
-			accessRightsResponse.setCreatedAt(accessRightsEntity.getCreatedAt());
-			accessRightsResponse.setCreatedBy(accessRightsEntity.getCreatedBy());
-			accessRightsResponse.setId(accessRightsEntity.getId());
-			accessRightsResponse.setMetaId(accessRightsEntity.getMetaId());
-			accessRightsResponse.setStatus(accessRightsEntity.getStatus());
-			accessRightsResponse.setView(accessRightsEntity.getView());
-			accessRightsResponse.setWrite(accessRightsEntity.getWrite());
-			accessRightsResponse.setTable(dataEntity.getTableName());
-			accessRightsResponse.setTablename(dataEntity.getName());
-			List<ProfAccessGroupMappingRequest> accessRightRequest = new ArrayList<>();
-			for (ProfAccessGroupMappingEntity groupMappingRequest : groupMappingEntities) {
-				ProfAccessGroupMappingRequest groupMappingRequests = new ProfAccessGroupMappingRequest();
-				groupMappingRequests.setGroupId(groupMappingRequest.getGroupId());
-				groupMappingRequests.setGroupName(groupMappingRequest.getGroupName());
-				accessRightRequest.add(groupMappingRequests);
-			}
-			accessRightsResponse.setGroupMappingRequests(accessRightRequest);
-			List<ProfAccessUserMappingRequest> accessUserMappingRequests = new ArrayList<>();
-			for (ProfAccessUserMappingEntity userMappingRequest : accessUserMappingEntities) {
-				ProfAccessUserMappingRequest mappingRequest = new ProfAccessUserMappingRequest();
-				mappingRequest.setUserId(userMappingRequest.getUserId());
-				mappingRequest.setUserName(userMappingRequest.getUserName());
-				accessUserMappingRequests.add(mappingRequest);
-			}
-			accessRightsResponse.setAccessUserMappingRequests(accessUserMappingRequests);
-		}
-		return accessRightsResponse;
+	public ProfOverallAccessRightsResponse convertAccessEntityToResponse(ProfAccessRightsEntity accessRightsEntity, ProfMetaDataEntity dataEntity, int id) {
+	    ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
+	    accessRightsResponse.setId(accessRightsEntity.getId());
+	    accessRightsResponse.setMetaId(accessRightsEntity.getMetaId());
+	    accessRightsResponse.setView(accessRightsEntity.getView());
+	    accessRightsResponse.setWrite(accessRightsEntity.getWrite());
+	    accessRightsResponse.setCreatedBy(accessRightsEntity.getCreatedBy());
+	    accessRightsResponse.setCreatedAt(accessRightsEntity.getCreatedAt());
+	    accessRightsResponse.setStatus(accessRightsEntity.getStatus());
+	     accessRightsResponse.setTable(dataEntity.getTableName());
+	     accessRightsResponse.setTablename(dataEntity.getName());
+
+	    List<ProfAccessGroupMappingEntity> groupMappingEntities = accessRightsEntity.getAccessGroupMappingEntities();
+	    List<ProfAccessUserMappingEntity> accessUserMappingEntities = accessRightsEntity.getAccessUserMappingEntities();
+
+	    List<ProfAccessGroupMappingRequest> groupMappingRequests = new ArrayList<>();
+	    for (ProfAccessGroupMappingEntity groupMappingEntity : groupMappingEntities) {
+	        ProfAccessGroupMappingRequest groupMappingRequest = new ProfAccessGroupMappingRequest();
+	        groupMappingRequest.setGroupId(groupMappingEntity.getGroupId());
+	        groupMappingRequest.setGroupName(groupMappingEntity.getGroupName());
+	        groupMappingRequests.add(groupMappingRequest);
+	    }
+	    accessRightsResponse.setGroupMappingRequests(groupMappingRequests);
+
+	    List<ProfAccessUserMappingRequest> userMappingRequests = new ArrayList<>();
+	    for (ProfAccessUserMappingEntity userMappingEntity : accessUserMappingEntities) {
+	        ProfAccessUserMappingRequest userMappingRequest = new ProfAccessUserMappingRequest();
+	        userMappingRequest.setUserId(userMappingEntity.getUserId());
+	        userMappingRequest.setUserName(userMappingEntity.getUserName());
+	        userMappingRequests.add(userMappingRequest);
+	    }
+	    accessRightsResponse.setAccessUserMappingRequests(userMappingRequests);
+
+	    return accessRightsResponse;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(Include.NON_NULL)
 public class ProfOverallAccessRightsResponse {
@@ -30,9 +31,11 @@ public class ProfOverallAccessRightsResponse {
 	private String tablename;
 
 	private String message;
-
+	
+	@JsonProperty("group")
 	List<ProfAccessGroupMappingRequest> groupMappingRequests;
-
+	
+	@JsonProperty("user")
 	List<ProfAccessUserMappingRequest> accessUserMappingRequests;
 
 	public List<ProfAccessGroupMappingRequest> getGroupMappingRequests() {
