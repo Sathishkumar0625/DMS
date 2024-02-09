@@ -16,7 +16,7 @@ import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 
 @Component
-public class MetaHelper {
+public class AccessRightsHelper {
 	@Autowired
 	private EntityManager entityManager;
 

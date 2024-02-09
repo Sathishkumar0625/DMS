@@ -3,7 +3,6 @@ package com.proflaut.dms.service.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +43,9 @@ public class FolderServiceImpl implements FolderService {
 	public FileResponse saveFolder(FolderFO folderFO) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
-			Optional<ProfMetaDataEntity> dataEntity = dataRepository
+			ProfMetaDataEntity dataEntity = dataRepository
 					.findById(Integer.parseInt(folderFO.getMetaDataId()));
-			if (dataEntity.isPresent()) {
+			if (dataEntity != null) {
 				String folderPath = folderLocation + folderFO.getFolderName();
 				File folder = new File(folderPath);
 

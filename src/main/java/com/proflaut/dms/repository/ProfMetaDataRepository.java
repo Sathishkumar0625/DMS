@@ -12,4 +12,6 @@ public interface ProfMetaDataRepository extends JpaRepository<ProfMetaDataEntity
 	ProfMetaDataEntity findByIdAndNameIgnoreCase(Integer id, String name);
 
 	ProfMetaDataEntity findByNameIgnoreCase(String name);
+
+	ProfMetaDataEntity findById(int id);
 }

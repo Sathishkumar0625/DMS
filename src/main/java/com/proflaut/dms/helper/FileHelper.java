@@ -64,6 +64,7 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
 @Component
+@Transactional
 public class FileHelper {
 
 	@Autowired
@@ -127,8 +128,7 @@ public class FileHelper {
 						handleIOException(e);
 					}
 
-					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName,
-							fileRequest);
+					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName);
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, fileRequest, entity);
 
@@ -172,11 +172,11 @@ public class FileHelper {
 		ent.setDocPath(fileName);
 		ent.setExtention(fileRequest.getExtention());
 		ent.setIsEmail("N");
+		ent.setMetaId(Integer.valueOf(fileRequest.getCreateTableRequests().get(0).getMetadataId()));
 		return ent;
 	}
 
-	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName,
-			FileRequest fileRequest) {
+	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName) {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());

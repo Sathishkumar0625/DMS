@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
-import com.proflaut.dms.helper.MetaHelper;
+import com.proflaut.dms.helper.AccessRightsHelper;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
@@ -23,14 +23,14 @@ import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 
 @Service
-public class MetaServiceImpl {
+public class AccessRightsServiceImpl {
 	@Autowired
 	private EntityManager entityManager;
 	@Autowired
 	ProfMetaDataRepository dataRepository;
 
 	@Autowired
-	MetaHelper helper;
+	AccessRightsHelper helper;
 
 	@Autowired
 	ProfAccessRightRepository accessRightRepository;

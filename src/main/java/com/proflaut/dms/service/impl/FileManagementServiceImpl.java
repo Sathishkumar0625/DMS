@@ -6,15 +6,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -77,8 +80,9 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	ProfMetaDataRepository metaDataRepository;
-
-	public FileResponse storeFile(FileRequest fileRequest, String token) throws CustomException {
+	
+	@Transactional
+	public FileResponse storeFile(FileRequest fileRequest, String token, TransactionStatus status, PlatformTransactionManager transactionManager) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
 			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
@@ -89,10 +93,12 @@ public class FileManagementServiceImpl {
 			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
+				transactionManager.commit(status);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			transactionManager.rollback(status);
 			throw new CustomException(e.getMessage());
 		}
 
@@ -118,7 +124,8 @@ public class FileManagementServiceImpl {
 		return fileRetreiveResponse;
 	}
 
-	public FileRetreiveByResponse reteriveFileByNameAndId(int id) {
+	public Map<String, Object> reteriveFileById(int id) {
+		 Map<String, Object> response=new LinkedHashMap<>();
 		FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
 		try {
 			ProfDocEntity docEntity = profDocUploadRepository.findById(id);
@@ -129,19 +136,25 @@ public class FileManagementServiceImpl {
 			if (entity == null) {
 				throw new CustomException("FolderEntity not found for ID: " + docEntity.getFolderId());
 			}
+			ProfMetaDataEntity dataEntity=metaDataRepository.findById(docEntity.getMetaId());
+			
 			String decrypted = fileHelper.retrieveDocument(docEntity, entity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
 				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
+				GetAllTableResponse allTableResponse=getAll(dataEntity.getName());
+				response.put("Image", fileRetreiveByResponse);
+				response.put(dataEntity.getName(), allTableResponse);
 			} else {
 				fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
+				response.put("Image", fileRetreiveByResponse);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
 		}
-		return fileRetreiveByResponse;
+		return response;
 	}
 
 	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest, String token) {

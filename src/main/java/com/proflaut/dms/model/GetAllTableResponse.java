@@ -10,6 +10,16 @@ public class GetAllTableResponse {
 	private int id;
 	private String createdAt;
 	private String createdBy;
+	private String image;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
 	private String fileExtention;
 	private String tableName;
 	private List<FieldDefinitionResponse> fieldNames;

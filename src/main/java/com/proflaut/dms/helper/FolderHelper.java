@@ -35,6 +35,7 @@ public class FolderHelper {
 		ent.setFolderName(folderFO.getFolderName());
 		ent.setFolderPath(folderPath);
 		ent.setIsParent(folderLocation);
+		ent.setMetaId(folderFO.getMetaDataId());
 		return ent;
 	}	
 

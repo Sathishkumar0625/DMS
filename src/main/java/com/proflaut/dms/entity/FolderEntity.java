@@ -32,6 +32,17 @@ public class FolderEntity {
 	@Column(name = "FOLDER_NAME")
 	private String folderName;
 
+	@Column(name = "META_ID")
+	private String metaId;
+
+	public String getMetaId() {
+		return metaId;
+	}
+
+	public void setMetaId(String metaId) {
+		this.metaId = metaId;
+	}
+
 	public String getFolderName() {
 		return folderName;
 	}

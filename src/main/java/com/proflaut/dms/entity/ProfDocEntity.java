@@ -35,7 +35,6 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_ID")
 	private int folderId;
 
-
 	@Column(name = "EXTENTION")
 	private String extention;
 
@@ -45,7 +44,16 @@ public class ProfDocEntity {
 	@Column(name = "EMAIL_RES_ID")
 	private String emilResId;
 
-	
+	@Column(name = "META_ID")
+	private int metaId;
+
+	public int getMetaId() {
+		return metaId;
+	}
+
+	public void setMetaId(int metaId) {
+		this.metaId = metaId;
+	}
 
 	public String getEmilResId() {
 		return emilResId;
