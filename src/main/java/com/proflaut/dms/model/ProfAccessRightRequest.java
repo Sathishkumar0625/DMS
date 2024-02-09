@@ -1,21 +1,12 @@
 package com.proflaut.dms.model;
 
-
 public class ProfAccessRightRequest {
-	private int userId;
+	private String userId;
 	private String groupId;
-	private int metaId;
+	private String metaId;
 	private String view;
 	private String write;
 	private String createdBy;
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
 
 	public String getGroupId() {
 		return groupId;
@@ -23,14 +14,6 @@ public class ProfAccessRightRequest {
 
 	public void setGroupId(String groupId) {
 		this.groupId = groupId;
-	}
-
-	public int getMetaId() {
-		return metaId;
-	}
-
-	public void setMetaId(int metaId) {
-		this.metaId = metaId;
 	}
 
 	public String getView() {
@@ -55,6 +38,22 @@ public class ProfAccessRightRequest {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getMetaId() {
+		return metaId;
+	}
+
+	public void setMetaId(String metaId) {
+		this.metaId = metaId;
 	}
 
 }

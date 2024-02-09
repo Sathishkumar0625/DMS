@@ -43,7 +43,7 @@ public class AccessRightsHelper {
 	public ProfAccessRightsEntity convertRequestToAccesEntity(ProfAccessRightRequest accessRightRequest) {
 		ProfAccessRightsEntity accessRightsEntity = new ProfAccessRightsEntity();
 		accessRightsEntity.setCreatedBy(accessRightRequest.getCreatedBy());
-		accessRightsEntity.setGroupId(Integer.valueOf(accessRightRequest.getGroupId()));
+		accessRightsEntity.setGroupId((accessRightRequest.getGroupId()));
 		accessRightsEntity.setView(accessRightRequest.getView());
 		accessRightsEntity.setWrite(accessRightRequest.getWrite());
 		accessRightsEntity.setMetaId(accessRightRequest.getMetaId());

@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ProfOverallAccessRightsResponse {
 	private int id;
 
-	private int metaId;
+	private String metaId;
 
-	private int userId;
+	private String userId;
 
 	private String view;
 
@@ -21,7 +21,7 @@ public class ProfOverallAccessRightsResponse {
 
 	private String status;
 
-	private int groupId;
+	private String groupId;
 
 	public int getId() {
 		return id;
@@ -29,22 +29,6 @@ public class ProfOverallAccessRightsResponse {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public int getMetaId() {
-		return metaId;
-	}
-
-	public void setMetaId(int metaId) {
-		this.metaId = metaId;
-	}
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
 	}
 
 	public String getView() {
@@ -87,11 +71,27 @@ public class ProfOverallAccessRightsResponse {
 		this.status = status;
 	}
 
-	public int getGroupId() {
+	public String getMetaId() {
+		return metaId;
+	}
+
+	public void setMetaId(String metaId) {
+		this.metaId = metaId;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(int groupId) {
+	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
 

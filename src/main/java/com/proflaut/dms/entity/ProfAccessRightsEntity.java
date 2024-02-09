@@ -14,10 +14,10 @@ public class ProfAccessRightsEntity {
 	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "META_ID",unique = true)
-	private int metaId;
+	@Column(name = "META_ID", unique = true)
+	private String metaId;
 	@Column(name = "USER_ID")
-	private int userId;
+	private String userId;
 	@Column(name = "VIEW")
 	private String view;
 	@Column(name = "WRITE")
@@ -29,15 +29,7 @@ public class ProfAccessRightsEntity {
 	@Column(name = "STATUS")
 	private String status;
 	@Column(name = "GROUP_ID")
-	private int groupId;
-
-	public int getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
-	}
+	private String groupId;
 
 	public int getId() {
 		return id;
@@ -47,20 +39,28 @@ public class ProfAccessRightsEntity {
 		this.id = id;
 	}
 
-	public int getMetaId() {
+	public String getMetaId() {
 		return metaId;
 	}
 
-	public void setMetaId(int metaId) {
+	public void setMetaId(String metaId) {
 		this.metaId = metaId;
 	}
 
-	public int getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 	public String getView() {
