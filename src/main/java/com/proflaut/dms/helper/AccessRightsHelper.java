@@ -71,7 +71,7 @@ public class AccessRightsHelper {
 		return accessRightsResponse;
 	}
 
-	public ProfOverallAccessRightsResponse convertAccessEntityToResponse(ProfAccessRightsEntity accessRightsEntity) {
+	public ProfOverallAccessRightsResponse convertAccessEntityToResponse(ProfAccessRightsEntity accessRightsEntity, ProfMetaDataEntity dataEntity) {
 		ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
 		accessRightsResponse.setCreatedAt(accessRightsEntity.getCreatedAt());
 		accessRightsResponse.setCreatedBy(accessRightsEntity.getCreatedBy());
@@ -82,6 +82,8 @@ public class AccessRightsHelper {
 		accessRightsResponse.setUserId(accessRightsEntity.getUserId());
 		accessRightsResponse.setView(accessRightsEntity.getView());
 		accessRightsResponse.setWrite(accessRightsEntity.getWrite());
+		accessRightsResponse.setTable(dataEntity.getTableName());
+		accessRightsResponse.setTablename(dataEntity.getName());
 		return accessRightsResponse;
 	}
 

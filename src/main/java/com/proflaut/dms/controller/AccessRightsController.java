@@ -80,20 +80,20 @@ public class AccessRightsController {
 	}
 
 	@GetMapping("/getAllAccess")
-    public ResponseEntity<List<ProfOverallAccessRightsResponse>> getAllAccess() {
-        List<ProfOverallAccessRightsResponse> accessRightsResponses = null;
-        try {
-            accessRightsResponses = accessRightsServiceImpl.findAccess();
-            if (!accessRightsResponses.isEmpty()) {
-                return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+	public ResponseEntity<List<ProfOverallAccessRightsResponse>> getAllAccess() {
+		List<ProfOverallAccessRightsResponse> accessRightsResponses = null;
+		try {
+			accessRightsResponses = accessRightsServiceImpl.findAccess();
+			if (!accessRightsResponses.isEmpty()) {
+				return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@GetMapping("/getAccessById")
 	public ResponseEntity<ProfOverallAccessRightsResponse> getAccess(@RequestParam String id) {
@@ -104,10 +104,12 @@ public class AccessRightsController {
 		ProfOverallAccessRightsResponse accessRightsResponses = null;
 		try {
 			accessRightsResponses = accessRightsServiceImpl.findAccessById(id);
-			if (accessRightsResponses != null) {
+			if (accessRightsResponses != null
+					&& !accessRightsResponses.getMessage().equalsIgnoreCase("ProfMetaDataEntity IS NULL")
+					&& !accessRightsResponses.getMessage().equalsIgnoreCase("ProfAccessRightsEntity IS NULL")) {
 				return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(accessRightsResponses,HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

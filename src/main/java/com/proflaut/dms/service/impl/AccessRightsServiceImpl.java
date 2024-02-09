@@ -91,7 +91,8 @@ public class AccessRightsServiceImpl {
 			for (ProfAccessRightsEntity profAccessRightsEntity : accessRightsEntity) {
 				ProfMetaDataEntity dataEntity = dataRepository.findById(profAccessRightsEntity.getId());
 				if (dataEntity != null) {
-					ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity,dataEntity);
+					ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity,
+							dataEntity);
 					accessRightsResponses.add(response);
 				}
 			}
@@ -107,7 +108,15 @@ public class AccessRightsServiceImpl {
 			int id = Integer.parseInt(ids);
 			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(id);
 			if (accessRightsEntity != null) {
-				accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity);
+				ProfMetaDataEntity dataEntity = dataRepository
+						.findById(Integer.parseInt(accessRightsEntity.getMetaId()));
+				if (dataEntity != null) {
+					accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity,dataEntity);
+				}else {
+					accessRightsResponse.setMessage("ProfMetaDataEntity IS NULL");
+				}
+			}else {
+				accessRightsResponse.setMessage("ProfAccessRightsEntity IS NULL");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
