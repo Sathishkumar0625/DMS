@@ -19,6 +19,7 @@ import com.proflaut.dms.helper.AccessRightsHelper;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
+import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 
@@ -34,6 +35,9 @@ public class AccessRightsServiceImpl {
 
 	@Autowired
 	ProfAccessRightRepository accessRightRepository;
+
+	@Autowired
+	FileManagementServiceImpl serviceImpl;
 
 	public Map<String, Object> findAllRowsAndColumns(String tableName) {
 		Map<String, Object> responseMap = new HashMap<>();
@@ -80,23 +84,32 @@ public class AccessRightsServiceImpl {
 		return accessRightResponse;
 	}
 
-	public List<ProfOverallAccessRightsResponse> findAccess() {
-		List<ProfOverallAccessRightsResponse> accessRightsResponses = new ArrayList<>();
-		try {
-			List<ProfAccessRightsEntity> accessRightsEntity = accessRightRepository.findAll();
-			for (ProfAccessRightsEntity profAccessRightsEntity : accessRightsEntity) {
-				ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity);
-				accessRightsResponses.add(response);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return accessRightsResponses;
+	public Map<String, Object> findAccess() {
+	    List<Map<String, Object>> accessAndMetadataList = new ArrayList<>();
+	    try {
+	        List<ProfAccessRightsEntity> accessRightsEntityList = accessRightRepository.findAll();
+	        for (ProfAccessRightsEntity accessRightsEntity : accessRightsEntityList) {
+	            ProfOverallAccessRightsResponse accessRightsResponse = helper.convertToOverallResponse(accessRightsEntity);
+	            ProfOverallMetaDataResponse metaDataResponse = serviceImpl.getMetaData(Integer.valueOf(accessRightsEntity.getMetaId()));
+
+	            Map<String, Object> accessAndMetadataMap = new LinkedHashMap<>();
+	            accessAndMetadataMap.put("AccessRight", accessRightsResponse);
+	            accessAndMetadataMap.put("id", metaDataResponse);
+	            accessAndMetadataList.add(accessAndMetadataMap);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    Map<String, Object> response = new LinkedHashMap<>();
+	    response.put("data", accessAndMetadataList);
+	    return response;
 	}
 
-	public ProfOverallAccessRightsResponse findAccessById(int id) {
+
+	public ProfOverallAccessRightsResponse findAccessById(String ids) {
 		ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
 		try {
+			int id=Integer.parseInt(ids);
 			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(id);
 			if (accessRightsEntity != null) {
 				accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity);

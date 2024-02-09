@@ -1,6 +1,6 @@
 package com.proflaut.dms.controller;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,12 +79,12 @@ public class AccessRightsController {
 	}
 
 	@GetMapping("/getAllAccess")
-	public ResponseEntity<List<ProfOverallAccessRightsResponse>> getAllAccess() {
-		List<ProfOverallAccessRightsResponse> accessRightsResponses = null;
+	public ResponseEntity<Map<String,Object>> getAllAccess() {
+		Map<String,Object> response=new LinkedHashMap<>();
 		try {
-			accessRightsResponses = accessRightsServiceImpl.findAccess();
-			if (!accessRightsResponses.isEmpty()) {
-				return new ResponseEntity<>(accessRightsResponses, HttpStatus.OK);
+			response = accessRightsServiceImpl.findAccess();
+			if (!response.isEmpty()) {
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
@@ -95,7 +95,7 @@ public class AccessRightsController {
 	}
 
 	@GetMapping("/getAccessById")
-	public ResponseEntity<ProfOverallAccessRightsResponse> getAccess(@RequestParam int id) {
+	public ResponseEntity<ProfOverallAccessRightsResponse> getAccess(@RequestParam String id) {
 		if (StringUtils.isEmpty(id)) {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

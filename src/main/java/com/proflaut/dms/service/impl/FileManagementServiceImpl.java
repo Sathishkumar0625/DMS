@@ -1,7 +1,9 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.proflaut.dms.constant.DMSConstant;
@@ -81,8 +85,11 @@ public class FileManagementServiceImpl {
 	@Autowired
 	ProfMetaDataRepository metaDataRepository;
 	
+	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
+
 	@Transactional
-	public FileResponse storeFile(FileRequest fileRequest, String token, TransactionStatus status, PlatformTransactionManager transactionManager) throws CustomException {
+	public FileResponse storeFile(FileRequest fileRequest, String token, TransactionStatus status,
+			PlatformTransactionManager transactionManager) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
 			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
@@ -125,7 +132,7 @@ public class FileManagementServiceImpl {
 	}
 
 	public Map<String, Object> reteriveFileById(int id) {
-		 Map<String, Object> response=new LinkedHashMap<>();
+		Map<String, Object> response = new LinkedHashMap<>();
 		FileRetreiveByResponse fileRetreiveByResponse = new FileRetreiveByResponse();
 		try {
 			ProfDocEntity docEntity = profDocUploadRepository.findById(id);
@@ -136,14 +143,14 @@ public class FileManagementServiceImpl {
 			if (entity == null) {
 				throw new CustomException("FolderEntity not found for ID: " + docEntity.getFolderId());
 			}
-			ProfMetaDataEntity dataEntity=metaDataRepository.findById(docEntity.getMetaId());
-			
+			ProfMetaDataEntity dataEntity = metaDataRepository.findById(docEntity.getMetaId());
+
 			String decrypted = fileHelper.retrieveDocument(docEntity, entity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
 				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-				GetAllTableResponse allTableResponse=getAll(dataEntity.getName());
+				GetAllTableResponse allTableResponse = getAll(dataEntity.getName());
 				response.put("Image", fileRetreiveByResponse);
 				response.put(dataEntity.getName(), allTableResponse);
 			} else {
@@ -255,36 +262,65 @@ public class FileManagementServiceImpl {
 		return getAllTableResponse;
 	}
 
-	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest) {
+	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest,Path path) throws IOException {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(Integer.valueOf(createTableRequest.getMetadataId()),createTableRequest.getTableName());
-			Optional<FolderEntity> entity= folderRepository.findById(Integer.valueOf( fileRequest.getFolderId()));
+			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(
+					Integer.valueOf(createTableRequest.getMetadataId()), createTableRequest.getTableName());
+			Optional<FolderEntity> entity = folderRepository.findById(Integer.valueOf(fileRequest.getFolderId()));
 			if (dataEntity != null && !entity.isEmpty()) {
-				dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),id);
-			}else {
+				dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),
+						id);
+			} else {
 				throw new CustomException("ID NOT FOUND");
 			}
 		} catch (Exception e) {
+
+			delete(path);
 			e.printStackTrace();
 		}
 		return dataResponse;
 	}
-	public List<ProfOverallMetaDataResponse> getAllData() {
-	    List<ProfOverallMetaDataResponse> metaResponses = new ArrayList<>();
-	    try {
-	        List<ProfMetaDataEntity> dataEntities = metaDataRepository.findAll();
 
-	        for (ProfMetaDataEntity metaDataEntity : dataEntities) {
-	            if (!metaDataEntity.getStatus().equalsIgnoreCase("I")) {
-	                ProfOverallMetaDataResponse response = fileHelper.convertToResponse(metaDataEntity);
-	                metaResponses.add(response);
-	            }
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return metaResponses;
+	public List<ProfOverallMetaDataResponse> getAllData() {
+		List<ProfOverallMetaDataResponse> metaResponses = new ArrayList<>();
+		try {
+			List<ProfMetaDataEntity> dataEntities = metaDataRepository.findAll();
+
+			for (ProfMetaDataEntity metaDataEntity : dataEntities) {
+				if (!metaDataEntity.getStatus().equalsIgnoreCase("I")) {
+					ProfOverallMetaDataResponse response = fileHelper.convertToResponse(metaDataEntity);
+					metaResponses.add(response);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return metaResponses;
+	}
+
+	public void delete(Path path) throws IOException {
+		logger.info("path ->{}",path);
+		boolean isDeleted = Files.deleteIfExists(path);
+		if (isDeleted) {
+			logger.info("File deleted successfully");
+		} else {
+			logger.info("File doesn't exist");
+		}
+	}
+
+	public ProfOverallMetaDataResponse getMetaData(int id) {
+		ProfOverallMetaDataResponse dataResponse=new ProfOverallMetaDataResponse();
+		try {
+			ProfMetaDataEntity dataEntity=metaDataRepository.findById(id);
+			if (dataEntity != null) {
+				dataResponse=fileHelper.convertMetaEntityToResponse(dataEntity);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return dataResponse;
 	}
 
 }

@@ -14,7 +14,7 @@ public class ProfAccessRightsEntity {
 	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "META_ID", unique = true)
+	@Column(name = "META_ID")
 	private String metaId;
 	@Column(name = "USER_ID")
 	private String userId;

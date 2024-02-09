@@ -1,6 +1,8 @@
 package com.proflaut.dms.controller;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -81,10 +83,10 @@ public class FileController {
 				logger.info("Upload Success");
 				ProfDocEntity docEntity = uploadRepository.findByDocNameAndFolderId(fileRequest.getDockName(),
 						Integer.valueOf(fileRequest.getFolderId()));
-				String path=folderLocation+File.separator+docEntity.getDocName();
-				System.out.println(path);
+				String path=folderLocation+docEntity.getProspectId()+File.separator+docEntity.getDocPath();
+				 Path paths = Paths.get(path);
 				ProfMetaDataResponse metaDataResponse = fileManagementServiceImpl
-						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest);
+						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 					logger.error("INSERT META DATA SUCCESS");
@@ -231,6 +233,22 @@ public class FileController {
 		try {
 			List<ProfOverallMetaDataResponse> dataResponse = fileManagementServiceImpl.getAllData();
 			if (!dataResponse.isEmpty()) {
+				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/getMetaById")
+	public ResponseEntity<ProfOverallMetaDataResponse> getMetaDataById(@RequestParam int id) {
+		ProfOverallMetaDataResponse dataResponse=null;
+		try {
+			 dataResponse = fileManagementServiceImpl.getMetaData(id);
+			if (dataResponse != null) {
 				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -530,4 +530,12 @@ public class FileHelper {
 		return metaDataResponse;
 	}
 
+	public ProfOverallMetaDataResponse convertMetaEntityToResponse(ProfMetaDataEntity dataEntity) {
+		ProfOverallMetaDataResponse dataResponse=new ProfOverallMetaDataResponse();
+		dataResponse.setId(dataEntity.getId());
+		dataResponse.setName(dataEntity.getName());
+		dataResponse.setTableName(dataEntity.getTableName());
+		return dataResponse;
+	}
+
 }
