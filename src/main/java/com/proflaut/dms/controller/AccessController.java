@@ -4,9 +4,12 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,14 +28,13 @@ import com.proflaut.dms.service.impl.AccessServiceImpl;
 @RequestMapping("/access")
 @CrossOrigin
 public class AccessController {
-	
-	
+
+	private static final Logger logger = LogManager.getLogger(AccessController.class);
 	AccessServiceImpl accessServiceImpl;
-	
-	
+
 	@Autowired
 	public AccessController(AccessServiceImpl accessServiceImpl) {
-		
+
 		this.accessServiceImpl = accessServiceImpl;
 	}
 
@@ -68,6 +70,10 @@ public class AccessController {
 
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody UserInfo userInfo) {
+		if (StringUtils.isEmpty(userInfo.getUserName()) && StringUtils.isEmpty(userInfo.getPassword()) ) {
+			logger.warn(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		LoginResponse loginResponse = null;
 		try {
 			loginResponse = accessServiceImpl.getUser(userInfo);

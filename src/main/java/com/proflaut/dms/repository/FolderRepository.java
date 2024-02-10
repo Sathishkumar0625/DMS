@@ -11,7 +11,7 @@ import com.proflaut.dms.entity.FolderEntity;
 @Repository
 public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
-	FolderEntity findById(int folderId);
+	FolderEntity findById(int id);
 
 	FolderEntity findByProspectId(String prospectId);
 

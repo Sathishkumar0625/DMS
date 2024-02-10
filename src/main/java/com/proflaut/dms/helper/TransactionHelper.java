@@ -80,7 +80,7 @@ public class TransactionHelper {
 		mainEntity.setProspectId("DMS_" + uniqueId);
 		FolderFO folderFO = new FolderFO();
 		folderFO.setProspectId("DMS_" + uniqueId);
-		folderServiceImpl.saveFolder(folderFO);
+		folderServiceImpl.saveFolder(folderFO, uniqueId);
 		return mainEntity;
 	}
 

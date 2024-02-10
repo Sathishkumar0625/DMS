@@ -1,17 +1,16 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
+import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.FolderHelper;
 import com.proflaut.dms.model.FileResponse;
@@ -20,10 +19,10 @@ import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
-import com.proflaut.dms.service.interF.FolderService;
+import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
-public class FolderServiceImpl implements FolderService {
+public class FolderServiceImpl {
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -35,17 +34,17 @@ public class FolderServiceImpl implements FolderService {
 	FolderHelper helper;
 
 	@Autowired
-	FolderService folderService;
+	ProfUserPropertiesRepository profUserPropertiesRepository;
 
 	@Autowired
 	ProfMetaDataRepository dataRepository;
 
-	public FileResponse saveFolder(FolderFO folderFO) throws CustomException {
+	public FileResponse saveFolder(FolderFO folderFO, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
-			ProfMetaDataEntity dataEntity = dataRepository
-					.findById(Integer.parseInt(folderFO.getMetaDataId()));
-			if (dataEntity != null) {
+			ProfMetaDataEntity dataEntity = dataRepository.findById(Integer.parseInt(folderFO.getMetaDataId()));
+			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
+			if (dataEntity != null && propertiesEntity != null) {
 				String folderPath = folderLocation + folderFO.getFolderName();
 				File folder = new File(folderPath);
 
@@ -55,7 +54,7 @@ public class FolderServiceImpl implements FolderService {
 					return fileResponse;
 				}
 
-				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse);
+				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse, propertiesEntity);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
 				fileResponse.setId(folderRespEnt.getId());
 				fileResponse.setFolderPath(folderRespEnt.getFolderPath());
@@ -88,33 +87,27 @@ public class FolderServiceImpl implements FolderService {
 		return fileResponse;
 	}
 
-	public FolderRetreiveResponse retreive(Integer id) {
-		FolderRetreiveResponse folderRetreiveResponse = new FolderRetreiveResponse();
+	public Folders retreive(int id) {
+		Folders folders = new Folders();
 		try {
-
-			FolderEntity folderEntity = helper.callFolderEntity(id);
+			FolderEntity folderEntity = folderRepo.findById(id);
 			if (folderEntity != null) {
-				List<Folders> foldersList = new ArrayList<>();
-				Folders folders = helper.convertFolderEntityToFolder(folderEntity);
-
-				foldersList.add(folders);
-				folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
-				folderRetreiveResponse.setFolder(foldersList);
-			} else {
-				folderRetreiveResponse.setStatus(DMSConstant.FAILURE);
+				folders = helper.convertFolderEntityToFolder(folderEntity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 
 		}
-		return folderRetreiveResponse;
+		return folders;
 
 	}
 
-	public FolderRetreiveResponse getAllFolders() {
+	public FolderRetreiveResponse getAllFolders(String token) {
 		FolderRetreiveResponse folderRetreiveResponse = new FolderRetreiveResponse();
 		try {
-			List<FolderEntity> foldersList = folderRepo.findAll();
+			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
+
+			List<FolderEntity> foldersList = folderRepo.findAll(Sort.by(Sort.Direction.ASC, "parentFolderID"));
 			List<Folders> folders = foldersList.stream().map(helper::convertFolderEntityToFolder)
 					.collect(Collectors.toList());
 
@@ -126,4 +119,5 @@ public class FolderServiceImpl implements FolderService {
 		}
 		return folderRetreiveResponse;
 	}
+
 }

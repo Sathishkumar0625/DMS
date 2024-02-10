@@ -35,6 +35,28 @@ public class FolderEntity {
 	@Column(name = "META_ID")
 	private String metaId;
 
+	@Column(name = "CREATED_BY")
+	private String createdBy;
+
+	@Column(name = "CREATED_AT")
+	private String createdAt;
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
 	public String getMetaId() {
 		return metaId;
 	}
