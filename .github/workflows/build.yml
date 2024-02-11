@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - main
 
 
 jobs:
@@ -35,4 +35,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=sathish0625_proflaut_dms_AY1avtyVKLVtT9SeyPd1 -Dsonar.projectName='proflaut_dms'
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=sathish0625_PROFLAUT_DMS_MAIN_AY2XnB_5pYZ7WGR_oNi8 -Dsonar.projectName='PROFLAUT_DMS_MAIN'
