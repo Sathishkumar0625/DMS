@@ -151,7 +151,7 @@
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.10.0.2594</version> <!-- Replace with the latest
+				<version>3.2.5</version> <!-- Replace with the latest
 				version -->
 				<configuration>
 					<sonar.host.url>http://localhost:9000</sonar.host.url>
