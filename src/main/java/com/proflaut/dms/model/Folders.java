@@ -13,8 +13,17 @@ public class Folders {
 	private String createdBy;
 	private String createdAt;
 	private int parentFolderId;
+	private String fileName;
 	private String view;
 	private String write;
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
 	public String getView() {
 		return view;

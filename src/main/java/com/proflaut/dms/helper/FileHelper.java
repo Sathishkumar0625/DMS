@@ -25,6 +25,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -288,8 +289,13 @@ public class FileHelper {
 	}
 
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
+		int nextId = getNextSequenceValue("table_sequence");
+
 		StringBuilder queryBuilder = new StringBuilder();
-		String tableName = createTableRequest.getTableName() + "_" + tableCount;
+		String tableName;
+
+		tableName = createTableRequest.getTableName() + "_" + tableCount;
+
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
 		queryBuilder.append("DOC_ID INTEGER, ");
@@ -312,6 +318,12 @@ public class FileHelper {
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
 		tableCount++;
 		return tableName;
+	}
+
+	private int getNextSequenceValue(String sequenceName) {
+		Query query = entityManager.createNativeQuery("SELECT nextval(:sequenceName)");
+		query.setParameter("sequenceName", sequenceName);
+		return ((Number) query.getSingleResult()).intValue();
 	}
 
 	private String getDatabaseType(String fieldType, int maxLength) {
@@ -531,7 +543,7 @@ public class FileHelper {
 	}
 
 	public ProfOverallMetaDataResponse convertMetaEntityToResponse(ProfMetaDataEntity dataEntity) {
-		ProfOverallMetaDataResponse dataResponse=new ProfOverallMetaDataResponse();
+		ProfOverallMetaDataResponse dataResponse = new ProfOverallMetaDataResponse();
 		dataResponse.setId(dataEntity.getId());
 		dataResponse.setName(dataEntity.getName());
 		dataResponse.setTableName(dataEntity.getTableName());

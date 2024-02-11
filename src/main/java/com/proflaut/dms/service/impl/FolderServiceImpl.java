@@ -1,20 +1,14 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
-import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
-import com.proflaut.dms.entity.ProfAccessRightsEntity;
-import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
+import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
-import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.FolderHelper;
@@ -26,6 +20,7 @@ import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
+import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -41,6 +36,9 @@ public class FolderServiceImpl {
 
 	@Autowired
 	FolderHelper helper;
+	
+	@Autowired
+	ProfDocUploadRepository docUploadRepository;
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
@@ -113,7 +111,8 @@ public class FolderServiceImpl {
 		try {
 			FolderEntity folderEntity = folderRepo.findById(id);
 			if (folderEntity != null) {
-				folders = helper.convertFolderEntityToFolder(folderEntity);
+				ProfDocEntity docEntity=docUploadRepository.findByFolderIdAndMetaId(folderEntity.getId(),Integer.valueOf(folderEntity.getMetaId()));
+				folders = helper.convertFolderEntityToFolderFo(folderEntity,docEntity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -127,57 +126,12 @@ public class FolderServiceImpl {
 		FolderRetreiveResponse folderRetreiveResponse = new FolderRetreiveResponse();
 		try {
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
-			int userId = propertiesEntity.getUserId();
-
-			// Retrieve user's group mappings
-			List<ProfUserGroupMappingEntity> userGroupMappings = groupMappingRepository.findByUserId(userId);
-
-			// Retrieve user's access mappings
-			List<ProfAccessUserMappingEntity> userAccessMappings = accessUserMappingRepository.findByUserId(String.valueOf(userId));
-
-			// Retrieve user's access group mappings
-			List<ProfAccessGroupMappingEntity> groupAccessMappings = new ArrayList<>();
-			for (ProfUserGroupMappingEntity userGroupMapping : userGroupMappings) {
-				String groupId = userGroupMapping.getGroupId();
-				List<ProfAccessGroupMappingEntity> mappings = accessGroupMappingRepository.findByGroupId(groupId);
-				groupAccessMappings.addAll(mappings);
+			if (propertiesEntity != null) {
+				int userId = propertiesEntity.getUserId();
+				List<Folders> folders = helper.convertToGetAllFolders(userId);
+				folderRetreiveResponse.setFolder(folders);
 			}
-
-			List<Integer> accessIds = new ArrayList<>();
-
-			// Retrieve access IDs from userAccessMappings
-			for (ProfAccessUserMappingEntity userAccessMapping : userAccessMappings) {
-				if (userAccessMapping.getAccessRightsEntity() != null) {
-					accessIds.add(userAccessMapping.getAccessRightsEntity().getId());
-				}
-			}
-
-			// Retrieve access IDs from groupAccessMappings
-			for (ProfAccessGroupMappingEntity groupAccessMapping : groupAccessMappings) {
-				if (groupAccessMapping.getAccessRightsEntity() != null) {
-					accessIds.add(groupAccessMapping.getAccessRightsEntity().getId());
-				}
-			}
-
-			List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByIdIn(accessIds);
-
-			List<FolderEntity> foldersList = folderRepo.findAll(Sort.by(Sort.Direction.ASC, "parentFolderID"));
-			List<Folders> folders = foldersList.stream()
-	                .map(folderEntity -> {
-	                    Folders folder = helper.convertFolderEntityToFolder(folderEntity);
-	                    for (ProfAccessRightsEntity accessRight : accessRights) {
-	                        if (accessRight.getMetaId().equals(folder.getMetaId())) {
-	                            folder.setView(accessRight.getView());
-	                            folder.setWrite(accessRight.getWrite());
-	                            break;
-	                        }
-	                    }
-	                    return folder;
-	                })
-	                .collect(Collectors.toList());
-
 			folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
-			folderRetreiveResponse.setFolder(folders);
 		} catch (Exception e) {
 			e.printStackTrace();
 			folderRetreiveResponse.setStatus(DMSConstant.FAILURE);

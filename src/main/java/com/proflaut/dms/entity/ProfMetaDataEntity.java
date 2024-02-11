@@ -14,6 +14,7 @@ public class ProfMetaDataEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @SequenceGenerator(name = "table_sequence", sequenceName = "table_sequence", allocationSize = 1)
 	@Column(name = "ID")
 	private int id;
 	@Column(name = "TABLE_NAME",unique =true)
