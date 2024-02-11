@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -212,7 +213,8 @@ public class FolderHelper {
 		return folders;
 	}
 
-	public ProfFolderRetrieveResponse convertFolderEntityToFolderRetrieveResponse(List<FolderEntity> entity) {
+	public ProfFolderRetrieveResponse convertFolderEntityToFolderRetrieveResponse(List<FolderEntity> entity,
+			List<ProfAccessRightsEntity> accessRights) {
 		ProfFolderRetrieveResponse folderRetrieveResponse = new ProfFolderRetrieveResponse();
 		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
 
@@ -225,6 +227,17 @@ public class FolderHelper {
 			folderPathResponse.setFolderID(folderEntity.getId());
 			folderPathResponse.setFolderName(folderEntity.getFolderName());
 			folderPathResponse.setMetaId(folderEntity.getMetaId());
+
+			// Find the corresponding access rights for this folder
+			Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
+					.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
+
+			// Set view and write access if access rights are present
+			accessRight.ifPresent(access -> {
+				folderPathResponse.setView(access.getView());
+				folderPathResponse.setWrite(access.getWrite());
+			});
+
 			folderPathResponses.add(folderPathResponse);
 		}
 		folderRetrieveResponse.setSubFolderPath(folderPathResponses);

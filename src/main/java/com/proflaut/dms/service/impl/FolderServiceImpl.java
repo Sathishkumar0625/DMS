@@ -2,11 +2,14 @@ package com.proflaut.dms.service.impl;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
+import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -145,7 +148,9 @@ public class FolderServiceImpl {
 		try {
 			List<FolderEntity> entity = folderRepo.findByParentFolderID(parentFolderID);
 			if (entity != null) {
-				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity);
+				List<String> metaIds = entity.stream().map(FolderEntity:: getMetaId).collect(Collectors.toList());
+	            List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByMetaIdIn(metaIds);
+				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity,accessRights);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -11,5 +11,6 @@ import com.proflaut.dms.entity.ProfAccessRightsEntity;
 public interface ProfAccessRightRepository extends JpaRepository<ProfAccessRightsEntity, Integer> {
 	ProfAccessRightsEntity findById(int id);
 	List<ProfAccessRightsEntity> findByIdIn(List<Integer> ids);
+	List<ProfAccessRightsEntity> findByMetaIdIn(List<String> metaIds);
 	
 }
