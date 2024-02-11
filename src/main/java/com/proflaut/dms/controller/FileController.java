@@ -142,7 +142,7 @@ public class FileController {
 
 	@GetMapping("/downloadBy")
 	public ResponseEntity<Map<String, Object>> getDocumentByName(@RequestParam int id) {
-		if (!StringUtils.isEmpty(id)) {
+		if (StringUtils.isEmpty(id)) {
 			logger.warn(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

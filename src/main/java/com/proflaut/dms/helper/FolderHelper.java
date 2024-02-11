@@ -20,11 +20,14 @@ import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileResponse;
+import com.proflaut.dms.model.Files;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.Folders;
+import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
@@ -184,8 +187,9 @@ public class FolderHelper {
 		}).collect(Collectors.toList());
 	}
 
-	public Folders convertFolderEntityToFolderFo(FolderEntity folderEntity, ProfDocEntity docEntity) {
+	public Folders convertFolderEntityToFolderFo(FolderEntity folderEntity, List<ProfDocEntity> docEntity) {
 		Folders folders=new Folders();
+		List<Files> files=new ArrayList<>();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
 		folders.setIsParent(folderEntity.getIsParent());
@@ -194,7 +198,18 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(folderEntity.getParentFolderID());
-		folders.setFileName(docEntity.getDocPath());
+		for (ProfDocEntity profDocEntity : docEntity) {
+			Files file=new Files();
+			file.setDocName(profDocEntity.getDocName());
+			file.setFileName(profDocEntity.getDocPath());
+			file.setId(profDocEntity.getId());
+			file.setCreatedAt(profDocEntity.getUploadTime());
+			file.setCreatedBy(profDocEntity.getCreatedBy());
+			files.add(file);
+		} 
+		folders.setFiles(files);
+//		ProfMetaDataEntity dataEntity=dataRepository.findById(folderEntity.getMetaId());
+//		GetAllTableResponse allTableResponse = getAll();
 		return folders;
 	}
 

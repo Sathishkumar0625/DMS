@@ -164,7 +164,7 @@ public class FileHelper {
 		ProfDocEntity ent = new ProfDocEntity();
 		ProfUserPropertiesEntity userProp = profUserPropertiesRepository.findByToken(token);
 		if (userProp != null) {
-			ent.setCreatedBy(userProp.getUserId());
+			ent.setCreatedBy(userProp.getUserName());
 		}
 		ent.setFolderId(entity.getId());
 		ent.setUploadTime(formatCurrentDateTime());

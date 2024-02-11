@@ -41,6 +41,17 @@ public class FolderEntity {
 	@Column(name = "CREATED_AT")
 	private String createdAt;
 
+	@Column(name = "DOC_NAME")
+	private String docName;
+
+	public String getDocName() {
+		return docName;
+	}
+
+	public void setDocName(String docName) {
+		this.docName = docName;
+	}
+
 	public String getCreatedBy() {
 		return createdBy;
 	}

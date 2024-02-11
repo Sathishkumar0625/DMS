@@ -36,7 +36,7 @@ public class FolderServiceImpl {
 
 	@Autowired
 	FolderHelper helper;
-	
+
 	@Autowired
 	ProfDocUploadRepository docUploadRepository;
 
@@ -111,7 +111,7 @@ public class FolderServiceImpl {
 		try {
 			FolderEntity folderEntity = folderRepo.findById(id);
 			if (folderEntity != null) {
-				ProfDocEntity docEntity=docUploadRepository.findByFolderIdAndMetaId(folderEntity.getId(),Integer.valueOf(folderEntity.getMetaId()));
+				List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderEntity.getId());
 				folders = helper.convertFolderEntityToFolderFo(folderEntity,docEntity);
 			}
 		} catch (Exception e) {

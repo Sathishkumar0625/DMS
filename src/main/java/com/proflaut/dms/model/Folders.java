@@ -1,5 +1,7 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -13,16 +15,16 @@ public class Folders {
 	private String createdBy;
 	private String createdAt;
 	private int parentFolderId;
-	private String fileName;
+	private List<Files> files;
 	private String view;
 	private String write;
 
-	public String getFileName() {
-		return fileName;
+	public List<Files> getFiles() {
+		return files;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setFiles(List<Files> files) {
+		this.files = files;
 	}
 
 	public String getView() {

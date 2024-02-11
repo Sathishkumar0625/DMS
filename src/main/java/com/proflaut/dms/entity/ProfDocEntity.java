@@ -27,7 +27,7 @@ public class ProfDocEntity {
 	private String docPath;
 
 	@Column(name = "CREATED_BY")
-	private int createdBy;
+	private String createdBy;
 
 	@Column(name = "UPLOADED_TIME")
 	private String uploadTime;
@@ -95,11 +95,13 @@ public class ProfDocEntity {
 		this.prospectId = prospectId;
 	}
 
-	public int getCreatedBy() {
+	
+
+	public String getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(int createdBy) {
+	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
 
