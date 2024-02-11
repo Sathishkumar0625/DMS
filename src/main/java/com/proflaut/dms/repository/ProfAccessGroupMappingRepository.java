@@ -9,4 +9,6 @@ import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 public interface ProfAccessGroupMappingRepository extends JpaRepository<ProfAccessGroupMappingEntity, Integer> {
 	List<ProfAccessGroupMappingEntity> findById(int id);
 
+	List<ProfAccessGroupMappingEntity> findByGroupId(String groupId);
+
 }

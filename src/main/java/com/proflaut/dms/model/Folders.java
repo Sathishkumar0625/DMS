@@ -13,6 +13,24 @@ public class Folders {
 	private String createdBy;
 	private String createdAt;
 	private int parentFolderId;
+	private String view;
+	private String write;
+
+	public String getView() {
+		return view;
+	}
+
+	public void setView(String view) {
+		this.view = view;
+	}
+
+	public String getWrite() {
+		return write;
+	}
+
+	public void setWrite(String write) {
+		this.write = write;
+	}
 
 	public int getParentFolderId() {
 		return parentFolderId;

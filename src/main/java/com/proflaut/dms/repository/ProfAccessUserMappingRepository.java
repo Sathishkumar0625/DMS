@@ -8,4 +8,6 @@ import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 
 public interface ProfAccessUserMappingRepository extends JpaRepository<ProfAccessUserMappingEntity, Integer>{
 	List<ProfAccessUserMappingEntity> findById(int id);
+
+	List<ProfAccessUserMappingEntity> findByUserId(String userId);
 }
