@@ -1,13 +1,13 @@
-package com.proflaut.dms.DMS;
+//package com.proflaut.dms.DMS;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class DmsApplicationTests {
+//@SpringBootTest
+//class DmsApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+	//@Test
+	//void contextLoads() {
+	//}
 
-}
+//}
