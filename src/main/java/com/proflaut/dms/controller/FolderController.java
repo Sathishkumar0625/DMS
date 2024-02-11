@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
@@ -22,6 +23,7 @@ import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
+import com.proflaut.dms.model.ProfFolderRetrieveResponse;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
 
@@ -108,7 +110,7 @@ public class FolderController {
 
 	}
 
-	@GetMapping("/getAllfolders")
+	@GetMapping("/getAllParentFolders")
 	public ResponseEntity<FolderRetreiveResponse> getAll(@RequestHeader("token") String token) {
 		try {
 			FolderRetreiveResponse folderRetreiveResponse = folderServiceImpl.getAllFolders(token);
@@ -124,4 +126,18 @@ public class FolderController {
 		}
 	}
 
+	@GetMapping("getByParentId")
+	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestParam int parentFolderID) {
+		ProfFolderRetrieveResponse folderRetrieveResponse = null;
+		try {
+			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID);
+			if (!folderRetrieveResponse.getSubFolderPath().isEmpty()) {
+				return new ResponseEntity<>(folderRetrieveResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

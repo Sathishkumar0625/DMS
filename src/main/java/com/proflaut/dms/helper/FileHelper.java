@@ -106,8 +106,6 @@ public class FileHelper {
 			FolderEntity entity = folderRepository.findById(Integer.parseInt(fileRequest.getFolderId()));
 
 			if (entity != null) {
-				int count = entity.getParentFolderID();
-				count += 1;
 				String path = entity.getFolderPath();
 				UUID uuid = UUID.randomUUID();
 				String fileName = uuid.toString();
@@ -132,13 +130,10 @@ public class FileHelper {
 					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName);
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, fileRequest, entity);
-
 					existingDocEntity.setDocPath(fileName);
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
-					folderRepository.updateParentFolderId(count, Integer.parseInt(fileRequest.getFolderId()));
-
 					try (FileWriter fileWriter = new FileWriter(file)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();

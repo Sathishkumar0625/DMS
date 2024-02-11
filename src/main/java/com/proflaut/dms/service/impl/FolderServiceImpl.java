@@ -16,6 +16,7 @@ import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
+import com.proflaut.dms.model.ProfFolderRetrieveResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
@@ -112,7 +113,7 @@ public class FolderServiceImpl {
 			FolderEntity folderEntity = folderRepo.findById(id);
 			if (folderEntity != null) {
 				List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderEntity.getId());
-				folders = helper.convertFolderEntityToFolderFo(folderEntity,docEntity);
+				folders = helper.convertFolderEntityToFolderFo(folderEntity, docEntity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -137,6 +138,19 @@ public class FolderServiceImpl {
 			folderRetreiveResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return folderRetreiveResponse;
+	}
+
+	public ProfFolderRetrieveResponse fetchByParentId(int parentFolderID) {
+		ProfFolderRetrieveResponse folders = new ProfFolderRetrieveResponse();
+		try {
+			List<FolderEntity> entity = folderRepo.findByParentFolderID(parentFolderID);
+			if (entity != null) {
+				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return folders;
 	}
 
 }

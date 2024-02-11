@@ -20,14 +20,14 @@ import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
-import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.Files;
 import com.proflaut.dms.model.FolderFO;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.Folders;
-import com.proflaut.dms.model.GetAllTableResponse;
+import com.proflaut.dms.model.ProfFolderRetrieveResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
@@ -95,7 +95,6 @@ public class FolderHelper {
 
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity) {
 		Folders folders = new Folders();
-
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
 		folders.setIsParent(folderEntity.getIsParent());
@@ -103,9 +102,8 @@ public class FolderHelper {
 		folders.setFolderPath(folderEntity.getFolderPath());
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
-		folders.setParentFolderId(folderEntity.getParentFolderID());
+		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
 		return folders;
-
 	}
 
 	public FolderEntity convertFoToFolderEntity(String prospectId) {
@@ -174,22 +172,25 @@ public class FolderHelper {
 		// Retrieve folder entities
 		List<FolderEntity> foldersList = folderRepo.findAll(Sort.by(Sort.Direction.ASC, "parentFolderID"));
 
-		return foldersList.stream().map(folderEntity -> {
-			Folders folder = convertFolderEntityToFolder(folderEntity);
-			for (ProfAccessRightsEntity accessRight : accessRights) {
-				if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
-					folder.setView(accessRight.getView());
-					folder.setWrite(accessRight.getWrite());
-					break;
-				}
-			}
-			return folder;
-		}).collect(Collectors.toList());
+		int parentFolder = foldersList.get(0).getParentFolderID();
+		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID())
+				.map(folderEntity -> {
+					Folders folder = convertFolderEntityToFolder(folderEntity);
+					for (ProfAccessRightsEntity accessRight : accessRights) {
+						if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
+							folder.setView(accessRight.getView());
+							folder.setWrite(accessRight.getWrite());
+							break;
+						}
+					}
+					return folder;
+				}).collect(Collectors.toList());
+
 	}
 
 	public Folders convertFolderEntityToFolderFo(FolderEntity folderEntity, List<ProfDocEntity> docEntity) {
-		Folders folders=new Folders();
-		List<Files> files=new ArrayList<>();
+		Folders folders = new Folders();
+		List<Files> files = new ArrayList<>();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
 		folders.setIsParent(folderEntity.getIsParent());
@@ -197,20 +198,37 @@ public class FolderHelper {
 		folders.setFolderPath(folderEntity.getFolderPath());
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
-		folders.setParentFolderId(folderEntity.getParentFolderID());
+		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
 		for (ProfDocEntity profDocEntity : docEntity) {
-			Files file=new Files();
+			Files file = new Files();
 			file.setDocName(profDocEntity.getDocName());
 			file.setFileName(profDocEntity.getDocPath());
 			file.setId(profDocEntity.getId());
 			file.setCreatedAt(profDocEntity.getUploadTime());
 			file.setCreatedBy(profDocEntity.getCreatedBy());
 			files.add(file);
-		} 
+		}
 		folders.setFiles(files);
-//		ProfMetaDataEntity dataEntity=dataRepository.findById(folderEntity.getMetaId());
-//		GetAllTableResponse allTableResponse = getAll();
 		return folders;
+	}
+
+	public ProfFolderRetrieveResponse convertFolderEntityToFolderRetrieveResponse(List<FolderEntity> entity) {
+		ProfFolderRetrieveResponse folderRetrieveResponse = new ProfFolderRetrieveResponse();
+		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
+
+		for (FolderEntity folderEntity : entity) {
+			FolderPathResponse folderPathResponse = new FolderPathResponse();
+			folderPathResponse.setFolderPath(folderEntity.getFolderPath());
+			folderPathResponse.setIsParent(folderEntity.getIsParent());
+			folderPathResponse.setCreatedAt(folderEntity.getCreatedAt());
+			folderPathResponse.setCreatedBy(folderEntity.getCreatedBy());
+			folderPathResponse.setFolderID(folderEntity.getId());
+			folderPathResponse.setFolderName(folderEntity.getFolderName());
+			folderPathResponse.setMetaId(folderEntity.getMetaId());
+			folderPathResponses.add(folderPathResponse);
+		}
+		folderRetrieveResponse.setSubFolderPath(folderPathResponses);
+		return folderRetrieveResponse;
 	}
 
 }

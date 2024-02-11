@@ -14,7 +14,7 @@ public class Folders {
 	private String folderPath;
 	private String createdBy;
 	private String createdAt;
-	private int parentFolderId;
+	private String parentFolderId;
 	private List<Files> files;
 	private String view;
 	private String write;
@@ -43,11 +43,11 @@ public class Folders {
 		this.write = write;
 	}
 
-	public int getParentFolderId() {
+	public String getParentFolderId() {
 		return parentFolderId;
 	}
 
-	public void setParentFolderId(int parentFolderId) {
+	public void setParentFolderId(String parentFolderId) {
 		this.parentFolderId = parentFolderId;
 	}
 
