@@ -148,7 +148,7 @@
 			</plugin>
 
 			<!-- Maven SonarQube Plugin -->
-<<<<<<< HEAD
+
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
@@ -168,7 +168,7 @@
 					<shutdown>kill</shutdown>
 				</configuration>
 			</plugin>
-=======
+
 			
 			 <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -178,7 +178,6 @@
           <shutdown>kill</shutdown>
         </configuration>
       </plugin>
->>>>>>> 1f2bb4c56e924babe5413c70cb1e009c04e5885b
 		</plugins>
 	</build>
 
@@ -189,11 +188,6 @@
 			<url>https://releases.aspose.cloud/java/repo/</url>
 		</repository>
 	</repositories>
-<<<<<<< HEAD
-=======
-
-	
 
 
->>>>>>> 1f2bb4c56e924babe5413c70cb1e009c04e5885b
 </project>
