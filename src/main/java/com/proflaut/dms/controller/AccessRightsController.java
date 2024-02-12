@@ -1,7 +1,6 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
-import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,27 +33,8 @@ public class AccessRightsController {
 	AccessRightsServiceImpl accessRightsServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(AccessRightsController.class);
-
-	@GetMapping("/findAllFromTable")
-	public ResponseEntity<Map<String, Object>> findAllFromTable(@RequestParam String tableName) {
-		if (StringUtils.isEmpty(tableName)) {
-			logger.info(DMSConstant.INVALID_INPUT);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		try {
-			Map<String, Object> responseMap = accessRightsServiceImpl.findAllRowsAndColumns(tableName);
-			if (!responseMap.isEmpty()) {
-				return new ResponseEntity<>(responseMap, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(responseMap, HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-	}
-
+	
+	
 	@PostMapping("/saveAccess")
 	public ResponseEntity<ProfAccessRightResponse> createAccess(
 			@RequestBody ProfAccessRightRequest accessRightRequest) {

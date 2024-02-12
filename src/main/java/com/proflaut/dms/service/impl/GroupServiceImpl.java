@@ -60,8 +60,8 @@ public class GroupServiceImpl {
 			}else {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return groupInfoResponse;
 	}

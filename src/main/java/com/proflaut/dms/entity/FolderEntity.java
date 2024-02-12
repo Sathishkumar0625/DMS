@@ -6,10 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROF_FOLDER", indexes = { @Index(columnList = "PROSPECT_ID") })
+@Table(name = "PROF_FOLDER", indexes = { @Index(columnList = "ID") })
 public class FolderEntity {
 
 	@Id
@@ -26,7 +27,8 @@ public class FolderEntity {
 	@Column(name = "IS_PARENT")
 	private String isParent;
 
-	@Column(name = "FOLDER_PATH")
+	@Lob
+	@Column(name = "FOLDER_PATH", columnDefinition = "CLOB")
 	private String folderPath;
 
 	@Column(name = "FOLDER_NAME")
@@ -40,17 +42,6 @@ public class FolderEntity {
 
 	@Column(name = "CREATED_AT")
 	private String createdAt;
-
-	@Column(name = "DOC_NAME")
-	private String docName;
-
-	public String getDocName() {
-		return docName;
-	}
-
-	public void setDocName(String docName) {
-		this.docName = docName;
-	}
 
 	public String getCreatedBy() {
 		return createdBy;

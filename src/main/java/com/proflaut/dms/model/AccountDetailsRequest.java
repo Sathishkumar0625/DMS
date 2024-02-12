@@ -1,6 +1,6 @@
 package com.proflaut.dms.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -17,11 +17,11 @@ public class AccountDetailsRequest {
 		this.customerId = customerId;
 	}
 	
-	public ArrayList<AccountUserRequest> getAccountUserRequest() {
+	public List<AccountUserRequest> getAccountUserRequest() {
 		return accountUserRequest;
 	}
 
-	public void setAccountUserRequest(ArrayList<AccountUserRequest> accountUserRequest) {
+	public void setAccountUserRequest(List<AccountUserRequest> accountUserRequest) {
 		this.accountUserRequest = accountUserRequest;
 	}
 
@@ -29,6 +29,6 @@ public class AccountDetailsRequest {
 	private String customerId;
 
 	@JsonProperty("accountDetails")
-	private ArrayList<AccountUserRequest> accountUserRequest;
+	private List<AccountUserRequest> accountUserRequest;
 
 }

@@ -32,18 +32,16 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfDocEntity;
-import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
-import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
-import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
+import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @RestController
 @RequestMapping("/file")
@@ -62,6 +60,9 @@ public class FileController {
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
+
+	@Autowired
+	MetaServiceImpl metaServiceImpl;
 
 	@PostMapping("/upload")
 	@Transactional
@@ -83,9 +84,9 @@ public class FileController {
 				logger.info("Upload Success");
 				ProfDocEntity docEntity = uploadRepository.findByDocNameAndFolderId(fileRequest.getDockName(),
 						Integer.valueOf(fileRequest.getFolderId()));
-				String path=folderLocation+docEntity.getProspectId()+File.separator+docEntity.getDocPath();
-				 Path paths = Paths.get(path);
-				ProfMetaDataResponse metaDataResponse = fileManagementServiceImpl
+				String path = folderLocation + File.separator + docEntity.getDocPath();
+				Path paths = Paths.get(path);
+				ProfMetaDataResponse metaDataResponse = metaServiceImpl
 						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
@@ -165,30 +166,6 @@ public class FileController {
 		}
 	}
 
-	@PostMapping("/createTable")
-	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,
-			@RequestBody CreateTableRequest createTableRequest) {
-		if (StringUtils.isEmpty(token) || StringUtils.isEmpty(createTableRequest.getTableName())
-				|| StringUtils.isEmpty(createTableRequest.getFileExtension())) {
-			logger.info(DMSConstant.INVALID_INPUT);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
-		try {
-			metaDataResponse = fileManagementServiceImpl.createTableFromFieldDefinitions(createTableRequest, token);
-			if (!metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
-				return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(metaDataResponse, HttpStatus.NOT_ACCEPTABLE);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			metaDataResponse.setStatus(DMSConstant.FAILURE);
-			metaDataResponse.setErrorMessage(e.getMessage());
-			return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@PostMapping("/share")
 	public ResponseEntity<ProfEmailShareResponse> uploadFile(@RequestBody ProfEmailShareRequest emailShareRequest) {
 		if (StringUtils.isEmpty(emailShareRequest.getTo()) || StringUtils.isEmpty(emailShareRequest.getDocName())) {
@@ -210,53 +187,6 @@ public class FileController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-	}
-
-	@GetMapping("/getAllTables")
-	public ResponseEntity<GetAllTableResponse> getAllMetaTables(@RequestParam String tableName) {
-		GetAllTableResponse getAllTableResponse = null;
-		try {
-			getAllTableResponse = fileManagementServiceImpl.getAll(tableName);
-			if (getAllTableResponse.getCreatedBy() != null) {
-				return new ResponseEntity<>(getAllTableResponse, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@GetMapping("/getAllMetaEntity")
-	public ResponseEntity<List<ProfOverallMetaDataResponse>> getAllMetaData() {
-		try {
-			List<ProfOverallMetaDataResponse> dataResponse = fileManagementServiceImpl.getAllData();
-			if (!dataResponse.isEmpty()) {
-				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	@GetMapping("/getMetaById")
-	public ResponseEntity<ProfOverallMetaDataResponse> getMetaDataById(@RequestParam int id) {
-		ProfOverallMetaDataResponse dataResponse=null;
-		try {
-			 dataResponse = fileManagementServiceImpl.getMetaData(id);
-			if (dataResponse != null) {
-				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 	}
 
 }

@@ -78,9 +78,8 @@ public class FolderHelper {
 
 		FolderEntity ent = new FolderEntity();
 		String folderPath = "";
-		folderPath = storeFolder(fileResponse, folderFO);
+//		folderPath = storeFolder(fileResponse, folderFO);
 		ent.setFolderName(folderFO.getFolderName());
-		ent.setFolderPath(folderPath);
 		ent.setIsParent(folderLocation);
 		ent.setMetaId(folderFO.getMetaDataId());
 		ent.setCreatedAt(formatCurrentDateTime());

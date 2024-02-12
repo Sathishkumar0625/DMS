@@ -1,17 +1,13 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -21,8 +17,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.proflaut.dms.constant.DMSConstant;
@@ -34,7 +28,6 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.FileHelper;
-import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
@@ -43,8 +36,6 @@ import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
-import com.proflaut.dms.model.ProfMetaDataResponse;
-import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
@@ -85,7 +76,12 @@ public class FileManagementServiceImpl {
 	@Autowired
 	ProfMetaDataRepository metaDataRepository;
 
-	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
+	@Autowired
+	AccessRightsServiceImpl accessRightsServiceImpl;
+	
+	@Autowired
+	MetaServiceImpl metaServiceImpl;
+
 
 	@Transactional
 	public FileResponse storeFile(FileRequest fileRequest, String token, TransactionStatus status,
@@ -150,12 +146,13 @@ public class FileManagementServiceImpl {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
 				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-				GetAllTableResponse allTableResponse = getAll(dataEntity.getName());
-				response.put("Image", fileRetreiveByResponse);
-				response.put(dataEntity.getName(), allTableResponse);
+				GetAllTableResponse allTableResponse = metaServiceImpl.getAll(dataEntity.getId());
+//				response = accessRightsServiceImpl.findAllRowsAndColumns(dataEntity.getName());
+				response.put("image", fileRetreiveByResponse);
+				response.put("metaDetails", allTableResponse);
 			} else {
 				fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
-				response.put("Image", fileRetreiveByResponse);
+				response.put("image", fileRetreiveByResponse);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -164,42 +161,12 @@ public class FileManagementServiceImpl {
 		return response;
 	}
 
-	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest, String token) {
-		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
-		try {
-			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
-			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(entity.getUserId());
-
-			if (entity.getToken() != null && infoEntity.getUserName() != null) {
-				String tableName = fileHelper.createTable(createTableRequest.getFields(), createTableRequest);
-				ProfMetaDataEntity dataEntity = fileHelper.convertTableReqToMetaEntity(createTableRequest, tableName,
-						infoEntity);
-				if (dataEntity != null) {
-					entityManager.persist(dataEntity);
-					metaDataResponse.setStatus(DMSConstant.SUCCESS);
-				} else {
-					throw new CustomException("ProfMetaDataEntity is Null");
-				}
-			} else {
-				metaDataResponse.setStatus(DMSConstant.FAILURE);
-				throw new CustomException("Token or userName is null");
-			}
-		} catch (CustomException ce) {
-			ce.printStackTrace();
-			metaDataResponse.setStatus(DMSConstant.FAILURE);
-			metaDataResponse.setErrorMessage(ce.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			metaDataResponse.setStatus(DMSConstant.FAILURE);
-			metaDataResponse.setErrorMessage("An error occurred");
-		}
-		return metaDataResponse;
-	}
+	
 
 	public ProfEmailShareResponse emailReader(ProfEmailShareRequest emailShareRequest) {
 		ProfEmailShareResponse emailShareResponse = new ProfEmailShareResponse();
 		try {
-			FolderEntity folderEntity = folderRepository.findByProspectId(emailShareRequest.getProspectId());
+			FolderEntity folderEntity = folderRepository.findById(emailShareRequest.getDocId());
 			ProfDocEntity docEntity = profDocUploadRepository.findByDocNameAndProspectId(emailShareRequest.getDocName(),
 					folderEntity.getProspectId());
 			String extension = docEntity.getExtention();
@@ -239,89 +206,6 @@ public class FileManagementServiceImpl {
 		}
 
 		return emailShareResponse;
-	}
-
-	public GetAllTableResponse getAll(String name) {
-		GetAllTableResponse getAllTableResponse = new GetAllTableResponse();
-		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(name);
-			if (dataEntity != null) {
-				getAllTableResponse = fileHelper.convertEntityToResponse(dataEntity, entityManager);
-			} else {
-				throw new CustomException("DataEntity not found for name: " + name);
-			}
-		} catch (CustomException ce) {
-			ce.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (entityManager != null && entityManager.isOpen()) {
-				entityManager.close();
-			}
-		}
-		return getAllTableResponse;
-	}
-
-	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest,
-			Path path) throws IOException {
-		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
-		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(
-					Integer.valueOf(createTableRequest.getMetadataId()), createTableRequest.getTableName());
-			Optional<FolderEntity> entity = folderRepository.findById(Integer.valueOf(fileRequest.getFolderId()));
-			if (dataEntity != null && !entity.isEmpty()) {
-				dataResponse = fileHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),
-						id);
-			} else {
-				throw new CustomException("ID NOT FOUND");
-			}
-		} catch (Exception e) {
-
-			delete(path);
-			e.printStackTrace();
-		}
-		return dataResponse;
-	}
-
-	public List<ProfOverallMetaDataResponse> getAllData() {
-		List<ProfOverallMetaDataResponse> metaResponses = new ArrayList<>();
-		try {
-			List<ProfMetaDataEntity> dataEntities = metaDataRepository.findAll();
-
-			for (ProfMetaDataEntity metaDataEntity : dataEntities) {
-				if (!metaDataEntity.getStatus().equalsIgnoreCase("I")) {
-					ProfOverallMetaDataResponse response = fileHelper.convertToResponse(metaDataEntity);
-					metaResponses.add(response);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return metaResponses;
-	}
-
-	public void delete(Path path) throws IOException {
-		logger.info("path ->{}", path);
-		boolean isDeleted = Files.deleteIfExists(path);
-		if (isDeleted) {
-			logger.info("File deleted successfully");
-		} else {
-			logger.info("File doesn't exist");
-		}
-	}
-
-	public ProfOverallMetaDataResponse getMetaData(int id) {
-		ProfOverallMetaDataResponse dataResponse = new ProfOverallMetaDataResponse();
-		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
-			if (dataEntity != null) {
-				dataResponse = fileHelper.convertMetaEntityToResponse(dataEntity);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return dataResponse;
 	}
 
 }

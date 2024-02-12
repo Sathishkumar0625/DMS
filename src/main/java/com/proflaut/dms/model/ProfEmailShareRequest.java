@@ -4,14 +4,14 @@ public class ProfEmailShareRequest {
 	private String from;
 	private String to;
 	private String docName;
-	private String prospectId;
+	private int docId;
 
-	public String getProspectId() {
-		return prospectId;
+	public int getDocId() {
+		return docId;
 	}
 
-	public void setProspectId(String prospectId) {
-		this.prospectId = prospectId;
+	public void setDocId(int docId) {
+		this.docId = docId;
 	}
 
 	public String getFrom() {
