@@ -16,7 +16,7 @@
 	<description>DMS Spring boot project</description>
 	<properties>
 		<java.version>1.8</java.version>
-		<sonar.token>sqp_2d9dea08bc7db060188f325fedbdda03888bf5b9</sonar.token>
+		<sonar.token>sqp_4e55ef8e2d6a901043c7fc30324e777d7f41cc16</sonar.token>
 	</properties>
 	<dependencies>
 
@@ -148,6 +148,7 @@
 			</plugin>
 
 			<!-- Maven SonarQube Plugin -->
+<<<<<<< HEAD
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
@@ -167,6 +168,17 @@
 					<shutdown>kill</shutdown>
 				</configuration>
 			</plugin>
+=======
+			
+			 <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <shutdown>kill</shutdown>
+        </configuration>
+      </plugin>
+>>>>>>> 1f2bb4c56e924babe5413c70cb1e009c04e5885b
 		</plugins>
 	</build>
 
@@ -177,4 +189,11 @@
 			<url>https://releases.aspose.cloud/java/repo/</url>
 		</repository>
 	</repositories>
+<<<<<<< HEAD
+=======
+
+	
+
+
+>>>>>>> 1f2bb4c56e924babe5413c70cb1e009c04e5885b
 </project>
