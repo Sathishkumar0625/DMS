@@ -284,12 +284,12 @@ public class FileHelper {
 	}
 
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
-		int nextId = getNextSequenceValue("table_sequence");
+		int nextId = getCurrentSequenceValue("table_sequence");
 
 		StringBuilder queryBuilder = new StringBuilder();
 		String tableName;
 
-		tableName = createTableRequest.getTableName() + "_" + tableCount;
+		tableName = createTableRequest.getTableName() + "_" +tableCount;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
@@ -315,10 +315,10 @@ public class FileHelper {
 		return tableName;
 	}
 
-	private int getNextSequenceValue(String sequenceName) {
-		Query query = entityManager.createNativeQuery("SELECT nextval(:sequenceName)");
-		query.setParameter("sequenceName", sequenceName);
-		return ((Number) query.getSingleResult()).intValue();
+	private int getCurrentSequenceValue(String sequenceName) {
+	    Query query = entityManager.createNativeQuery("SELECT nextval(:sequenceName)");
+	    query.setParameter("sequenceName", sequenceName);
+	    return ((Number) query.getSingleResult()).intValue();
 	}
 
 	private String getDatabaseType(String fieldType, int maxLength) {

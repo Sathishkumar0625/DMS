@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Index;
+import javax.persistence.SequenceGenerator;
 
 @Entity
 @Table(name = "PROF_METADATA", indexes = { @Index(columnList = "ID") })
