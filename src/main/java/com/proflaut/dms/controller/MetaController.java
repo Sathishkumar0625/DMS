@@ -131,7 +131,11 @@ public class MetaController {
 		List<ProfUploadAccessResponse> accessResponse=null;
 		try {
 			accessResponse=metaServiceImpl.uploadAccessRights(token);
-			return new ResponseEntity<>(accessResponse,HttpStatus.OK);
+			if (!accessResponse.isEmpty()) {
+				return new ResponseEntity<>(accessResponse,HttpStatus.OK);
+			}else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
