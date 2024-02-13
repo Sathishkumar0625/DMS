@@ -1,6 +1,9 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
+
+import javax.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,7 @@ public class AccessRightsController {
 	
 	@PostMapping("/saveAccess")
 	public ResponseEntity<ProfAccessRightResponse> createAccess(
-			@RequestBody ProfAccessRightRequest accessRightRequest) {
+			@Valid @RequestBody ProfAccessRightRequest accessRightRequest) {
 		if (StringUtils.isEmpty(accessRightRequest.getView()) || StringUtils.isEmpty(accessRightRequest.getWrite())
 				|| StringUtils.isEmpty(accessRightRequest.getCreatedBy())) {
 			logger.info(DMSConstant.INVALID_INPUT);

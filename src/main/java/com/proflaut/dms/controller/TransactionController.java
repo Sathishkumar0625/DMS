@@ -50,7 +50,6 @@ public class TransactionController {
 
 	private final AppConfiguration appConfiguration;
 
-	@Autowired
 	public TransactionController( AppConfiguration appConfiguration) {
 		this.appConfiguration = appConfiguration;
 	}

@@ -20,7 +20,7 @@ public class ProfUserPropertiesEntity {
 	@Column(name = "ID")
 	private Integer id;
 
-	@Column(name = "USER_ID", unique = true)
+	@Column(name = "USER_ID", unique = true,nullable = false)
 	private Integer userId;
 
 	@Column(name = "LAST_USED")
@@ -29,7 +29,7 @@ public class ProfUserPropertiesEntity {
 	@Column(name = "SEC_KEY")
 	private String secKey;
 	
-	@Column(name = "TOKEN")
+	@Column(name = "TOKEN",nullable = false)
 	private String token;
 
 	@Column(name = "LAST_LOGIN")
@@ -47,7 +47,7 @@ public class ProfUserPropertiesEntity {
 	@Column(name = "LOCKED_DATE")
 	private Timestamp lockedDate;
 	
-	@Column(name = "USER_NAME")
+	@Column(name = "USER_NAME",nullable = false)
 	private String userName;
 	
 	public String getUserName() {

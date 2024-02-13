@@ -1,7 +1,11 @@
 package com.proflaut.dms.model;
 
+import javax.validation.constraints.NotBlank;
+
 public class ProfAccessUserMappingRequest {
+	@NotBlank(message = "User Name Id cannot be blank")
 	private String userName;
+	@NotBlank(message = "User Id cannot be blank")
 	private String userId;
 
 	public String getUserName() {

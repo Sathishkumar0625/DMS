@@ -1,5 +1,7 @@
 package com.proflaut.dms.controller;
 
+import javax.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class FolderController {
 
 	@PostMapping("/create")
 	public ResponseEntity<FileResponse> createFolder(@RequestHeader("token") String token,
-			@RequestBody FolderFO folderFO) {
+			@Valid @RequestBody FolderFO folderFO) {
 
 		if (StringUtils.isEmpty(folderFO.getFolderName()) || StringUtils.isEmpty(folderFO.getMetaDataId())
 				|| StringUtils.isEmpty(token)) {
@@ -79,6 +81,10 @@ public class FolderController {
 
 	@GetMapping("/ById/{id}")
 	public ResponseEntity<FileResponse> getById(@PathVariable("id") Integer id, FileRequest fileRequest) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		FileResponse fileResponse = null;
 		try {
 			fileResponse = folderServiceImpl.retriveFile(id);
@@ -95,6 +101,10 @@ public class FolderController {
 
 	@GetMapping("/getById/{id}")
 	public ResponseEntity<Folders> findById(@PathVariable("id") Integer id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		Folders folderRetreiveResponse = null;
 		try {
 			folderRetreiveResponse = folderServiceImpl.retreive(id);
@@ -112,6 +122,10 @@ public class FolderController {
 
 	@GetMapping("/getAllParentFolders")
 	public ResponseEntity<FolderRetreiveResponse> getAll(@RequestHeader("token") String token) {
+		if (StringUtils.isEmpty(token)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		try {
 			FolderRetreiveResponse folderRetreiveResponse = folderServiceImpl.getAllFolders(token);
 			if (folderRetreiveResponse != null
@@ -128,6 +142,10 @@ public class FolderController {
 
 	@GetMapping("getByParentId")
 	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestParam int parentFolderID) {
+		if (StringUtils.isEmpty(parentFolderID)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfFolderRetrieveResponse folderRetrieveResponse = null;
 		try {
 			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID);

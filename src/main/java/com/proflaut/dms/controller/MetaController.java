@@ -3,6 +3,8 @@ package com.proflaut.dms.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +32,15 @@ import com.proflaut.dms.service.impl.MetaServiceImpl;
 @RequestMapping("/meta")
 @CrossOrigin
 public class MetaController {
-	
+
 	private static final Logger logger = LogManager.getLogger(MetaController.class);
-	
+
 	@Autowired
 	MetaServiceImpl metaServiceImpl;
-	
+
 	@PostMapping("/createTable")
 	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,
-			@RequestBody CreateTableRequest createTableRequest) {
+			@Valid @RequestBody CreateTableRequest createTableRequest) {
 		if (StringUtils.isEmpty(token) || StringUtils.isEmpty(createTableRequest.getTableName())
 				|| StringUtils.isEmpty(createTableRequest.getFileExtension())) {
 			logger.info(DMSConstant.INVALID_INPUT);
@@ -48,7 +50,7 @@ public class MetaController {
 		try {
 			metaDataResponse = metaServiceImpl.createTableFromFieldDefinitions(createTableRequest, token);
 			if (!metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
-				return new ResponseEntity<>(metaDataResponse, HttpStatus.OK);
+				return ResponseEntity.ok(metaDataResponse);
 			} else {
 				return new ResponseEntity<>(metaDataResponse, HttpStatus.NOT_ACCEPTABLE);
 			}
@@ -59,9 +61,13 @@ public class MetaController {
 			return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getAllTables")
 	public ResponseEntity<GetAllTableResponse> getAllMetaTables(@RequestParam int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		GetAllTableResponse getAllTableResponse = null;
 		try {
 			getAllTableResponse = metaServiceImpl.getAll(id);
@@ -90,12 +96,16 @@ public class MetaController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getMetaById")
 	public ResponseEntity<ProfOverallMetaDataResponse> getMetaDataById(@RequestParam int id) {
-		ProfOverallMetaDataResponse dataResponse=null;
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfOverallMetaDataResponse dataResponse = null;
 		try {
-			 dataResponse = metaServiceImpl.getMetaData(id);
+			dataResponse = metaServiceImpl.getMetaData(id);
 			if (dataResponse != null) {
 				return new ResponseEntity<>(dataResponse, HttpStatus.OK);
 			} else {
@@ -106,7 +116,7 @@ public class MetaController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/findAllFromTable")
 	public ResponseEntity<Map<String, Object>> findAllFromTable(@RequestParam String tableName) {
 		if (StringUtils.isEmpty(tableName)) {
@@ -126,14 +136,19 @@ public class MetaController {
 		}
 
 	}
+
 	@GetMapping("/getAllAccessMetaTable")
-	public ResponseEntity<List<ProfUploadAccessResponse>> uploadAccess(@RequestHeader("token")String token){
-		List<ProfUploadAccessResponse> accessResponse=null;
+	public ResponseEntity<List<ProfUploadAccessResponse>> uploadAccess(@RequestHeader("token") String token) {
+		if (StringUtils.isEmpty(token)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		List<ProfUploadAccessResponse> accessResponse = null;
 		try {
-			accessResponse=metaServiceImpl.uploadAccessRights(token);
+			accessResponse = metaServiceImpl.uploadAccessRights(token);
 			if (!accessResponse.isEmpty()) {
-				return new ResponseEntity<>(accessResponse,HttpStatus.OK);
-			}else {
+				return new ResponseEntity<>(accessResponse, HttpStatus.OK);
+			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {

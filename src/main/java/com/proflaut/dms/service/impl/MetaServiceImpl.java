@@ -108,7 +108,7 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
 			if (dataEntity != null) {
-				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, entityManager);
+				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, entityManager,id);
 			} else {
 				throw new CustomException("DataEntity not found for name: " + id);
 			}
@@ -164,7 +164,7 @@ public class MetaServiceImpl {
 			Optional<FolderEntity> entity = folderRepository.findById(Integer.valueOf(fileRequest.getFolderId()));
 			if (dataEntity != null && !entity.isEmpty()) {
 				dataResponse = metaHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),
-						id);
+						id,path);
 			} else {
 				delete(path);
 				throw new CustomException("ID NOT FOUND");

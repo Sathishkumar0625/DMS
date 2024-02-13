@@ -16,7 +16,7 @@ public class ProfGroupInfoEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "GROUP_NAME", unique = true)
+	@Column(name = "GROUP_NAME", unique = true,nullable = false)
 	private String groupName;
 	@Column(name = "STATUS")
 	private String status;

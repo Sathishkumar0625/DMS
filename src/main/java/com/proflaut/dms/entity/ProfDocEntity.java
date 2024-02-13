@@ -20,7 +20,7 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_NAME")
 	private String prospectId;
 
-	@Column(name = "DOCUMENT_NAME")
+	@Column(name = "DOCUMENT_NAME",nullable = false)
 	private String docName;
 
 	@Column(name = "DOCUMENT_PATH")
@@ -35,7 +35,7 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_ID")
 	private int folderId;
 
-	@Column(name = "EXTENTION")
+	@Column(name = "EXTENTION",nullable = false)
 	private String extention;
 
 	@Column(name = "IS_EMAIL")

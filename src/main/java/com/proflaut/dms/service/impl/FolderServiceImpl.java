@@ -134,8 +134,10 @@ public class FolderServiceImpl {
 				int userId = propertiesEntity.getUserId();
 				List<Folders> folders = helper.convertToGetAllFolders(userId);
 				folderRetreiveResponse.setFolder(folders);
+				folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				throw new CustomException("Token Not Found" + token);
 			}
-			folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			folderRetreiveResponse.setStatus(DMSConstant.FAILURE);
@@ -148,9 +150,9 @@ public class FolderServiceImpl {
 		try {
 			List<FolderEntity> entity = folderRepo.findByParentFolderID(parentFolderID);
 			if (entity != null) {
-				List<String> metaIds = entity.stream().map(FolderEntity:: getMetaId).collect(Collectors.toList());
-	            List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByMetaIdIn(metaIds);
-				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity,accessRights);
+				List<String> metaIds = entity.stream().map(FolderEntity::getMetaId).collect(Collectors.toList());
+				List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByMetaIdIn(metaIds);
+				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity, accessRights);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,5 +1,7 @@
 package com.proflaut.dms.model;
 
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({ "folderName", "parentFolderID", "isParent" })
@@ -7,10 +9,12 @@ public class FolderFO {
 
 	private String prospectId;
 
-	private int parentFolderID;
+	private String parentFolderID;
 
+	@NotBlank(message = "Group Id cannot be blank")
 	private String folderName;
 
+	@NotBlank(message = "Meta Data Id cannot be blank")
 	private String metaDataId;
 
 	public String getFolderName() {
@@ -37,11 +41,11 @@ public class FolderFO {
 		this.prospectId = prospectId;
 	}
 
-	public int getParentFolderID() {
+	public String getParentFolderID() {
 		return parentFolderID;
 	}
 
-	public void setParentFolderID(int parentFolderID) {
+	public void setParentFolderID(String parentFolderID) {
 		this.parentFolderID = parentFolderID;
 	}
 }

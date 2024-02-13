@@ -84,7 +84,7 @@ public class FolderHelper {
 		ent.setMetaId(folderFO.getMetaDataId());
 		ent.setCreatedAt(formatCurrentDateTime());
 		ent.setCreatedBy(propertiesEntity.getUserName());
-		ent.setParentFolderID(folderFO.getParentFolderID());
+		ent.setParentFolderID(Integer.parseInt(folderFO.getParentFolderID()));
 		return ent;
 	}
 

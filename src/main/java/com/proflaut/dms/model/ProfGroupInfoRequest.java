@@ -1,8 +1,11 @@
 package com.proflaut.dms.model;
 
+import javax.validation.constraints.NotBlank;
+
 public class ProfGroupInfoRequest {
 
 	private String createdBy;
+	@NotBlank(message = "Group Name cannot be blank")
 	private String groupName;
 	private String status;
 

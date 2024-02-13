@@ -1,5 +1,7 @@
 package com.proflaut.dms.helper;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.constant.DMSConstant;
@@ -22,12 +25,16 @@ import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
+import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @Component
 public class MetaHelper {
 
 	@PersistenceContext
 	EntityManager entityManager;
+
+	@Autowired
+	MetaServiceImpl metaServiceImpl;
 
 	public String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -90,7 +97,8 @@ public class MetaHelper {
 		return metaDataEntity;
 	}
 
-	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager) {
+	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager,
+			int id) {
 		GetAllTableResponse allTableResponse = new GetAllTableResponse();
 		allTableResponse.setId(dataEntity.getId());
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
@@ -143,6 +151,7 @@ public class MetaHelper {
 		List<String> values = new ArrayList<>();
 		try {
 			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+
 			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
 			for (Object result : results) {
@@ -177,7 +186,8 @@ public class MetaHelper {
 	}
 
 	@Transactional
-	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id) {
+	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id,
+			Path path) throws IOException {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		StringBuilder insertQueryBuilder = new StringBuilder();
 		insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
@@ -207,6 +217,7 @@ public class MetaHelper {
 			entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
 			dataResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
+			metaServiceImpl.delete(path);
 			e.printStackTrace();
 			dataResponse.setStatus(DMSConstant.FAILURE);
 		}
@@ -220,7 +231,7 @@ public class MetaHelper {
 			return "'" + fieldValue.getValue().replace("'", "''") + "'";
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<String> getColumnNames(String tableName) {
 		List<String> columnNames = new ArrayList<>();
@@ -234,6 +245,5 @@ public class MetaHelper {
 		}
 		return columnNames;
 	}
-
 
 }

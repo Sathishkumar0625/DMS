@@ -3,7 +3,6 @@ package com.proflaut.dms.controller;
 import java.util.List;
 
 import javax.validation.Valid;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.LoginResponse;
 import com.proflaut.dms.model.UserInfo;
@@ -34,7 +32,6 @@ public class AccessController {
 
 	@Autowired
 	public AccessController(AccessServiceImpl accessServiceImpl) {
-
 		this.accessServiceImpl = accessServiceImpl;
 	}
 
@@ -70,7 +67,7 @@ public class AccessController {
 
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody UserInfo userInfo) {
-		if (StringUtils.isEmpty(userInfo.getUserName()) && StringUtils.isEmpty(userInfo.getPassword()) ) {
+		if (StringUtils.isEmpty(userInfo.getUserName()) && StringUtils.isEmpty(userInfo.getPassword())) {
 			logger.warn(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

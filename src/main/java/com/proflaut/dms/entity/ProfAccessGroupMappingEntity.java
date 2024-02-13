@@ -16,12 +16,12 @@ public class ProfAccessGroupMappingEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "GROUP_ID")
+	@Column(name = "GROUP_ID",nullable = false)
 	private String groupId;
-	@Column(name = "GROUP_NAME")
+	@Column(name = "GROUP_NAME",nullable = false)
 	private String groupName;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "access_id")
 	private ProfAccessRightsEntity accessRightsEntity;
 

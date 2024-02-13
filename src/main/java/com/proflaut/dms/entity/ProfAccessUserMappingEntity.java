@@ -16,9 +16,9 @@ public class ProfAccessUserMappingEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "USER_ID")
+	@Column(name = "USER_ID",nullable = false)
 	private String userId;
-	@Column(name = "USERNAME")
+	@Column(name = "USERNAME",nullable = false)
 	private String userName;
 
 	@ManyToOne

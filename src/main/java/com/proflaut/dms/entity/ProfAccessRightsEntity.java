@@ -18,11 +18,11 @@ public class ProfAccessRightsEntity {
 	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "META_ID")
+	@Column(name = "META_ID",nullable = false)
 	private String metaId;
-	@Column(name = "VIEW")
+	@Column(name = "VIEW",nullable = false)
 	private String view;
-	@Column(name = "WRITE")
+	@Column(name = "WRITE",nullable = false)
 	private String write;
 	@Column(name = "CREATED_BY")
 	private String createdBy;

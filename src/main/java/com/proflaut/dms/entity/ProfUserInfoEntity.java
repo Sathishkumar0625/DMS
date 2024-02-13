@@ -16,7 +16,7 @@ public class ProfUserInfoEntity {
 	@Column(name = "USER_ID")
 	private Integer userId;
 
-	@Column(name = "USER_NAME", unique = true)
+	@Column(name = "USER_NAME", unique = true,nullable = false)
 	private String userName;
 
 	public Integer getUserId() {
@@ -67,10 +67,10 @@ public class ProfUserInfoEntity {
 		this.updatedDate = updatedDate;
 	}
 
-	@Column(name = "PASSWORD")
+	@Column(name = "PASSWORD",nullable = false)
 	private String password;
 
-	@Column(name = "EMAIL")
+	@Column(name = "EMAIL",nullable = false)
 	private String email;
 
 	@Column(name = "CREATED_DATE")

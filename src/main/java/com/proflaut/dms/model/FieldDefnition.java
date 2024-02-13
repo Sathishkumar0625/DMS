@@ -1,9 +1,15 @@
 package com.proflaut.dms.model;
 
+import javax.validation.constraints.NotBlank;
+
 public class FieldDefnition {
+	@NotBlank(message = "fieldName cannot be blank")
 	private String fieldName;
+	@NotBlank(message = "fieldType cannot be blank")
 	private String fieldType;
+	@NotBlank(message = "mandatory cannot be blank")
 	private String mandatory;
+	@NotBlank(message = "maxLength cannot be blank")
 	private String maxLength;
 	private String value;
 
