@@ -23,6 +23,7 @@ import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
+import com.proflaut.dms.model.ProfUploadAccessResponse;
 import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @RestController
@@ -124,5 +125,15 @@ public class MetaController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
+	}
+	@GetMapping("/getAllAccessMetaTable")
+	public ResponseEntity<List<ProfUploadAccessResponse>> uploadAccess(@RequestHeader("token")String token){
+		List<ProfUploadAccessResponse> accessResponse=null;
+		try {
+			accessResponse=metaServiceImpl.uploadAccessRights(token);
+			return new ResponseEntity<>(accessResponse,HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

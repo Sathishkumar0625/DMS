@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
+import com.proflaut.dms.entity.ProfAccessRightsEntity;
+import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -32,7 +34,10 @@ import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
+import com.proflaut.dms.model.ProfUploadAccessResponse;
 import com.proflaut.dms.repository.FolderRepository;
+import com.proflaut.dms.repository.ProfAccessRightRepository;
+import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -57,6 +62,12 @@ public class MetaServiceImpl {
 
 	@Autowired
 	FolderRepository folderRepository;
+
+	@Autowired
+	ProfAccessUserMappingRepository accessUserMappingRepository;
+
+	@Autowired
+	ProfAccessRightRepository accessRightRepository;
 
 	private static final Logger logger = LogManager.getLogger(MetaServiceImpl.class);
 
@@ -175,7 +186,7 @@ public class MetaServiceImpl {
 			logger.info("File doesn't exist");
 		}
 	}
-	
+
 	public Map<String, Object> findAllRowsAndColumns(String tableName) {
 		Map<String, Object> responseMap = new HashMap<>();
 		try {
@@ -205,6 +216,44 @@ public class MetaServiceImpl {
 			e.printStackTrace();
 		}
 		return responseMap;
+	}
+
+	public List<ProfUploadAccessResponse> uploadAccessRights(String token) {
+		List<ProfUploadAccessResponse> accessResponses = new ArrayList<>();
+		try {
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
+			if (entity.getUserId() == null) {
+				throw new CustomException("User Id Not Found");
+			}
+			List<ProfAccessUserMappingEntity> userAccessMappings = accessUserMappingRepository
+					.findByUserId(String.valueOf(entity.getUserId()));
+			List<Integer> accessIds = new ArrayList<>();
+
+			// Retrieve access IDs from userAccessMappings
+			for (ProfAccessUserMappingEntity userAccessMapping : userAccessMappings) {
+				ProfAccessRightsEntity accessRightsEntity = userAccessMapping.getAccessRightsEntity();
+				if (accessRightsEntity != null) {
+					accessIds.add(accessRightsEntity.getId());
+				}
+			}
+			List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByIdIn(accessIds);
+	        for (ProfAccessRightsEntity accessRight : accessRights) {
+	            String metaId = accessRight.getMetaId();
+	            // Query metadata based on metaId
+	            ProfMetaDataEntity metaData = metaDataRepository.findById(Integer.parseInt(metaId));
+	            if (metaData != null) {
+	            	ProfUploadAccessResponse accessResponse=new ProfUploadAccessResponse();
+	            	accessResponse.setMetaId(Integer.valueOf(metaId));
+	            	accessResponse.setTableName(metaData.getName());
+//	            	accessResponse.setView(accessRight.getView());
+//	            	accessResponse.setWrite(accessRight.getWrite()); 
+	            	accessResponses.add(accessResponse);
+	            }
+	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return accessResponses;
 	}
 
 }
