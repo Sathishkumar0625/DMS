@@ -245,8 +245,6 @@ public class MetaServiceImpl {
 	            	ProfUploadAccessResponse accessResponse=new ProfUploadAccessResponse();
 	            	accessResponse.setMetaId(Integer.valueOf(metaId));
 	            	accessResponse.setTableName(metaData.getName());
-//	            	accessResponse.setView(accessRight.getView());
-//	            	accessResponse.setWrite(accessRight.getWrite()); 
 	            	accessResponses.add(accessResponse);
 	            }
 	        }

@@ -16,7 +16,7 @@
 	<description>DMS Spring boot project</description>
 	<properties>
 		<java.version>1.8</java.version>
-		<sonar.token>sqp_4e55ef8e2d6a901043c7fc30324e777d7f41cc16</sonar.token>
+		<sonar.token>sqp_72e65730dcf0cf3cebc3aa9baffd0e86230ba931</sonar.token>
 	</properties>
 	<dependencies>
 
@@ -132,62 +132,52 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<!-- Spring Boot Maven Plugin -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+    <plugins>
+        <!-- Spring Boot Maven Plugin -->
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <excludes>
+                    <exclude>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                    </exclude>
+                </excludes>
+            </configuration>
+        </plugin>
 
-			<!-- Maven SonarQube Plugin -->
+        <!-- Maven SonarQube Plugin -->
+        <plugin>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.7.0.1746</version> <!-- Replace with the latest version -->
+            <configuration>
+                <sonar.host.url>http://localhost:9000</sonar.host.url>
+                <!-- Specify the SonarQube token -->
+                <sonar.login>${sonar.token}</sonar.login>
+            </configuration>
+        </plugin>
 
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.7.0.1746</version> <!-- Replace with the latest
-				version -->
-				<configuration>
-					<sonar.host.url>http://localhost:9000</sonar.host.url>
-					<!-- Specify the SonarQube token -->
-					<sonar.login>${sonar.token}</sonar.login>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+        <!-- Maven Surefire Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <shutdown>kill</shutdown>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 
-				<configuration>
-					<shutdown>kill</shutdown>
-				</configuration>
-			</plugin>
+<repositories>
+    <repository>
+        <id>AsposeJavaAPI</id>
+        <name>Aspose Java API</name>
+        <url>https://releases.aspose.cloud/java/repo/</url>
+    </repository>
+</repositories>
 
-			
-			 <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <shutdown>kill</shutdown>
-        </configuration>
-      </plugin>
-		</plugins>
-	</build>
-
-	<repositories>
-		<repository>
-			<id>AsposeJavaAPI</id>
-			<name>Aspose Java API</name>
-			<url>https://releases.aspose.cloud/java/repo/</url>
-		</repository>
-	</repositories>
-	
 
 
 </project>

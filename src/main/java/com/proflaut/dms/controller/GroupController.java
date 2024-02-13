@@ -92,7 +92,7 @@ public class GroupController {
 
 	@PostMapping("/createUser")
 	public ResponseEntity<ProfGroupInfoResponse> createUserGroup(
-		@Valid	@RequestBody ProfUserGroupMappingRequest mappingRequest) {
+			@Valid @RequestBody ProfUserGroupMappingRequest mappingRequest) {
 		ProfGroupInfoResponse groupInfoResponse = null;
 		try {
 			groupInfoResponse = groupServiceImpl.createGroup(mappingRequest);

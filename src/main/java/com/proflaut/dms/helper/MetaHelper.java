@@ -97,8 +97,7 @@ public class MetaHelper {
 		return metaDataEntity;
 	}
 
-	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager,
-			int id) {
+	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager, int id) {
 		GetAllTableResponse allTableResponse = new GetAllTableResponse();
 		allTableResponse.setId(dataEntity.getId());
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
@@ -107,19 +106,17 @@ public class MetaHelper {
 		allTableResponse.setTableName(dataEntity.getName());
 		String tableName = dataEntity.getTableName().toLowerCase();
 		if (tableName != null) {
-			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, entityManager);
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, entityManager,id);
 			allTableResponse.setFieldNames(definitionResponses);
 		}
 		return allTableResponse;
 	}
 
-	private List<FieldDefinitionResponse> getColumnDetails(String tableName, EntityManager entityManager) {
+	private List<FieldDefinitionResponse> getColumnDetails(String tableName, EntityManager entityManager, int id) {
 		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
-
 		try {
 			String sqlQuery = "SELECT column_name, data_type, is_nullable, character_maximum_length "
-					+ "FROM information_schema.columns " + "WHERE table_name = :tableName";
-
+					+ "FROM information_schema.columns WHERE table_name = :tableName"; // Removed "AND DOC_ID = :id"
 			@SuppressWarnings("unchecked")
 			List<Object[]> result = entityManager.createNativeQuery(sqlQuery).setParameter("tableName", tableName)
 					.getResultList();
@@ -129,10 +126,10 @@ public class MetaHelper {
 				String dataType = (String) row[1];
 				String isNullable = (String) row[2];
 				Integer characterMaxLength = (Integer) row[3];
-
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
 				fieldDefinitionResponse.setFieldName(columnName);
-				List<String> values = fetchDataFromTable(columnName, tableName);
+				// Fetch data for each column based on both tableName and id
+				List<String> values = fetchDataFromTable(columnName, tableName,id);
 				fieldDefinitionResponse.setValue(String.join(",", values));
 				fieldDefinitionResponse
 						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
@@ -143,14 +140,13 @@ public class MetaHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return definitionResponses;
 	}
 
-	private List<String> fetchDataFromTable(String columnName, String tableName) {
+	private List<String> fetchDataFromTable(String columnName, String tableName, int id) {
 		List<String> values = new ArrayList<>();
 		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName+ " WHERE doc_id = " + id;
 
 			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
