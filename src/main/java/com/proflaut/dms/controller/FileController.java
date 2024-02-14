@@ -77,6 +77,7 @@ public class FileController {
 			fileResponse.setErrorMessage(errorMessage.toString());
 			return new ResponseEntity<>(fileResponse, HttpStatus.BAD_REQUEST);
 		}
+		Path paths=null;
 		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token, status, transactionManager);
@@ -85,7 +86,7 @@ public class FileController {
 				ProfDocEntity docEntity = uploadRepository.findByDocNameAndFolderId(fileRequest.getDockName(),
 						Integer.valueOf(fileRequest.getFolderId()));
 				String path = folderLocation + File.separator + docEntity.getDocPath();
-				Path paths = Paths.get(path);
+				paths = Paths.get(path);
 				ProfMetaDataResponse metaDataResponse = metaServiceImpl
 						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths);
 				fileResponse.setId(docEntity.getId());
@@ -99,7 +100,8 @@ public class FileController {
 				}
 			} else {
 				logger.warn("Upload Failure");
-				transactionManager.rollback(status);
+				metaServiceImpl.delete(paths);
+				transactionManager.rollback(status);				
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {

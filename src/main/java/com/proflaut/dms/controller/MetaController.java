@@ -70,7 +70,7 @@ public class MetaController {
 		}
 		GetAllTableResponse getAllTableResponse = null;
 		try {
-			getAllTableResponse = metaServiceImpl.getAll(id);
+			getAllTableResponse = metaServiceImpl.getAllTable(id);
 			if (getAllTableResponse.getCreatedBy() != null) {
 				return new ResponseEntity<>(getAllTableResponse, HttpStatus.OK);
 			} else {

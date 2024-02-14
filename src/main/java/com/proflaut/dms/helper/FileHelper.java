@@ -88,17 +88,17 @@ public class FileHelper {
 		return currentDateTime.format(formatter);
 	}
 
-
 	@Transactional
 	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token) throws CustomException {
 		boolean isFileCreated = false;
+		String fileName = null;
 		try {
 			FolderEntity entity = folderRepository.findById(Integer.parseInt(fileRequest.getFolderId()));
 
 			if (entity != null) {
 				String path = entity.getIsParent();
 				UUID uuid = UUID.randomUUID();
-				String fileName = uuid.toString();
+				fileName = uuid.toString();
 
 				ProfDocEntity existingDocEntity = docUploadRepository.findByDocNameAndFolderId(
 						fileRequest.getDockName(), Integer.parseInt(fileRequest.getFolderId()));
@@ -138,9 +138,30 @@ public class FileHelper {
 				}
 			}
 		} catch (Exception e) {
+			rollbackAndDeleteFile(fileName);
 			handleGenericException(e);
+		} finally {
+			if (!isFileCreated) {
+				rollbackAndDeleteFile(fileName);
+			}
 		}
 		return isFileCreated;
+	}
+
+	private void rollbackAndDeleteFile(String fileName) {
+		String partialFilePath = folderLocation + File.separator + fileName;
+		Path path = Paths.get(partialFilePath);
+		File partialFile = new File(partialFilePath);
+		if (partialFile.exists()) {
+			try {
+				Files.delete(path);
+				logger.info("Partially uploaded file deleted successfully.");
+			} catch (IOException e) {
+				logger.error("Failed to delete partially uploaded file.", e);
+			}
+		} else {
+			logger.info("Partially uploaded file does not exist.");
+		}
 	}
 
 	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity,
@@ -172,10 +193,9 @@ public class FileHelper {
 		return oldImageEntity;
 	}
 
-	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, FolderEntity entity)
-			throws CustomException {
-		String backupFolderPath = folderLocation + "Backup_" + entity.getFolderName();
-		Path existingPath = Paths.get(entity.getFolderPath(), existingDocEntity.getDocPath());
+	private void moveDocumentToBackup(ProfDocEntity existingDocEntity, FolderEntity entity) throws CustomException {
+		String backupFolderPath = folderLocation;
+		Path existingPath = Paths.get(entity.getIsParent(), existingDocEntity.getDocPath());
 		Path backupFolder = Paths.get(backupFolderPath);
 
 		if (!Files.exists(backupFolder)) {
@@ -207,7 +227,7 @@ public class FileHelper {
 
 			if (!org.springframework.util.StringUtils.isEmpty(profDocEntity.get(i).getDocPath())) {
 				try {
-					String filePath =folderLocation + File.separator + profDocEntity.get(i).getDocPath();
+					String filePath = folderLocation + File.separator + profDocEntity.get(i).getDocPath();
 					String encryptedContent = new String(Files.readAllBytes(Paths.get(filePath)));
 					PasswordEncDecrypt td = new PasswordEncDecrypt();
 					decrypted = td.decrypt(encryptedContent);
@@ -270,7 +290,6 @@ public class FileHelper {
 	public ProfUserPropertiesEntity callProfUserConnection(String token) {
 		return profUserPropertiesRepository.findByToken(token);
 	}
-
 
 	private void handleIOException(IOException e) throws CustomException {
 		throw new CustomException("IOException: " + e.getMessage());
@@ -343,5 +362,4 @@ public class FileHelper {
 		return configEntity;
 	}
 
-	
 }

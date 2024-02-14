@@ -146,8 +146,7 @@ public class FileManagementServiceImpl {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
 				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
-				GetAllTableResponse allTableResponse = metaServiceImpl.getAll(dataEntity.getId());
-//				response = accessRightsServiceImpl.findAllRowsAndColumns(dataEntity.getName());
+				GetAllTableResponse allTableResponse = metaServiceImpl.getAll(docEntity);
 				response.put("image", fileRetreiveByResponse);
 				response.put("metaDetails", allTableResponse);
 			} else {

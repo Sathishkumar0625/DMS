@@ -24,7 +24,9 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
+import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
+import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -38,6 +40,7 @@ import com.proflaut.dms.model.ProfUploadAccessResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
+import com.proflaut.dms.repository.ProfMetaDataPropRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -69,6 +72,12 @@ public class MetaServiceImpl {
 	@Autowired
 	ProfAccessRightRepository accessRightRepository;
 
+	@Autowired
+	ProfMetaDataRepository profMetaDataRepository;
+
+	@Autowired
+	ProfMetaDataPropRepository dataPropRepository;
+
 	private static final Logger logger = LogManager.getLogger(MetaServiceImpl.class);
 
 	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest, String token) {
@@ -83,6 +92,11 @@ public class MetaServiceImpl {
 						infoEntity);
 				if (dataEntity != null) {
 					entityManager.persist(dataEntity);
+					ProfMetaDataEntity dataEnt = metaDataRepository.findById(dataEntity.getId());
+					List<ProfMetaDataPropertiesEntity> propertiesList = metaHelper
+							.convertMetaEntityToMetaProperties(createTableRequest, dataEnt);
+					dataPropRepository.saveAll(propertiesList);
+
 					metaDataResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
 					throw new CustomException("ProfMetaDataEntity is Null");
@@ -103,14 +117,14 @@ public class MetaServiceImpl {
 		return metaDataResponse;
 	}
 
-	public GetAllTableResponse getAll(int id) {
+	public GetAllTableResponse getAll(ProfDocEntity docEntity) {
 		GetAllTableResponse getAllTableResponse = new GetAllTableResponse();
 		try {
-			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
+			ProfMetaDataEntity dataEntity = metaDataRepository.findById(docEntity.getMetaId());
 			if (dataEntity != null) {
-				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, entityManager,id);
+				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, entityManager, docEntity.getId());
 			} else {
-				throw new CustomException("DataEntity not found for name: " + id);
+				throw new CustomException("DataEntity not found for name: " + docEntity.getId());
 			}
 		} catch (CustomException ce) {
 			ce.printStackTrace();
@@ -164,7 +178,7 @@ public class MetaServiceImpl {
 			Optional<FolderEntity> entity = folderRepository.findById(Integer.valueOf(fileRequest.getFolderId()));
 			if (dataEntity != null && !entity.isEmpty()) {
 				dataResponse = metaHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),
-						id,path);
+						id, path);
 			} else {
 				delete(path);
 				throw new CustomException("ID NOT FOUND");
@@ -237,21 +251,43 @@ public class MetaServiceImpl {
 				}
 			}
 			List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByIdIn(accessIds);
-	        for (ProfAccessRightsEntity accessRight : accessRights) {
-	            String metaId = accessRight.getMetaId();
-	            // Query metadata based on metaId
-	            ProfMetaDataEntity metaData = metaDataRepository.findById(Integer.parseInt(metaId));
-	            if (metaData != null) {
-	            	ProfUploadAccessResponse accessResponse=new ProfUploadAccessResponse();
-	            	accessResponse.setMetaId(Integer.valueOf(metaId));
-	            	accessResponse.setTableName(metaData.getName());
-	            	accessResponses.add(accessResponse);
-	            }
-	        }
+			for (ProfAccessRightsEntity accessRight : accessRights) {
+				String metaId = accessRight.getMetaId();
+				// Query metadata based on metaId
+				ProfMetaDataEntity metaData = metaDataRepository.findById(Integer.parseInt(metaId));
+				if (metaData != null) {
+					ProfUploadAccessResponse accessResponse = new ProfUploadAccessResponse();
+					accessResponse.setMetaId(Integer.valueOf(metaId));
+					accessResponse.setTableName(metaData.getName());
+					accessResponses.add(accessResponse);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return accessResponses;
+	}
+
+	public GetAllTableResponse getAllTable(int id) {
+		GetAllTableResponse getAllTableResponse = new GetAllTableResponse();
+		try {
+			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
+			if (dataEntity != null) {
+				getAllTableResponse = metaHelper.convertEntityToGetAllTableResponse(dataEntity, entityManager);
+			} else {
+				throw new CustomException("DataEntity not found for name: ");
+			}
+		} catch (CustomException ce) {
+			ce.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (entityManager != null && entityManager.isOpen()) {
+				entityManager.close();
+			}
+		}
+		return getAllTableResponse;
+
 	}
 
 }

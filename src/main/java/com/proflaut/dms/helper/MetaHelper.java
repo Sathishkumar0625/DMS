@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
+import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FieldDefinitionResponse;
@@ -25,6 +26,7 @@ import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
+import com.proflaut.dms.repository.ProfMetaDataPropRepository;
 import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @Component
@@ -35,6 +37,9 @@ public class MetaHelper {
 
 	@Autowired
 	MetaServiceImpl metaServiceImpl;
+
+	@Autowired
+	ProfMetaDataPropRepository dataPropRepository;
 
 	public String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -97,7 +102,8 @@ public class MetaHelper {
 		return metaDataEntity;
 	}
 
-	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager, int id) {
+	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager,
+			int docId) {
 		GetAllTableResponse allTableResponse = new GetAllTableResponse();
 		allTableResponse.setId(dataEntity.getId());
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
@@ -106,35 +112,27 @@ public class MetaHelper {
 		allTableResponse.setTableName(dataEntity.getName());
 		String tableName = dataEntity.getTableName().toLowerCase();
 		if (tableName != null) {
-			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, entityManager,id);
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, dataEntity, docId);
 			allTableResponse.setFieldNames(definitionResponses);
 		}
 		return allTableResponse;
 	}
 
-	private List<FieldDefinitionResponse> getColumnDetails(String tableName, EntityManager entityManager, int id) {
+	private List<FieldDefinitionResponse> getColumnDetails(String tableName, ProfMetaDataEntity dataEntity, int docId) {
 		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
 		try {
-			String sqlQuery = "SELECT column_name, data_type, is_nullable, character_maximum_length "
-					+ "FROM information_schema.columns WHERE table_name = :tableName"; // Removed "AND DOC_ID = :id"
-			@SuppressWarnings("unchecked")
-			List<Object[]> result = entityManager.createNativeQuery(sqlQuery).setParameter("tableName", tableName)
-					.getResultList();
+			List<ProfMetaDataPropertiesEntity> dataPropertiesEntities = dataPropRepository
+					.findByMetaId(String.valueOf(dataEntity.getId()));
 
-			for (Object[] row : result) {
-				String columnName = (String) row[0];
-				String dataType = (String) row[1];
-				String isNullable = (String) row[2];
-				Integer characterMaxLength = (Integer) row[3];
+			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
-				fieldDefinitionResponse.setFieldName(columnName);
-				// Fetch data for each column based on both tableName and id
-				List<String> values = fetchDataFromTable(columnName, tableName,id);
+				fieldDefinitionResponse.setFieldName(property.getFieldNames());
+				fieldDefinitionResponse.setFieldType(property.getFieldType());
+				fieldDefinitionResponse.setMandatory(property.getMandatory());
+				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
+				List<String> values = fetchDataFromTable(property.getFieldNames().toLowerCase(), tableName, docId);
 				fieldDefinitionResponse.setValue(String.join(",", values));
-				fieldDefinitionResponse
-						.setFieldType("character varying".equalsIgnoreCase(dataType) ? "String" : "Integer");
-				fieldDefinitionResponse.setMandatory("NO".equalsIgnoreCase(isNullable) ? "Y" : "N");
-				fieldDefinitionResponse.setMaxLength(characterMaxLength != null ? characterMaxLength.toString() : null);
+
 				definitionResponses.add(fieldDefinitionResponse);
 			}
 		} catch (Exception e) {
@@ -143,13 +141,14 @@ public class MetaHelper {
 		return definitionResponses;
 	}
 
-	private List<String> fetchDataFromTable(String columnName, String tableName, int id) {
+	private List<String> fetchDataFromTable(String columnName, String tableName, int docId) {
 		List<String> values = new ArrayList<>();
 		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName+ " WHERE doc_id = " + id;
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName + " WHERE doc_id = :docId";
 
 			@SuppressWarnings("unchecked")
-			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
+			List<Object> results = entityManager.createNativeQuery(sqlQuery).setParameter("docId", docId)
+					.getResultList();
 			for (Object result : results) {
 				if (result != null) {
 					values.add(result.toString());
@@ -240,6 +239,82 @@ public class MetaHelper {
 			e.printStackTrace();
 		}
 		return columnNames;
+	}
+
+	public List<ProfMetaDataPropertiesEntity> convertMetaEntityToMetaProperties(CreateTableRequest createTableRequest,
+			ProfMetaDataEntity dataEnt) {
+		List<ProfMetaDataPropertiesEntity> metaDataPropertiesList = new ArrayList<>();
+
+		for (FieldDefnition field : createTableRequest.getFields()) {
+			ProfMetaDataPropertiesEntity metaDataProperties = new ProfMetaDataPropertiesEntity();
+			metaDataProperties.setMetaId(String.valueOf(dataEnt.getId()));
+			metaDataProperties.setFieldNames(field.getFieldName());
+			metaDataProperties.setFieldType(field.getFieldType());
+			metaDataProperties.setMandatory(field.getMandatory());
+			metaDataProperties.setLength(Integer.parseInt(field.getMaxLength()));
+			metaDataPropertiesList.add(metaDataProperties);
+		}
+
+		return metaDataPropertiesList;
+	}
+
+	public GetAllTableResponse convertEntityToGetAllTableResponse(ProfMetaDataEntity dataEntity,
+			EntityManager entityManager2) {
+		GetAllTableResponse allTableResponse = new GetAllTableResponse();
+		allTableResponse.setId(dataEntity.getId());
+		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
+		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
+		allTableResponse.setFileExtention(dataEntity.getFileExtension());
+		allTableResponse.setTableName(dataEntity.getName());
+		String tableName = dataEntity.getTableName().toLowerCase();
+		if (tableName != null) {
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose(tableName, dataEntity);
+			allTableResponse.setFieldNames(definitionResponses);
+		}
+		return allTableResponse;
+	}
+
+	private List<FieldDefinitionResponse> getColumnDetailsForRespose(String tableName, ProfMetaDataEntity dataEntity) {
+
+		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
+		try {
+			List<ProfMetaDataPropertiesEntity> dataPropertiesEntities = dataPropRepository
+					.findByMetaId(String.valueOf(dataEntity.getId()));
+
+			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
+				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
+				fieldDefinitionResponse.setFieldName(property.getFieldNames());
+				fieldDefinitionResponse.setFieldType(property.getFieldType());
+				fieldDefinitionResponse.setMandatory(property.getMandatory());
+				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
+				List<String> values = fetchDataFromMetaTable(property.getFieldNames().toLowerCase(), tableName);
+				fieldDefinitionResponse.setValue(String.join(",", values));
+
+				definitionResponses.add(fieldDefinitionResponse);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return definitionResponses;
+	}
+
+	private List<String> fetchDataFromMetaTable(String columnName, String tableName) {
+		List<String> values = new ArrayList<>();
+		try {
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+
+			@SuppressWarnings("unchecked")
+			List<Object> results = entityManager.createNativeQuery(sqlQuery)
+					.getResultList();
+			for (Object result : results) {
+				if (result != null) {
+					values.add(result.toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return values;
 	}
 
 }

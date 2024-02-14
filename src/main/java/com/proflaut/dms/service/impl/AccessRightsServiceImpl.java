@@ -50,7 +50,7 @@ public class AccessRightsServiceImpl {
 		try {
 			List<ProfAccessRightsEntity> accessRightsEntity = accessRightRepository.findAll();
 			for (ProfAccessRightsEntity profAccessRightsEntity : accessRightsEntity) {
-				ProfMetaDataEntity dataEntity = dataRepository.findById(profAccessRightsEntity.getId());
+				ProfMetaDataEntity dataEntity = dataRepository.findById(Integer.parseInt(profAccessRightsEntity.getMetaId()));
 				if (dataEntity != null) {
 					ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity,
 							dataEntity);
