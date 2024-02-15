@@ -13,7 +13,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,6 +80,7 @@ public class MetaServiceImpl {
 
 	private static final Logger logger = LogManager.getLogger(MetaServiceImpl.class);
 
+	@Transactional(rollbackFor = Exception.class)
 	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest, String token) {
 		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
 		try {
@@ -87,11 +88,13 @@ public class MetaServiceImpl {
 			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(entity.getUserId());
 
 			if (entity.getToken() != null && infoEntity.getUserName() != null) {
-				String tableName = metaHelper.createTable(createTableRequest.getFields(), createTableRequest);
-				ProfMetaDataEntity dataEntity = metaHelper.convertTableReqToMetaEntity(createTableRequest, tableName,
-						infoEntity);
-				if (dataEntity != null) {
+				ProfMetaDataEntity dataEntity = metaHelper.convertTableReqToMetaEntity(createTableRequest, infoEntity);
+				if (dataEntity.getName() != null && dataEntity.getFileExtension() != null) {
 					entityManager.persist(dataEntity);
+					String tableName = metaHelper.createTable(createTableRequest.getFields(), createTableRequest,
+							dataEntity.getId());
+					tableName = tableName.replace("\"", "");
+					profMetaDataRepository.updatetableName(tableName, dataEntity.getId());
 					ProfMetaDataEntity dataEnt = metaDataRepository.findById(dataEntity.getId());
 					List<ProfMetaDataPropertiesEntity> propertiesList = metaHelper
 							.convertMetaEntityToMetaProperties(createTableRequest, dataEnt);
@@ -122,7 +125,7 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findById(docEntity.getMetaId());
 			if (dataEntity != null) {
-				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, entityManager, docEntity.getId());
+				getAllTableResponse = metaHelper.convertEntityToResponse(dataEntity, docEntity.getId());
 			} else {
 				throw new CustomException("DataEntity not found for name: " + docEntity.getId());
 			}
@@ -170,7 +173,7 @@ public class MetaServiceImpl {
 	}
 
 	public ProfMetaDataResponse save(CreateTableRequest createTableRequest, Integer id, FileRequest fileRequest,
-			Path path) throws IOException {
+			Path path, ProfDocEntity docEntity) throws IOException {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByIdAndNameIgnoreCase(
@@ -178,14 +181,15 @@ public class MetaServiceImpl {
 			Optional<FolderEntity> entity = folderRepository.findById(Integer.valueOf(fileRequest.getFolderId()));
 			if (dataEntity != null && !entity.isEmpty()) {
 				dataResponse = metaHelper.insertDataIntoTable(dataEntity.getTableName(), createTableRequest.getFields(),
-						id, path);
+						id, path, docEntity);
 			} else {
 				delete(path);
 				throw new CustomException("ID NOT FOUND");
 			}
 		} catch (Exception e) {
-
-			delete(path);
+			if (path != null) {
+				delete(path);
+			}
 			e.printStackTrace();
 		}
 		return dataResponse;
@@ -206,10 +210,11 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(tableName);
 			if (dataEntity != null) {
-				String table = dataEntity.getTableName().toLowerCase();
-				List<String> columnNames = metaHelper.getColumnNames(table);
+				String metatableName = "\"" + dataEntity.getTableName() + "\"";
+				metatableName = metatableName.replace("\"\"", "\"");
+				List<String> columnNames = metaHelper.getColumnNames(metatableName);
 				String columnString = String.join(",", columnNames);
-				String sqlQuery = "SELECT " + columnString + " FROM " + table;
+				String sqlQuery = "SELECT " + columnString + " FROM " + metatableName;
 				Query query = entityManager.createNativeQuery(sqlQuery);
 				@SuppressWarnings("unchecked")
 				List<Object[]> resultList = query.getResultList();
@@ -273,7 +278,7 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findById(id);
 			if (dataEntity != null) {
-				getAllTableResponse = metaHelper.convertEntityToGetAllTableResponse(dataEntity, entityManager);
+				getAllTableResponse = metaHelper.convertEntityToGetAllTableResponse(dataEntity);
 			} else {
 				throw new CustomException("DataEntity not found for name: ");
 			}

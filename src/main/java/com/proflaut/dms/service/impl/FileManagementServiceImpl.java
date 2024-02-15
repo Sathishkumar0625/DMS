@@ -23,7 +23,6 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
-import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -139,9 +138,7 @@ public class FileManagementServiceImpl {
 			if (entity == null) {
 				throw new CustomException("FolderEntity not found for ID: " + docEntity.getFolderId());
 			}
-			ProfMetaDataEntity dataEntity = metaDataRepository.findById(docEntity.getMetaId());
-
-			String decrypted = fileHelper.retrieveDocument(docEntity, entity);
+			String decrypted = fileHelper.retrieveDocument(docEntity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());

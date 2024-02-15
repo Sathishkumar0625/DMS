@@ -187,9 +187,11 @@ public class FileHelper {
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
 		oldImageEntity.setUserName(uName);
-		// oldImageEntity.setProspectId(fileRequest.getProspectId());
+		oldImageEntity.setDocId(String.valueOf(existingDocEntity.getId()));
 		oldImageEntity.setCreatedBy(String.valueOf(uId));
 		oldImageEntity.setExtention(existingDocEntity.getExtention());
+		oldImageEntity.setFolderId(existingDocEntity.getFolderId());
+		oldImageEntity.setMetaId(existingDocEntity.getMetaId());
 		return oldImageEntity;
 	}
 
@@ -260,7 +262,7 @@ public class FileHelper {
 		return decrypted;
 	}
 
-	public String retrieveDocument(ProfDocEntity docEntity, FolderEntity entity) {
+	public String retrieveDocument(ProfDocEntity docEntity) {
 		String decompressedBytes = "";
 		String decrypted = "";
 		String path = folderLocation + File.separator + docEntity.getDocPath();

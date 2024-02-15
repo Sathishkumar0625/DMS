@@ -13,8 +13,11 @@ public class ProfOldImageEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "DOC_ID")
-	private Integer docId;
+	@Column(name = "ID")
+	private Integer id;
+
+	@Column(name = "META_ID")
+	private int metaId;
 
 	@Column(name = "DOCUMENT_NAME")
 	private String docName;
@@ -27,16 +30,35 @@ public class ProfOldImageEntity {
 
 	@Column(name = "PROSPECT_ID")
 	private String prospectId;
-	
+
 	@Column(name = "CREATED_BY")
 	private String createdBy;
-	
+
 	@Column(name = "EXTENTION")
 	private String extention;
-	
-	
 
-	
+	@Column(name = "DOC_ID")
+	private String docId;
+
+	@Column(name = "FOLDER_ID")
+	private int folderId;
+
+	public int getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(int folderId) {
+		this.folderId = folderId;
+	}
+
+	public String getDocId() {
+		return docId;
+	}
+
+	public void setDocId(String docId) {
+		this.docId = docId;
+	}
+
 	public String getExtention() {
 		return extention;
 	}
@@ -51,6 +73,14 @@ public class ProfOldImageEntity {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public int getMetaId() {
+		return metaId;
+	}
+
+	public void setMetaId(int metaId) {
+		this.metaId = metaId;
 	}
 
 	public String getProspectId() {
@@ -77,12 +107,12 @@ public class ProfOldImageEntity {
 		this.docPath = docPath;
 	}
 
-	public Integer getDocId() {
-		return docId;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setDocId(Integer docId) {
-		this.docId = docId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getDocName() {

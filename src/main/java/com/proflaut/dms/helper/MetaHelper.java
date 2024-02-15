@@ -1,6 +1,7 @@
 package com.proflaut.dms.helper;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
@@ -47,21 +49,18 @@ public class MetaHelper {
 		return currentDateTime.format(formatter);
 	}
 
-	private int tableCount = 1;
-
-	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
+	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest, int id) {
 
 		StringBuilder queryBuilder = new StringBuilder();
 		String tableName;
-
-		tableName = createTableRequest.getTableName() + "_" + tableCount;
+		tableName = "\"" + createTableRequest.getTableName() + "_" + id + "\"";
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
 		queryBuilder.append("DOC_ID INTEGER, ");
 		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			String fieldName = field.getFieldName();
+			String fieldName = "\"" + field.getFieldName() + "\"";
 			String fieldType = field.getFieldType();
 			String mandatory = field.getMandatory();
 			int maxLength = Integer.parseInt(field.getMaxLength());
@@ -76,7 +75,6 @@ public class MetaHelper {
 		}
 		queryBuilder.append(")");
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
-		tableCount++;
 		return tableName;
 	}
 
@@ -90,10 +88,9 @@ public class MetaHelper {
 		}
 	}
 
-	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName,
+	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest,
 			ProfUserInfoEntity entity) {
 		ProfMetaDataEntity metaDataEntity = new ProfMetaDataEntity();
-		metaDataEntity.setTableName(tableName);
 		metaDataEntity.setFileExtension(createTableRequest.getFileExtension());
 		metaDataEntity.setCreatedBy(entity.getUserName());
 		metaDataEntity.setCreatedAt(formatCurrentDateTime());
@@ -102,15 +99,15 @@ public class MetaHelper {
 		return metaDataEntity;
 	}
 
-	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, EntityManager entityManager,
-			int docId) {
+	public GetAllTableResponse convertEntityToResponse(ProfMetaDataEntity dataEntity, int docId) {
 		GetAllTableResponse allTableResponse = new GetAllTableResponse();
 		allTableResponse.setId(dataEntity.getId());
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
 		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
 		allTableResponse.setFileExtention(dataEntity.getFileExtension());
 		allTableResponse.setTableName(dataEntity.getName());
-		String tableName = dataEntity.getTableName().toLowerCase();
+		String tableName = "\"" + dataEntity.getTableName() + "\"";
+		tableName = tableName.replace("\"\"", "\"");
 		if (tableName != null) {
 			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, dataEntity, docId);
 			allTableResponse.setFieldNames(definitionResponses);
@@ -130,7 +127,7 @@ public class MetaHelper {
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
-				List<String> values = fetchDataFromTable(property.getFieldNames().toLowerCase(), tableName, docId);
+				List<String> values = fetchDataFromTable(property.getFieldNames(), tableName, docId);
 				fieldDefinitionResponse.setValue(String.join(",", values));
 
 				definitionResponses.add(fieldDefinitionResponse);
@@ -144,7 +141,9 @@ public class MetaHelper {
 	private List<String> fetchDataFromTable(String columnName, String tableName, int docId) {
 		List<String> values = new ArrayList<>();
 		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName + " WHERE doc_id = :docId";
+			String column = "\"" + columnName + "\"";
+			column = column.replace("\"\"", "\"");
+			String sqlQuery = "SELECT " + column + " FROM " + tableName + " WHERE doc_id = :docId";
 
 			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).setParameter("docId", docId)
@@ -182,15 +181,16 @@ public class MetaHelper {
 
 	@Transactional
 	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id,
-			Path path) throws IOException {
+			Path path, ProfDocEntity docEntity) throws IOException {
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		StringBuilder insertQueryBuilder = new StringBuilder();
-		insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
+		String table = "\"" + tableName + "\"";
+		insertQueryBuilder.append("INSERT INTO ").append(table).append(" (");
 
 		// Append column names
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			insertQueryBuilder.append(field.getFieldName());
+			insertQueryBuilder.append("\"" + field.getFieldName() + "\"");
 			if (it.hasNext()) {
 				insertQueryBuilder.append(", ");
 			}
@@ -227,14 +227,18 @@ public class MetaHelper {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String> getColumnNames(String tableName) {
 		List<String> columnNames = new ArrayList<>();
 		try {
 			String sqlQuery = "SELECT column_name FROM information_schema.columns WHERE table_name = :tableName";
 			Query query = entityManager.createNativeQuery(sqlQuery);
 			query.setParameter("tableName", tableName);
-			columnNames = query.getResultList();
+			@SuppressWarnings("unchecked")
+			List<String> rawColumnNames = query.getResultList();
+			for (String rawColumnName : rawColumnNames) {
+				String escapedColumnName = "\"" + rawColumnName + "\"";
+				columnNames.add(escapedColumnName);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -258,15 +262,15 @@ public class MetaHelper {
 		return metaDataPropertiesList;
 	}
 
-	public GetAllTableResponse convertEntityToGetAllTableResponse(ProfMetaDataEntity dataEntity,
-			EntityManager entityManager2) {
+	public GetAllTableResponse convertEntityToGetAllTableResponse(ProfMetaDataEntity dataEntity) {
 		GetAllTableResponse allTableResponse = new GetAllTableResponse();
 		allTableResponse.setId(dataEntity.getId());
 		allTableResponse.setCreatedAt(dataEntity.getCreatedAt());
 		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
 		allTableResponse.setFileExtention(dataEntity.getFileExtension());
 		allTableResponse.setTableName(dataEntity.getName());
-		String tableName = dataEntity.getTableName().toLowerCase();
+		String tableName = "\"" + dataEntity.getTableName() + "\"";
+		tableName = tableName.replace("\"\"", "\"");
 		if (tableName != null) {
 			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose(tableName, dataEntity);
 			allTableResponse.setFieldNames(definitionResponses);
@@ -287,7 +291,7 @@ public class MetaHelper {
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
-				List<String> values = fetchDataFromMetaTable(property.getFieldNames().toLowerCase(), tableName);
+				List<String> values = fetchDataFromMetaTable(property.getFieldNames(), tableName);
 				fieldDefinitionResponse.setValue(String.join(",", values));
 
 				definitionResponses.add(fieldDefinitionResponse);
@@ -301,11 +305,12 @@ public class MetaHelper {
 	private List<String> fetchDataFromMetaTable(String columnName, String tableName) {
 		List<String> values = new ArrayList<>();
 		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
+			String column = "\"" + columnName + "\"";
+			column = column.replace("\"\"", "\"");
+			String sqlQuery = "SELECT " + column + " FROM " + tableName;
 
 			@SuppressWarnings("unchecked")
-			List<Object> results = entityManager.createNativeQuery(sqlQuery)
-					.getResultList();
+			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
 			for (Object result : results) {
 				if (result != null) {
 					values.add(result.toString());

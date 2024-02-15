@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank;
 public class ProfUserGroupMappingRequest {
 	@NotBlank(message = "Group Id cannot be blank")
 	private String groupId;
-	@NotBlank(message = "User Id cannot be blank")
 	private int userId;
 	private String mappedBy;
 

@@ -1,6 +1,7 @@
 package com.proflaut.dms.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -67,7 +68,7 @@ public class FileController {
 	@PostMapping("/upload")
 	@Transactional
 	public ResponseEntity<FileResponse> fileUpload(@RequestHeader(value = "token") String token,
-			@Valid @RequestBody FileRequest fileRequest, BindingResult bindingResult) {
+			@Valid @RequestBody FileRequest fileRequest, BindingResult bindingResult) throws IOException {
 		logger.info("Getting into Upload");
 		FileResponse fileResponse = new FileResponse();
 		if (bindingResult.hasErrors()) {
@@ -88,7 +89,7 @@ public class FileController {
 				String path = folderLocation + File.separator + docEntity.getDocPath();
 				paths = Paths.get(path);
 				ProfMetaDataResponse metaDataResponse = metaServiceImpl
-						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths);
+						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths,docEntity);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 					logger.error("INSERT META DATA SUCCESS");
@@ -106,6 +107,7 @@ public class FileController {
 			}
 		} catch (Exception e) {
 			logger.error("Unexpected error during file upload", e);
+			metaServiceImpl.delete(paths);
 			transactionManager.rollback(status);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
