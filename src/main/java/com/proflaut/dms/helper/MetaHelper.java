@@ -14,6 +14,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @Component
 public class MetaHelper {
+
+	private static final Logger logger = LogManager.getLogger(MetaHelper.class);
 
 	@PersistenceContext
 	EntityManager entityManager;
@@ -182,7 +186,27 @@ public class MetaHelper {
 	@Transactional
 	public ProfMetaDataResponse insertDataIntoTable(String tableName, List<FieldDefnition> fields, Integer id,
 			Path path, ProfDocEntity docEntity) throws IOException {
+		int docId = docEntity.getId();
 		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
+		StringBuilder insertQueryBuilder = buildInsertQueryBuilder(tableName, fields, id);
+
+		try {
+			if (recordExists(tableName, docId)) {
+				performUpdate(tableName, fields, docId);
+				logger.info("Data Updated SuccessFully -> {}",tableName);
+
+			} else {
+				performInsert(insertQueryBuilder);
+			}
+			dataResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			handleException(e, path);
+			dataResponse.setStatus(DMSConstant.FAILURE);
+		}
+		return dataResponse;
+	}
+
+	private StringBuilder buildInsertQueryBuilder(String tableName, List<FieldDefnition> fields, Integer id) {
 		StringBuilder insertQueryBuilder = new StringBuilder();
 		String table = "\"" + tableName + "\"";
 		insertQueryBuilder.append("INSERT INTO ").append(table).append(" (");
@@ -195,6 +219,7 @@ public class MetaHelper {
 				insertQueryBuilder.append(", ");
 			}
 		}
+
 		insertQueryBuilder.append(", doc_id) VALUES (");
 
 		// Append values
@@ -205,18 +230,49 @@ public class MetaHelper {
 				insertQueryBuilder.append(", ");
 			}
 		}
+
 		// Append document ID
 		insertQueryBuilder.append(", ").append(id).append(")");
 
-		try {
-			entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
-			dataResponse.setStatus(DMSConstant.SUCCESS);
-		} catch (Exception e) {
-			metaServiceImpl.delete(path);
-			e.printStackTrace();
-			dataResponse.setStatus(DMSConstant.FAILURE);
+		return insertQueryBuilder;
+	}
+
+	private boolean recordExists(String tableName, int docId) {
+		String table = "\"" + tableName + "\"";
+		String docIdColumnName = "doc_id";
+		String selectQuery = "SELECT COUNT(*) FROM " + table + " WHERE " + docIdColumnName + " = :docId";
+		Query selectQueryObject = entityManager.createNativeQuery(selectQuery);
+		selectQueryObject.setParameter("docId", Integer.valueOf(docId));
+		BigInteger count = (BigInteger) selectQueryObject.getSingleResult();
+		return count.intValue() > 0;
+	}
+
+	private void performUpdate(String tableName, List<FieldDefnition> fields, int docId) {
+		String table = "\"" + tableName + "\"";
+		String docIdColumnName = "doc_id";
+		StringBuilder updateQueryBuilder = new StringBuilder();
+		updateQueryBuilder.append("UPDATE ").append(table).append(" SET ");
+		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
+			FieldDefnition fieldValue = it.next();
+			updateQueryBuilder.append("\"").append(fieldValue.getFieldName()).append("\" = ")
+					.append(getFormattedValue(fieldValue));
+			if (it.hasNext()) {
+				updateQueryBuilder.append(", ");
+			}
 		}
-		return dataResponse;
+		updateQueryBuilder.append(" WHERE ").append(docIdColumnName).append(" = ").append(docId);
+		entityManager.createNativeQuery(updateQueryBuilder.toString()).executeUpdate();
+	}
+
+	private void performInsert(StringBuilder insertQueryBuilder) {
+		entityManager.createNativeQuery(insertQueryBuilder.toString()).executeUpdate();
+	}
+
+	private void handleException(Exception e, Path path) throws IOException {
+		if (path != null) {
+			metaServiceImpl.delete(path);
+		}
+		e.printStackTrace();
 	}
 
 	private String getFormattedValue(FieldDefnition fieldValue) {

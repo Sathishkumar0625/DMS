@@ -142,6 +142,7 @@ public class FileManagementServiceImpl {
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
+				fileRetreiveByResponse.setDocName(docEntity.getDocName());
 				fileRetreiveByResponse.setStatus(DMSConstant.SUCCESS);
 				GetAllTableResponse allTableResponse = metaServiceImpl.getAll(docEntity);
 				response.put("image", fileRetreiveByResponse);
