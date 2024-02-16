@@ -341,13 +341,13 @@ public class MetaHelper {
 
 			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
-				String fieldName = property.getFieldNames().replace("_", " ");
+				String fieldName = property.getFieldNames();
 				fieldDefinitionResponse.setFieldName(fieldName);
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
-				List<String> values = fetchDataFromMetaTable(property.getFieldNames(), tableName);
-				fieldDefinitionResponse.setValue(String.join(",", values));
+				//List<String> values = fetchDataFromMetaTable(property.getFieldNames(), tableName);
+				//fieldDefinitionResponse.setValue(String.join(",", values));
 
 				definitionResponses.add(fieldDefinitionResponse);
 			}
@@ -359,9 +359,8 @@ public class MetaHelper {
 
 	private List<String> fetchDataFromMetaTable(String columnName, String tableName) {
 		List<String> values = new ArrayList<>();
-		String column = columnName.replace(" ", "_");
 		try {
-			String sqlQuery = "SELECT " + column + " FROM " + tableName;
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
 
 			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();

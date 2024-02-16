@@ -330,7 +330,7 @@ public class MetaServiceImpl {
 		Map<String, Object> metaData = (Map<String, Object>) requestBody.get("metaData");
 		for (Map.Entry<String, Object> entry : metaData.entrySet()) {
 			String originalfieldName = entry.getKey();
-			String fieldName = originalfieldName.trim().replace(" ", "_");
+			String fieldName = originalfieldName.trim();
 			Object value = entry.getValue();
 			if (value != null) {
 				if (whereClause.length() > 0) {
@@ -395,7 +395,7 @@ public class MetaServiceImpl {
 			// Add columns from ProfMetaDataPropertiesEntity
 			for (int i = 0; i < dataPropertiesEntity.size(); i++) {
 				ProfMetaDataPropertiesEntity property = dataPropertiesEntity.get(i);
-				String columnName = property.getFieldNames().replace("_", " ");
+				String columnName = property.getFieldNames();
 				reco.put(columnName, row[i + additionalColumnCount]);
 			}
 			records.add(reco);
