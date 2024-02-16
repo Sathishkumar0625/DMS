@@ -41,6 +41,8 @@ import com.proflaut.dms.model.ProfUploadAccessResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
+import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfDocumentRepository;
 import com.proflaut.dms.repository.ProfMetaDataPropRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
@@ -78,6 +80,9 @@ public class MetaServiceImpl {
 
 	@Autowired
 	ProfMetaDataPropRepository dataPropRepository;
+
+	@Autowired
+	ProfDocumentRepository documentRepository;
 
 	private static final Logger logger = LogManager.getLogger(MetaServiceImpl.class);
 
@@ -325,7 +330,7 @@ public class MetaServiceImpl {
 		Map<String, Object> metaData = (Map<String, Object>) requestBody.get("metaData");
 		for (Map.Entry<String, Object> entry : metaData.entrySet()) {
 			String originalfieldName = entry.getKey();
-			String fieldName=originalfieldName.trim().replace(" ", "_");
+			String fieldName = originalfieldName.trim().replace(" ", "_");
 			Object value = entry.getValue();
 			if (value != null) {
 				if (whereClause.length() > 0) {
@@ -379,7 +384,14 @@ public class MetaServiceImpl {
 			// Add additional columns not present in ProfMetaDataPropertiesEntity
 			reco.put("id", row[0]);
 			reco.put("doc_id", row[1]);
+			String docId = String.valueOf(row[1]);
+			List<ProfDocEntity> docEntities = getDocumentDetails(Integer.valueOf(docId));
 
+			// Add document details to record
+			if (!docEntities.isEmpty()) {
+				ProfDocEntity docEntity = docEntities.get(0); // Assuming only one document for each doc_id
+				reco.put("document_details", docEntity); // Add document details to record
+			}
 			// Add columns from ProfMetaDataPropertiesEntity
 			for (int i = 0; i < dataPropertiesEntity.size(); i++) {
 				ProfMetaDataPropertiesEntity property = dataPropertiesEntity.get(i);
@@ -389,6 +401,10 @@ public class MetaServiceImpl {
 			records.add(reco);
 		}
 		return records;
+	}
+
+	private List<ProfDocEntity> getDocumentDetails(int docId) {
+		return documentRepository.findById(docId);
 	}
 
 }
