@@ -71,10 +71,9 @@ public class MetaHelper {
 			String fieldName = originalFieldName.replace(" ", "_");
 			String fieldType = field.getFieldType();
 			String mandatory = field.getMandatory();
-			int maxLength = Integer.parseInt(field.getMaxLength());
 
 			// Append column definition
-			queryBuilder.append(fieldName).append(" ").append(getDatabaseType(fieldType, maxLength));
+			queryBuilder.append(fieldName).append(" ").append(getDatabaseType(fieldType));
 			if ("Y".equalsIgnoreCase(mandatory)) {
 				queryBuilder.append(" NOT NULL");
 			}
@@ -101,11 +100,11 @@ public class MetaHelper {
 		return tableName;
 	}
 
-	private String getDatabaseType(String fieldType, int maxLength) {
+	private String getDatabaseType(String fieldType) {
 		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
-			return "VARCHAR(" + maxLength + ")";
+			return "VARCHAR(255)";
 		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
-			return "INTEGER";
+			return "BIGINT";
 		} else {
 			return fieldType;
 		}

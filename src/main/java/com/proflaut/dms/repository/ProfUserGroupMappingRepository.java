@@ -12,4 +12,5 @@ public interface ProfUserGroupMappingRepository extends JpaRepository<ProfUserGr
 
 	List<ProfUserGroupMappingEntity> findByUserId(int userId);
 
+
 }

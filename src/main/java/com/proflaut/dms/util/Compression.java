@@ -9,11 +9,12 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 public class Compression {
-	
+	private Compression(){}
 	
 	public static String compressAndReturnB64(String text) throws IOException {
         byte[] deflateCompressed = deflateCompress(text.getBytes(StandardCharsets.UTF_8));
-
+        int size= deflateCompressed.length;
+        System.out.println(size);
         System.out.println("Original Text Length: " + text.length());
         System.out.println("Deflate Compressed Length: " + deflateCompressed.length);
 

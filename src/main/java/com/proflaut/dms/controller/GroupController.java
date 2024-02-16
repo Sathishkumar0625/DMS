@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.ProfAssignUserRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
@@ -38,11 +39,12 @@ public class GroupController {
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
 
 	@PostMapping("/create")
-	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token ,@Valid @RequestBody ProfGroupInfoRequest groupInfoRequest) {
+	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,
+			@Valid @RequestBody ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
 			logger.info("GEtting into Create Group");
-			groupInfoResponse = groupServiceImpl.createGroup(groupInfoRequest,token);
+			groupInfoResponse = groupServiceImpl.createGroup(groupInfoRequest, token);
 			return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,12 +93,28 @@ public class GroupController {
 
 	}
 
-	@PostMapping("/createUser")
+	@PostMapping("/assignGroup")
 	public ResponseEntity<ProfGroupInfoResponse> createUserGroup(
 			@Valid @RequestBody ProfUserGroupMappingRequest mappingRequest) {
 		ProfGroupInfoResponse groupInfoResponse = null;
 		try {
 			groupInfoResponse = groupServiceImpl.createGroup(mappingRequest);
+			if (groupInfoResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
+				return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(groupInfoResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/assignUser")
+	public ResponseEntity<ProfGroupInfoResponse> assignUser(@RequestBody ProfAssignUserRequest assignUserRequest) {
+		ProfGroupInfoResponse groupInfoResponse = null;
+		try {
+			groupInfoResponse = groupServiceImpl.createAssignUser(assignUserRequest);
 			if (groupInfoResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 				return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
 			} else {
@@ -145,7 +163,7 @@ public class GroupController {
 		}
 
 	}
-	
+
 	@GetMapping("/getGroupByUserId/{userId}")
 	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getGroupInfo(@PathVariable int userId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
@@ -160,6 +178,37 @@ public class GroupController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
 
+	@GetMapping("/getUserByGroupId/{groupId}")
+	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAllUserInfo(@PathVariable int groupId) {
+		List<ProfOveralUserInfoResponse> userInfoResponses = null;
+		try {
+			userInfoResponses = groupServiceImpl.getUsersByGroupId(groupId);
+			if (!userInfoResponses.isEmpty()) {
+				return new ResponseEntity<>(userInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getAssignGroupinfo/{userId}")
+	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAssignGroupInfo(@PathVariable int userId) {
+		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
+		try {
+			groupInfoResponses = groupServiceImpl.getAssignUserinfo(userId);
+			if (!groupInfoResponses.isEmpty()) {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

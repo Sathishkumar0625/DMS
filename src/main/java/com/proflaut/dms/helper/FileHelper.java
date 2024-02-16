@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -52,8 +54,6 @@ import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 import com.proflaut.dms.util.Compression;
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 @Component
 @Transactional
@@ -105,12 +105,12 @@ public class FileHelper {
 
 				if (existingDocEntity != null) {
 					File newFile = new File(path + File.separator + fileName);
-
+					String newFileSize = sizeInKiloBytes(newFile);
+					System.out.println(sizeInKiloBytes(newFile));
 					try (FileWriter fileWriter = new FileWriter(newFile)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();
 						String encrypted = td.encrypt(compressedBytes);
-
 						fileWriter.write(encrypted);
 						isFileCreated = true;
 					} catch (IOException e) {
@@ -121,9 +121,11 @@ public class FileHelper {
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, entity);
 					existingDocEntity.setDocPath(fileName);
+					existingDocEntity.setFileSize(newFileSize);
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
+					String fileSize = sizeInKiloBytes(file);
 					try (FileWriter fileWriter = new FileWriter(file)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -133,7 +135,8 @@ public class FileHelper {
 					} catch (IOException e) {
 						handleIOException(e);
 					}
-					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName);
+					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,
+							fileSize);
 					docUploadRepository.save(profDocEnt);
 				}
 			}
@@ -165,12 +168,13 @@ public class FileHelper {
 	}
 
 	public ProfDocEntity convertFileRequesttoProfDoc(FileRequest fileRequest, String token, FolderEntity entity,
-			String fileName) {
+			String fileName, String fileSize) {
 		ProfDocEntity ent = new ProfDocEntity();
 		ProfUserPropertiesEntity userProp = profUserPropertiesRepository.findByToken(token);
 		if (userProp != null) {
 			ent.setCreatedBy(userProp.getUserName());
 		}
+		ent.setFileSize(fileSize);
 		ent.setFolderId(entity.getId());
 		ent.setUploadTime(formatCurrentDateTime());
 		ent.setProspectId(entity.getFolderName());
@@ -362,6 +366,10 @@ public class FileHelper {
 		configEntity.setIsEmail("Y");
 		configEntity.setSendAt(formatCurrentDateTime());
 		return configEntity;
+	}
+
+	private String sizeInKiloBytes(File file) {
+		return (double) file.length() / 1024 + " kb";
 	}
 
 }

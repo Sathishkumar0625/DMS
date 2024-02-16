@@ -20,7 +20,7 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_NAME")
 	private String prospectId;
 
-	@Column(name = "DOCUMENT_NAME",nullable = false)
+	@Column(name = "DOCUMENT_NAME", nullable = false)
 	private String docName;
 
 	@Column(name = "DOCUMENT_PATH")
@@ -35,7 +35,7 @@ public class ProfDocEntity {
 	@Column(name = "FOLDER_ID")
 	private int folderId;
 
-	@Column(name = "EXTENTION",nullable = false)
+	@Column(name = "EXTENTION", nullable = false)
 	private String extention;
 
 	@Column(name = "IS_EMAIL")
@@ -46,6 +46,17 @@ public class ProfDocEntity {
 
 	@Column(name = "META_ID")
 	private int metaId;
+
+	@Column(name = "FILE_SIZE")
+	private String fileSize;
+
+	public String getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(String fileSize) {
+		this.fileSize = fileSize;
+	}
 
 	public int getMetaId() {
 		return metaId;
@@ -94,8 +105,6 @@ public class ProfDocEntity {
 	public void setProspectId(String prospectId) {
 		this.prospectId = prospectId;
 	}
-
-	
 
 	public String getCreatedBy() {
 		return createdBy;

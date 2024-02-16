@@ -7,12 +7,14 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
+import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
@@ -21,6 +23,7 @@ import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.GroupHelper;
 import com.proflaut.dms.model.CreateTableRequest;
+import com.proflaut.dms.model.ProfAssignUserRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
@@ -29,6 +32,7 @@ import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
+import com.proflaut.dms.repository.ProfGroupUserMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -54,6 +58,9 @@ public class GroupServiceImpl {
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
+
+	@Autowired
+	ProfGroupUserMappingRepository groupUserMappingRepository;
 
 	public ProfGroupInfoResponse updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
@@ -192,6 +199,56 @@ public class GroupServiceImpl {
 					}
 				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponses;
+	}
+
+	public ProfGroupInfoResponse createAssignUser(ProfAssignUserRequest assignUserRequest) {
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
+		try {
+			List<ProfGroupUserMappingEntity> userMappingEntities = groupHelper
+					.convertAssignUserReqToProfGroupUser(assignUserRequest);
+			groupUserMappingRepository.saveAll(userMappingEntities);
+			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponse;
+	}
+
+	public List<ProfOveralUserInfoResponse> getUsersByGroupId(int groupId) {
+		List<ProfOveralUserInfoResponse> userInfoResponses = new ArrayList<>();
+		try {
+			List<ProfGroupInfoEntity> groupInfoEntities = groupInfoRepository.getById(groupId);
+			if (!groupInfoEntities.isEmpty()) {
+				for (ProfGroupInfoEntity profGroupInfoEntity : groupInfoEntities) {
+					List<ProfUserInfoEntity> infoEntities = userInfoRepository
+							.getByUserId(profGroupInfoEntity.getUserId());
+					ProfOveralUserInfoResponse infoResponse = groupHelper.convertEntityToResponse(infoEntities);
+					userInfoResponses.add(infoResponse);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return userInfoResponses;
+	}
+
+	public List<ProfOverallGroupInfoResponse> getAssignUserinfo(int userId) {
+		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
+		try {
+			List<ProfUserGroupMappingEntity> groupInfoEntities = mappingRepository.findByUserId(userId);
+			if (!groupInfoEntities.isEmpty()) {
+				for (ProfUserGroupMappingEntity profGroupInfoEntity : groupInfoEntities) {
+					List<ProfGroupInfoEntity> infoEntities = groupInfoRepository
+							.getById(profGroupInfoEntity.getGroupId());
+					ProfOverallGroupInfoResponse infoResponse = groupHelper.convertGroupInfoToResponse(infoEntities);
+					groupInfoResponses.add(infoResponse);
+				}
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

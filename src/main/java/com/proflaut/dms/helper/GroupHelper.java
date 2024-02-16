@@ -10,12 +10,14 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
+import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FieldDefnition;
+import com.proflaut.dms.model.ProfAssignUserRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
@@ -172,6 +174,43 @@ public class GroupHelper {
 		groupInfoResponse.setCreatedBy(profGroupInfoEntity.getCreatedBy());
 		groupInfoResponse.setId(profGroupInfoEntity.getId());
 		groupInfoResponse.setUserId(profGroupInfoEntity.getUserId());
+		return groupInfoResponse;
+	}
+
+	public List<ProfGroupUserMappingEntity> convertAssignUserReqToProfGroupUser(
+			ProfAssignUserRequest assignUserRequest) {
+		List<ProfGroupUserMappingEntity> entities = new ArrayList<>();
+		for (Integer userId : assignUserRequest.getUserId()) {
+			ProfGroupUserMappingEntity entity = new ProfGroupUserMappingEntity();
+			entity.setUserId(userId);
+			entity.setGroupId(assignUserRequest.getGroupId());
+			entity.setCreatedBy(assignUserRequest.getMappedBy());
+			entity.setCreatedAt(formatCurrentDateTime());
+			entity.setStatus("A");
+			entities.add(entity);
+		}
+		return entities;
+	}
+
+	public ProfOveralUserInfoResponse convertEntityToResponse(List<ProfUserInfoEntity> infoEntities) {
+		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
+		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
+			infoResponse.setUserId(profUserInfoEntity.getUserId());
+			infoResponse.setUserName(profUserInfoEntity.getUserName());
+			infoResponse.setCreatedDate(profUserInfoEntity.getCreatedDate());
+		}
+		return infoResponse;
+
+	}
+
+	public ProfOverallGroupInfoResponse convertGroupInfoToResponse(List<ProfGroupInfoEntity> infoEntities) {
+		ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+		for (ProfGroupInfoEntity profGroupInfoEntity : infoEntities) {
+			groupInfoResponse.setGroupName(profGroupInfoEntity.getGroupName());
+			groupInfoResponse.setCreatedAt(profGroupInfoEntity.getCreatedAt());
+			groupInfoResponse.setCreatedBy(profGroupInfoEntity.getCreatedBy());
+			groupInfoResponse.setUserId(profGroupInfoEntity.getUserId());
+		}
 		return groupInfoResponse;
 	}
 }
