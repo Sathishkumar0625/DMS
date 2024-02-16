@@ -11,6 +11,7 @@ import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.helper.AccessRightsHelper;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
+import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
@@ -79,5 +80,22 @@ public class AccessRightsServiceImpl {
 			e.printStackTrace();
 		}
 		return accessRightsResponse;
+	}
+
+	public ProfAccessRightResponse updateAccessRights(ProfAccessRightsUpdateRequest accessRightsUpdateRequest, int id) {
+		ProfAccessRightResponse accessRightResponse=new ProfAccessRightResponse();
+		try {
+			ProfAccessRightsEntity accessRightsEntity=accessRightRepository.findById(id);
+			if (accessRightsEntity != null) {
+				ProfAccessRightsEntity entity=helper.convertRequestToUpdateAcess(accessRightsEntity,accessRightsUpdateRequest);
+				accessRightRepository.save(entity);
+				accessRightResponse.setStatus(DMSConstant.SUCCESS);
+			}else {
+				accessRightResponse.setStatus(DMSConstant.FAILURE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return accessRightResponse;
 	}
 }

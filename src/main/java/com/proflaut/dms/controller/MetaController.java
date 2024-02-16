@@ -155,4 +155,21 @@ public class MetaController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PostMapping("/searchDocument")
+	public ResponseEntity< Map<String, Object>> searchDocument(@RequestBody Map<String, Object> requestBody) {
+		Map<String, Object> response=null;
+		try {
+			response = metaServiceImpl.search(requestBody);
+			if (!response.isEmpty()) {
+				return new ResponseEntity<>(response,HttpStatus.OK);
+			}else {
+				return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
 }

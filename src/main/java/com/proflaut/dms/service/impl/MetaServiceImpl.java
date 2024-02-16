@@ -1,6 +1,7 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -93,7 +94,6 @@ public class MetaServiceImpl {
 					entityManager.persist(dataEntity);
 					String tableName = metaHelper.createTable(createTableRequest.getFields(), createTableRequest,
 							dataEntity.getId());
-					tableName = tableName.replace("\"", "");
 					profMetaDataRepository.updatetableName(tableName, dataEntity.getId());
 					ProfMetaDataEntity dataEnt = metaDataRepository.findById(dataEntity.getId());
 					List<ProfMetaDataPropertiesEntity> propertiesList = metaHelper
@@ -293,6 +293,102 @@ public class MetaServiceImpl {
 		}
 		return getAllTableResponse;
 
+	}
+
+	public Map<String, Object> search(Map<String, Object> requestBody) {
+		Map<String, Object> response = new LinkedHashMap<>();
+		try {
+			int metaDataId = (Integer) requestBody.get("metaData_id");
+			ProfMetaDataEntity metaDataEntity = metaDataRepository.findById(metaDataId);
+			if (metaDataEntity != null) {
+				String tableName = metaDataEntity.getTableName();
+				String whereClause = buildWhereClause(requestBody, tableName);
+				String selectQuery = buildSelectQuery(tableName, whereClause, metaDataId);
+
+				System.out.println(selectQuery);
+				Query query = entityManager.createNativeQuery(selectQuery);
+				@SuppressWarnings("unchecked")
+				List<Object[]> resultList = query.getResultList();
+
+				List<Map<String, Object>> records = extractRecords(resultList, metaDataId);
+				response.put("records", records);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	private String buildWhereClause(Map<String, Object> requestBody, String tableName) {
+		StringBuilder whereClause = new StringBuilder();
+		@SuppressWarnings("unchecked")
+		Map<String, Object> metaData = (Map<String, Object>) requestBody.get("metaData");
+		for (Map.Entry<String, Object> entry : metaData.entrySet()) {
+			String originalfieldName = entry.getKey();
+			String fieldName=originalfieldName.trim().replace(" ", "_");
+			Object value = entry.getValue();
+			if (value != null) {
+				if (whereClause.length() > 0) {
+					whereClause.append(" AND ");
+				}
+				if (value instanceof String) {
+					whereClause.append(tableName).append(".").append(fieldName).append(" LIKE '%").append(value)
+							.append("%'");
+				} else {
+					whereClause.append(tableName).append(".").append(fieldName).append(" = ").append(value);
+				}
+			}
+		}
+		return whereClause.toString();
+	}
+
+	private String buildSelectQuery(String tableName, String whereClause, int metaDataId) {
+		StringBuilder selectQuery = new StringBuilder("SELECT ");
+		List<ProfMetaDataPropertiesEntity> dataPropertiesEntity = dataPropRepository
+				.findByMetaId(String.valueOf(metaDataId));
+
+		// Add additional columns not present in ProfMetaDataPropertiesEntity
+		selectQuery.append(tableName).append(".id, ");
+		selectQuery.append(tableName).append(".doc_id, ");
+
+		// Add columns from ProfMetaDataPropertiesEntity
+		for (int i = 0; i < dataPropertiesEntity.size(); i++) {
+			ProfMetaDataPropertiesEntity property = dataPropertiesEntity.get(i);
+			selectQuery.append(tableName).append(".").append(property.getFieldNames());
+			if (i < dataPropertiesEntity.size() - 1) {
+				selectQuery.append(", ");
+			}
+		}
+
+		selectQuery.append(" FROM ").append(tableName);
+		if (!whereClause.isEmpty()) {
+			selectQuery.append(" WHERE ").append(whereClause);
+		}
+		return selectQuery.toString();
+	}
+
+	private List<Map<String, Object>> extractRecords(List<Object[]> resultList, int metaDataId) {
+		List<Map<String, Object>> records = new ArrayList<>();
+		List<ProfMetaDataPropertiesEntity> dataPropertiesEntity = dataPropRepository
+				.findByMetaId(String.valueOf(metaDataId));
+		int additionalColumnCount = 2;
+
+		for (Object[] row : resultList) {
+			Map<String, Object> reco = new LinkedHashMap<>();
+
+			// Add additional columns not present in ProfMetaDataPropertiesEntity
+			reco.put("id", row[0]);
+			reco.put("doc_id", row[1]);
+
+			// Add columns from ProfMetaDataPropertiesEntity
+			for (int i = 0; i < dataPropertiesEntity.size(); i++) {
+				ProfMetaDataPropertiesEntity property = dataPropertiesEntity.get(i);
+				String columnName = property.getFieldNames().replace("_", " ");
+				reco.put(columnName, row[i + additionalColumnCount]);
+			}
+			records.add(reco);
+		}
+		return records;
 	}
 
 }

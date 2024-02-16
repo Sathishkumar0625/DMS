@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
+import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
+import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
+import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.service.impl.AccessRightsServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 
@@ -36,8 +41,7 @@ public class AccessRightsController {
 	AccessRightsServiceImpl accessRightsServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(AccessRightsController.class);
-	
-	
+
 	@PostMapping("/saveAccess")
 	public ResponseEntity<ProfAccessRightResponse> createAccess(
 			@Valid @RequestBody ProfAccessRightRequest accessRightRequest) {
@@ -95,6 +99,28 @@ public class AccessRightsController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@PutMapping("/updateAccess/{id}")
+	public ResponseEntity<ProfAccessRightResponse> updateSignup(
+			@RequestBody ProfAccessRightsUpdateRequest accessRightUpdateRequest, @PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfAccessRightResponse accessRightResponse = null;
+		try {
+			accessRightResponse = accessRightsServiceImpl.updateAccessRights(accessRightUpdateRequest, id);
+			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 }

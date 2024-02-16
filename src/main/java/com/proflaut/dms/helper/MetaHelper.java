@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -57,14 +58,15 @@ public class MetaHelper {
 
 		StringBuilder queryBuilder = new StringBuilder();
 		String tableName;
-		tableName = "\"" + createTableRequest.getTableName() + "_" + id + "\"";
+		tableName = createTableRequest.getTableName().replace(" ", "_") + "_" + id;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
 		queryBuilder.append("DOC_ID INTEGER, ");
 		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			String fieldName = "\"" + field.getFieldName() + "\"";
+			String originalFieldName = field.getFieldName();
+			String fieldName = originalFieldName.replace(" ", "_");
 			String fieldType = field.getFieldType();
 			String mandatory = field.getMandatory();
 			int maxLength = Integer.parseInt(field.getMaxLength());
@@ -80,13 +82,14 @@ public class MetaHelper {
 		queryBuilder.append(")");
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
 		return tableName;
+
 	}
 
 	private String getDatabaseType(String fieldType, int maxLength) {
 		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
 			return "VARCHAR(" + maxLength + ")";
 		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
-			return "BIGINT";
+			return "Integer";
 		} else {
 			return fieldType;
 		}
@@ -110,8 +113,7 @@ public class MetaHelper {
 		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
 		allTableResponse.setFileExtention(dataEntity.getFileExtension());
 		allTableResponse.setTableName(dataEntity.getName());
-		String tableName = "\"" + dataEntity.getTableName() + "\"";
-		tableName = tableName.replace("\"\"", "\"");
+		String tableName = dataEntity.getTableName();
 		if (tableName != null) {
 			List<FieldDefinitionResponse> definitionResponses = getColumnDetails(tableName, dataEntity, docId);
 			allTableResponse.setFieldNames(definitionResponses);
@@ -127,7 +129,8 @@ public class MetaHelper {
 
 			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
-				fieldDefinitionResponse.setFieldName(property.getFieldNames());
+				String fieldName = property.getFieldNames().replace("_", " ");
+				fieldDefinitionResponse.setFieldName(fieldName);
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
@@ -145,8 +148,7 @@ public class MetaHelper {
 	private List<String> fetchDataFromTable(String columnName, String tableName, int docId) {
 		List<String> values = new ArrayList<>();
 		try {
-			String column = "\"" + columnName + "\"";
-			column = column.replace("\"\"", "\"");
+			String column = columnName.replace(" ", "_");
 			String sqlQuery = "SELECT " + column + " FROM " + tableName + " WHERE doc_id = :docId";
 
 			@SuppressWarnings("unchecked")
@@ -193,7 +195,7 @@ public class MetaHelper {
 		try {
 			if (recordExists(tableName, docId)) {
 				performUpdate(tableName, fields, docId);
-				logger.info("Data Updated SuccessFully -> {}",tableName);
+				logger.info("Data Updated SuccessFully -> {}", tableName);
 
 			} else {
 				performInsert(insertQueryBuilder);
@@ -208,13 +210,12 @@ public class MetaHelper {
 
 	private StringBuilder buildInsertQueryBuilder(String tableName, List<FieldDefnition> fields, Integer id) {
 		StringBuilder insertQueryBuilder = new StringBuilder();
-		String table = "\"" + tableName + "\"";
-		insertQueryBuilder.append("INSERT INTO ").append(table).append(" (");
+		insertQueryBuilder.append("INSERT INTO ").append(tableName).append(" (");
 
 		// Append column names
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			insertQueryBuilder.append("\"" + field.getFieldName() + "\"");
+			insertQueryBuilder.append(field.getFieldName().replace(" ", "_"));
 			if (it.hasNext()) {
 				insertQueryBuilder.append(", ");
 			}
@@ -238,9 +239,8 @@ public class MetaHelper {
 	}
 
 	private boolean recordExists(String tableName, int docId) {
-		String table = "\"" + tableName + "\"";
 		String docIdColumnName = "doc_id";
-		String selectQuery = "SELECT COUNT(*) FROM " + table + " WHERE " + docIdColumnName + " = :docId";
+		String selectQuery = "SELECT COUNT(*) FROM " + tableName + " WHERE " + docIdColumnName + " = :docId";
 		Query selectQueryObject = entityManager.createNativeQuery(selectQuery);
 		selectQueryObject.setParameter("docId", Integer.valueOf(docId));
 		BigInteger count = (BigInteger) selectQueryObject.getSingleResult();
@@ -248,14 +248,12 @@ public class MetaHelper {
 	}
 
 	private void performUpdate(String tableName, List<FieldDefnition> fields, int docId) {
-		String table = "\"" + tableName + "\"";
 		String docIdColumnName = "doc_id";
 		StringBuilder updateQueryBuilder = new StringBuilder();
-		updateQueryBuilder.append("UPDATE ").append(table).append(" SET ");
+		updateQueryBuilder.append("UPDATE ").append(tableName).append(" SET ");
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition fieldValue = it.next();
-			updateQueryBuilder.append("\"").append(fieldValue.getFieldName()).append("\" = ")
-					.append(getFormattedValue(fieldValue));
+			updateQueryBuilder.append(fieldValue.getFieldName().replace(" ", "_")).append(getFormattedValue(fieldValue));
 			if (it.hasNext()) {
 				updateQueryBuilder.append(", ");
 			}
@@ -308,7 +306,8 @@ public class MetaHelper {
 		for (FieldDefnition field : createTableRequest.getFields()) {
 			ProfMetaDataPropertiesEntity metaDataProperties = new ProfMetaDataPropertiesEntity();
 			metaDataProperties.setMetaId(String.valueOf(dataEnt.getId()));
-			metaDataProperties.setFieldNames(field.getFieldName());
+			String originalFieldName = field.getFieldName().replace(" ", "_");
+			metaDataProperties.setFieldNames(originalFieldName);
 			metaDataProperties.setFieldType(field.getFieldType());
 			metaDataProperties.setMandatory(field.getMandatory());
 			metaDataProperties.setLength(Integer.parseInt(field.getMaxLength()));
@@ -325,8 +324,7 @@ public class MetaHelper {
 		allTableResponse.setCreatedBy(dataEntity.getCreatedBy());
 		allTableResponse.setFileExtention(dataEntity.getFileExtension());
 		allTableResponse.setTableName(dataEntity.getName());
-		String tableName = "\"" + dataEntity.getTableName() + "\"";
-		tableName = tableName.replace("\"\"", "\"");
+		String tableName = dataEntity.getTableName();
 		if (tableName != null) {
 			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose(tableName, dataEntity);
 			allTableResponse.setFieldNames(definitionResponses);
@@ -343,7 +341,8 @@ public class MetaHelper {
 
 			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
-				fieldDefinitionResponse.setFieldName(property.getFieldNames());
+				String fieldName = property.getFieldNames().replace("_", " ");
+				fieldDefinitionResponse.setFieldName(fieldName);
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
@@ -360,9 +359,8 @@ public class MetaHelper {
 
 	private List<String> fetchDataFromMetaTable(String columnName, String tableName) {
 		List<String> values = new ArrayList<>();
+		String column = columnName.replace(" ", "_");
 		try {
-			String column = "\"" + columnName + "\"";
-			column = column.replace("\"\"", "\"");
 			String sqlQuery = "SELECT " + column + " FROM " + tableName;
 
 			@SuppressWarnings("unchecked")
