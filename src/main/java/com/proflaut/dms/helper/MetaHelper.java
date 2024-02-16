@@ -78,6 +78,7 @@ public class MetaHelper {
 			if (it.hasNext()) {
 				queryBuilder.append(", ");
 			}
+
 		}
 		queryBuilder.append(")");
 		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
@@ -252,7 +253,8 @@ public class MetaHelper {
 		updateQueryBuilder.append("UPDATE ").append(tableName).append(" SET ");
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition fieldValue = it.next();
-			updateQueryBuilder.append(fieldValue.getFieldName()).append(getFormattedValue(fieldValue));
+			updateQueryBuilder.append(fieldValue.getFieldName()).append( "=" )
+					.append(getFormattedValue(fieldValue));
 			if (it.hasNext()) {
 				updateQueryBuilder.append(", ");
 			}

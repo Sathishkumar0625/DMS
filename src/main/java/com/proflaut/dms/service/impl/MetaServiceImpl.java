@@ -1,7 +1,6 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import com.proflaut.dms.model.ProfUploadAccessResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
-import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfDocumentRepository;
 import com.proflaut.dms.repository.ProfMetaDataPropRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
@@ -215,7 +213,7 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(tableName);
 			if (dataEntity != null) {
-				String metatableName =dataEntity.getTableName();
+				String metatableName = dataEntity.getTableName();
 				List<String> columnNames = metaHelper.getColumnNames(metatableName);
 				String columnString = String.join(",", columnNames);
 				String sqlQuery = "SELECT " + columnString + " FROM " + metatableName;
@@ -338,7 +336,7 @@ public class MetaServiceImpl {
 				if (value instanceof String) {
 					whereClause.append(tableName).append(".").append(fieldName).append(" LIKE '%").append(value)
 							.append("%'");
-				} else {
+				} else if((Integer) value != 0) {
 					whereClause.append(tableName).append(".").append(fieldName).append(" = ").append(value);
 				}
 			}

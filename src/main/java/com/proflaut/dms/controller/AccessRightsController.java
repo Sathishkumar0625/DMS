@@ -23,9 +23,7 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
-import com.proflaut.dms.model.ProfGroupInfoResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
-import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.service.impl.AccessRightsServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 
