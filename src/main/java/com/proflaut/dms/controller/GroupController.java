@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAssignUserRequest;
@@ -200,7 +202,7 @@ public class GroupController {
 	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAssignGroupInfo(@PathVariable int userId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
 		try {
-			groupInfoResponses = groupServiceImpl.getAssignUserinfo(userId);
+			groupInfoResponses = groupServiceImpl.getAssignGroupinfo(userId);
 			if (!groupInfoResponses.isEmpty()) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {
@@ -211,4 +213,36 @@ public class GroupController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@DeleteMapping("/deleteAssignGroup")
+	public ResponseEntity<ProfGroupInfoResponse> deleteAssignUser(@RequestParam int groupId, @RequestParam int userId) {
+		ProfGroupInfoResponse groupInfoResponses = null;
+		try {
+			groupInfoResponses = groupServiceImpl.deleteAssUsers(groupId, userId);
+			if (!groupInfoResponses.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@GetMapping("/getAssignUserInfo/{groupId}")
+	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAssignUserInfo(@PathVariable int groupId) {
+		List<ProfOveralUserInfoResponse> overalUserInfoResponses = null;
+		try {
+			overalUserInfoResponses = groupServiceImpl.getAssignUserinfo(groupId);
+			if (!overalUserInfoResponses.isEmpty()) {
+				return new ResponseEntity<>(overalUserInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

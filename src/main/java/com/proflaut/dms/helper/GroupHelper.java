@@ -213,4 +213,14 @@ public class GroupHelper {
 		}
 		return groupInfoResponse;
 	}
+
+	public ProfOveralUserInfoResponse convertGroupUserToResponse(List<ProfUserInfoEntity> infoEntities) {
+		ProfOveralUserInfoResponse infoResponses=new ProfOveralUserInfoResponse();
+		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
+			infoResponses.setUserId(profUserInfoEntity.getUserId());
+			infoResponses.setUserName(profUserInfoEntity.getUserName());
+			infoResponses.setCreatedDate(profUserInfoEntity.getCreatedDate());
+		}
+		return infoResponses;
+	}
 }

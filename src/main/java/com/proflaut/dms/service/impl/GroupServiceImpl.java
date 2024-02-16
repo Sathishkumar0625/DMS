@@ -236,14 +236,14 @@ public class GroupServiceImpl {
 		return userInfoResponses;
 	}
 
-	public List<ProfOverallGroupInfoResponse> getAssignUserinfo(int userId) {
+	public List<ProfOverallGroupInfoResponse> getAssignGroupinfo(int userId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
 		try {
 			List<ProfUserGroupMappingEntity> groupInfoEntities = mappingRepository.findByUserId(userId);
 			if (!groupInfoEntities.isEmpty()) {
 				for (ProfUserGroupMappingEntity profGroupInfoEntity : groupInfoEntities) {
 					List<ProfGroupInfoEntity> infoEntities = groupInfoRepository
-							.getById(profGroupInfoEntity.getGroupId());
+							.getById(Integer.valueOf(profGroupInfoEntity.getGroupId()));
 					ProfOverallGroupInfoResponse infoResponse = groupHelper.convertGroupInfoToResponse(infoEntities);
 					groupInfoResponses.add(infoResponse);
 				}
@@ -253,6 +253,42 @@ public class GroupServiceImpl {
 			e.printStackTrace();
 		}
 		return groupInfoResponses;
+	}
+
+	public ProfGroupInfoResponse deleteAssUsers(int groupId, int userId) {
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
+		try {
+			ProfUserGroupMappingEntity groupMappingEntity = mappingRepository
+					.findByGroupIdAndUserId(String.valueOf(groupId), userId);
+			if (groupMappingEntity != null) {
+				mappingRepository.delete(groupMappingEntity);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponse;
+	}
+
+	public List<ProfOveralUserInfoResponse> getAssignUserinfo(int groupId) {
+		List<ProfOveralUserInfoResponse> overalUserInfoResponses = new ArrayList<>();
+		try {
+			List<ProfGroupUserMappingEntity> entity = mappingRepository.findByGroupId(groupId);
+			if (!entity.isEmpty()) {
+				for (ProfGroupUserMappingEntity groupUserMappingEntity : entity) {
+					List<ProfUserInfoEntity> infoEntities = userInfoRepository
+							.getByUserId(groupUserMappingEntity.getUserId());
+					ProfOveralUserInfoResponse overalUserInfoResponse = groupHelper.convertGroupUserToResponse(infoEntities);
+					overalUserInfoResponses.add(overalUserInfoResponse);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return overalUserInfoResponses;
 	}
 
 }

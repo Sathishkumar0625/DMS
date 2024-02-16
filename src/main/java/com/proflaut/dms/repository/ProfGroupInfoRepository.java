@@ -22,6 +22,5 @@ public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEnti
 
 	List<ProfGroupInfoEntity> getById(int groupId);
 
-	List<ProfGroupInfoEntity> getById(String groupId);
 
 }
