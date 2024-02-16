@@ -12,12 +12,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.LoginResponse;
+import com.proflaut.dms.model.ProfUserLogoutResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.service.impl.AccessServiceImpl;
@@ -30,7 +33,6 @@ public class AccessController {
 	private static final Logger logger = LogManager.getLogger(AccessController.class);
 	@Autowired
 	AccessServiceImpl accessServiceImpl;
-
 
 	@PostMapping("/signup")
 	public ResponseEntity<UserRegResponse> createUser(@Valid @RequestBody UserInfo userInfo,
@@ -79,6 +81,21 @@ public class AccessController {
 			return new ResponseEntity<>(loginResponse, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(loginResponse, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@PutMapping("/logout/{userId}")
+	public ResponseEntity<ProfUserLogoutResponse> logout(@PathVariable int userId) {
+		ProfUserLogoutResponse logoutResponse = null;
+		try {
+			logoutResponse = accessServiceImpl.deleteUser(userId);
+			if (!logoutResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(logoutResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(logoutResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

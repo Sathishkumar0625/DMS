@@ -215,8 +215,7 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = metaDataRepository.findByNameIgnoreCase(tableName);
 			if (dataEntity != null) {
-				String metatableName = "\"" + dataEntity.getTableName() + "\"";
-				metatableName = metatableName.replace("\"\"", "\"");
+				String metatableName =dataEntity.getTableName();
 				List<String> columnNames = metaHelper.getColumnNames(metatableName);
 				String columnString = String.join(",", columnNames);
 				String sqlQuery = "SELECT " + columnString + " FROM " + metatableName;

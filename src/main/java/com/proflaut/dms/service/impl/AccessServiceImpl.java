@@ -25,6 +25,7 @@ import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.AccessHelper;
 import com.proflaut.dms.model.LoginResponse;
+import com.proflaut.dms.model.ProfUserLogoutResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
@@ -33,21 +34,21 @@ import com.proflaut.dms.util.TokenGenerator;
 
 @Service
 public class AccessServiceImpl {
-	
+
 	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
 
 	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-	
+
 	@Autowired
 	AccessHelper accessHelper;
-	
+
 	@Autowired
 	TokenGenerator tokenGenerator;
-	
+
 	private static final Logger logger = LogManager.getLogger(AccessServiceImpl.class);
-	
+
 	public Map<String, String> validateToken(String token) {
 		Map<String, String> resp = new HashMap<>();
 		try {
@@ -93,7 +94,7 @@ public class AccessServiceImpl {
 		return userRegResponse;
 	}
 
-	public LoginResponse getUser(UserInfo userInfo)  {
+	public LoginResponse getUser(UserInfo userInfo) {
 		LoginResponse loginResponse = new LoginResponse();
 		try {
 
@@ -118,7 +119,7 @@ public class AccessServiceImpl {
 		String token = "";
 		boolean isValidate = accessHelper.validatePassword(profUserInfoEntity, userInfo);
 		if (isValidate) {
-			Map<String, String> tokenResp =tokenGenerator.generateToken(userInfo.getUserName());
+			Map<String, String> tokenResp = tokenGenerator.generateToken(userInfo.getUserName());
 			token = tokenResp.get("token");
 			ProfUserPropertiesEntity ent = accessHelper.convertUserInfotoProfUserProp(profUserInfoEntity, tokenResp);
 			userValidation(userInfo, profUserInfoEntity, loginResponse, token, ent);
@@ -169,5 +170,22 @@ public class AccessServiceImpl {
 			}
 		}
 
+	}
+
+	public ProfUserLogoutResponse deleteUser(int userId) {
+		ProfUserLogoutResponse logoutResponse = new ProfUserLogoutResponse();
+		try {
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByUserId(userId);
+			if (entity != null) {
+				profUserPropertiesRepository.delete(entity);
+				logoutResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				logoutResponse.setStatus(DMSConstant.FAILURE);
+				logoutResponse.setStatus(DMSConstant.USERID_NOT_EXIST);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return logoutResponse;
 	}
 }

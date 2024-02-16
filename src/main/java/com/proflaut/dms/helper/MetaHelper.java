@@ -129,7 +129,7 @@ public class MetaHelper {
 
 			for (ProfMetaDataPropertiesEntity property : dataPropertiesEntities) {
 				FieldDefinitionResponse fieldDefinitionResponse = new FieldDefinitionResponse();
-				String fieldName = property.getFieldNames().replace("_", " ");
+				String fieldName = property.getFieldNames();
 				fieldDefinitionResponse.setFieldName(fieldName);
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
@@ -148,8 +148,7 @@ public class MetaHelper {
 	private List<String> fetchDataFromTable(String columnName, String tableName, int docId) {
 		List<String> values = new ArrayList<>();
 		try {
-			String column = columnName.replace(" ", "_");
-			String sqlQuery = "SELECT " + column + " FROM " + tableName + " WHERE doc_id = :docId";
+			String sqlQuery = "SELECT " + columnName + " FROM " + tableName + " WHERE doc_id = :docId";
 
 			@SuppressWarnings("unchecked")
 			List<Object> results = entityManager.createNativeQuery(sqlQuery).setParameter("docId", docId)
@@ -215,7 +214,7 @@ public class MetaHelper {
 		// Append column names
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			insertQueryBuilder.append(field.getFieldName().replace(" ", "_"));
+			insertQueryBuilder.append(field.getFieldName());
 			if (it.hasNext()) {
 				insertQueryBuilder.append(", ");
 			}
@@ -253,7 +252,7 @@ public class MetaHelper {
 		updateQueryBuilder.append("UPDATE ").append(tableName).append(" SET ");
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition fieldValue = it.next();
-			updateQueryBuilder.append(fieldValue.getFieldName().replace(" ", "_")).append(getFormattedValue(fieldValue));
+			updateQueryBuilder.append(fieldValue.getFieldName()).append(getFormattedValue(fieldValue));
 			if (it.hasNext()) {
 				updateQueryBuilder.append(", ");
 			}
@@ -290,7 +289,7 @@ public class MetaHelper {
 			@SuppressWarnings("unchecked")
 			List<String> rawColumnNames = query.getResultList();
 			for (String rawColumnName : rawColumnNames) {
-				String escapedColumnName = "\"" + rawColumnName + "\"";
+				String escapedColumnName = rawColumnName;
 				columnNames.add(escapedColumnName);
 			}
 		} catch (Exception e) {
@@ -346,8 +345,9 @@ public class MetaHelper {
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
-				//List<String> values = fetchDataFromMetaTable(property.getFieldNames(), tableName);
-				//fieldDefinitionResponse.setValue(String.join(",", values));
+				// List<String> values = fetchDataFromMetaTable(property.getFieldNames(),
+				// tableName);
+				// fieldDefinitionResponse.setValue(String.join(",", values));
 
 				definitionResponses.add(fieldDefinitionResponse);
 			}
