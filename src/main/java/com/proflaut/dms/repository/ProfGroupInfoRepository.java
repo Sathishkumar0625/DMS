@@ -1,5 +1,6 @@
 package com.proflaut.dms.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,5 @@ public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEnti
 	ProfGroupInfoEntity findById(int id);
 	ProfGroupInfoEntity findByGroupNameIgnoreCase(String groupName);
 	ProfGroupInfoEntity save(Optional<ProfGroupInfoEntity> entity);
+	List<ProfGroupInfoEntity> findByUserId(int userId);
 }

@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
+import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
+import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.GroupHelper;
 import com.proflaut.dms.model.CreateTableRequest;
@@ -29,6 +31,7 @@ import com.proflaut.dms.model.ProfUserGroupMappingRequest;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
+import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 @Transactional
@@ -49,15 +52,19 @@ public class GroupServiceImpl {
 	@Autowired
 	ProfUserInfoRepository userInfoRepository;
 
+	@Autowired
+	ProfUserPropertiesRepository profUserPropertiesRepository;
+
 	public ProfGroupInfoResponse updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
-		ProfGroupInfoResponse groupInfoResponse=new ProfGroupInfoResponse();
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			 Optional<ProfGroupInfoEntity> groupInfo = groupInfoRepository.findById(id);
+			Optional<ProfGroupInfoEntity> groupInfo = groupInfoRepository.findById(id);
 			if (!groupInfo.isEmpty()) {
-				 ProfGroupInfoEntity updatedGroupInfo = groupHelper.updateGroupInfoEnt(groupInfoRequest, groupInfo.get());
-		         groupInfoRepository.save(updatedGroupInfo);
-		         groupInfoResponse.setStatus(DMSConstant.SUCCESS);
-			}else {
+				ProfGroupInfoEntity updatedGroupInfo = groupHelper.updateGroupInfoEnt(groupInfoRequest,
+						groupInfo.get());
+				groupInfoRepository.save(updatedGroupInfo);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
@@ -66,16 +73,22 @@ public class GroupServiceImpl {
 		return groupInfoResponse;
 	}
 
-	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest) throws CustomException {
+	public ProfGroupInfoResponse createGroup(ProfGroupInfoRequest groupInfoRequest, String token)
+			throws CustomException {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
 			if (groupHelper.usernameExists(groupInfoRequest.getGroupName())) {
 				throw new CustomException("Group Name already exists");
 			}
-
-			ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest);
-			groupInfoRepository.save(groupInfoEntity);
-			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
+			if (entity.getToken() != null) {
+				ProfGroupInfoEntity groupInfoEntity = groupHelper.convertGroupInfoReqToGroupInfoEnt(groupInfoRequest,
+						entity);
+				groupInfoRepository.save(groupInfoEntity);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new CustomException(e.getMessage());
@@ -105,9 +118,9 @@ public class GroupServiceImpl {
 	public ProfGroupInfoResponse createGroup(ProfUserGroupMappingRequest mappingRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			ProfUserGroupMappingEntity mappingEntity = groupHelper
+			List<ProfUserGroupMappingEntity> mappingEntity = groupHelper
 					.convertMappingInfoReqToMappingInfoEnt(mappingRequest);
-			mappingRepository.save(mappingEntity);
+			mappingRepository.saveAll(mappingEntity);
 			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			groupInfoResponse.setStatus(DMSConstant.FAILURE);
@@ -135,34 +148,54 @@ public class GroupServiceImpl {
 	}
 
 	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest) {
-		ProfMetaDataResponse metaDataResponse=new ProfMetaDataResponse();
-	    try {
-	    		String tableName=groupHelper.createTable(createTableRequest.getFields(),createTableRequest);
-	    		ProfMetaDataEntity dataEntity=groupHelper.convertTableReqToMetaEntity(createTableRequest,tableName);
-		        entityManager.persist(dataEntity);
-		        metaDataResponse.setStatus(DMSConstant.SUCCESS);
-			
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return metaDataResponse;
+		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
+		try {
+			String tableName = groupHelper.createTable(createTableRequest.getFields(), createTableRequest);
+			ProfMetaDataEntity dataEntity = groupHelper.convertTableReqToMetaEntity(createTableRequest, tableName);
+			entityManager.persist(dataEntity);
+			metaDataResponse.setStatus(DMSConstant.SUCCESS);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return metaDataResponse;
 	}
 
 	public ProfGroupInfoResponse updateSignupUser(ProfSignupUserRequest userRequest, int userId) {
-		ProfGroupInfoResponse groupInfoResponse=new ProfGroupInfoResponse();
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			ProfUserInfoEntity entity=userInfoRepository.findByUserId(userId);
+			ProfUserInfoEntity entity = userInfoRepository.findByUserId(userId);
 			if (entity != null) {
-				ProfUserInfoEntity infoEntity=groupHelper.convertRequestToUser(userRequest,entity);
+				ProfUserInfoEntity infoEntity = groupHelper.convertRequestToUser(userRequest, entity);
 				userInfoRepository.save(infoEntity);
 				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
-			}else {
+			} else {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return groupInfoResponse;
+	}
+
+	public List<ProfOverallGroupInfoResponse> findById(int userId) {
+		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
+		try {
+			ProfUserInfoEntity entity = userInfoRepository.findByUserId(userId);
+			if (entity != null) {
+				List<ProfGroupInfoEntity> infoEntity = groupInfoRepository.findByUserId(userId);
+				for (ProfGroupInfoEntity profGroupInfoEntity : infoEntity) {
+					if (!profGroupInfoEntity.getStatus().equalsIgnoreCase("I")) {
+						ProfOverallGroupInfoResponse groupInfoResponse = groupHelper
+								.convertActiveGroupInfo(profGroupInfoEntity);
+						groupInfoResponses.add(groupInfoResponse);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponses;
 	}
 
 }

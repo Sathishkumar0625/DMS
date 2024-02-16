@@ -1,13 +1,11 @@
 package com.proflaut.dms.entity;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 
 @Entity
 @Table(name = "PROF_GROUP_INFO")
@@ -16,15 +14,26 @@ public class ProfGroupInfoEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "GROUP_NAME", unique = true,nullable = false)
+	@Column(name = "GROUP_NAME", unique = true, nullable = false)
 	private String groupName;
 	@Column(name = "STATUS")
 	private String status;
 	@Column(name = "CREATED_BY")
 	private String createdBy;
-	
+
 	@Column(name = "CREATED_AT")
 	private String createdAt;
+
+	@Column(name = "USER_ID")
+	private int userId;
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 
 	public int getId() {
 		return id;
@@ -65,7 +74,5 @@ public class ProfGroupInfoEntity {
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
-
-
 
 }

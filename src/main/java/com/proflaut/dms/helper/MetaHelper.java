@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -57,12 +56,15 @@ public class MetaHelper {
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest, int id) {
 
 		StringBuilder queryBuilder = new StringBuilder();
-		String tableName;
-		tableName = createTableRequest.getTableName().replace(" ", "_") + "_" + id;
+		String tableName = createTableRequest.getTableName().replace(" ", "_") + "_" + id;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
 		queryBuilder.append("DOC_ID INTEGER, ");
+
+		// List to store index creation statements
+		List<String> indexStatements = new ArrayList<>();
+
 		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
 			String originalFieldName = field.getFieldName();
@@ -71,6 +73,7 @@ public class MetaHelper {
 			String mandatory = field.getMandatory();
 			int maxLength = Integer.parseInt(field.getMaxLength());
 
+			// Append column definition
 			queryBuilder.append(fieldName).append(" ").append(getDatabaseType(fieldType, maxLength));
 			if ("Y".equalsIgnoreCase(mandatory)) {
 				queryBuilder.append(" NOT NULL");
@@ -79,18 +82,30 @@ public class MetaHelper {
 				queryBuilder.append(", ");
 			}
 
+			// Create index statement for the column
+			String indexName = "idx_" + tableName + "_" + fieldName;
+			String indexStatement = "CREATE INDEX " + indexName + " ON " + tableName + " (" + fieldName + ")";
+			indexStatements.add(indexStatement);
 		}
-		queryBuilder.append(")");
-		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
-		return tableName;
 
+		queryBuilder.append(")");
+
+		// Execute table creation query
+		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
+
+		// Execute index creation queries
+		for (String indexStatement : indexStatements) {
+			entityManager.createNativeQuery(indexStatement).executeUpdate();
+		}
+
+		return tableName;
 	}
 
 	private String getDatabaseType(String fieldType, int maxLength) {
 		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
 			return "VARCHAR(" + maxLength + ")";
 		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
-			return "Integer";
+			return "INTEGER";
 		} else {
 			return fieldType;
 		}
@@ -253,8 +268,7 @@ public class MetaHelper {
 		updateQueryBuilder.append("UPDATE ").append(tableName).append(" SET ");
 		for (Iterator<FieldDefnition> it = fields.iterator(); it.hasNext();) {
 			FieldDefnition fieldValue = it.next();
-			updateQueryBuilder.append(fieldValue.getFieldName()).append( "=" )
-					.append(getFormattedValue(fieldValue));
+			updateQueryBuilder.append(fieldValue.getFieldName()).append("=").append(getFormattedValue(fieldValue));
 			if (it.hasNext()) {
 				updateQueryBuilder.append(", ");
 			}

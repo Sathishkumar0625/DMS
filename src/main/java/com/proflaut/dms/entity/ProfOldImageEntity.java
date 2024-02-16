@@ -28,9 +28,6 @@ public class ProfOldImageEntity {
 	@Column(name = "USER_NAME")
 	private String userName;
 
-	@Column(name = "PROSPECT_ID")
-	private String prospectId;
-
 	@Column(name = "CREATED_BY")
 	private String createdBy;
 
@@ -42,6 +39,17 @@ public class ProfOldImageEntity {
 
 	@Column(name = "FOLDER_ID")
 	private int folderId;
+
+	@Column(name = "VERSION")
+	private String version;
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
 	public int getFolderId() {
 		return folderId;
@@ -81,14 +89,6 @@ public class ProfOldImageEntity {
 
 	public void setMetaId(int metaId) {
 		this.metaId = metaId;
-	}
-
-	public String getProspectId() {
-		return prospectId;
-	}
-
-	public void setProspectId(String prospectId) {
-		this.prospectId = prospectId;
 	}
 
 	public String getUserName() {

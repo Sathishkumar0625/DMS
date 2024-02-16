@@ -1,18 +1,17 @@
 package com.proflaut.dms.model;
 
-import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 public class ProfUserGroupMappingRequest {
-	@NotBlank(message = "Group Id cannot be blank")
-	private String groupId;
+	private List<Integer> groupId;
 	private int userId;
 	private String mappedBy;
 
-	public String getGroupId() {
+	public List<Integer> getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(String groupId) {
+	public void setGroupId(List<Integer> groupId) {
 		this.groupId = groupId;
 	}
 
@@ -31,5 +30,4 @@ public class ProfUserGroupMappingRequest {
 	public void setMappedBy(String mappedBy) {
 		this.mappedBy = mappedBy;
 	}
-
 }

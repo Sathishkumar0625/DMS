@@ -2,6 +2,7 @@ package com.proflaut.dms.helper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -12,6 +13,7 @@ import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
+import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
@@ -35,12 +37,14 @@ public class GroupHelper {
 
 	private static int tableCount = 0;
 
-	public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest) {
+	public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
+			ProfUserPropertiesEntity entity2) {
 		ProfGroupInfoEntity entity = new ProfGroupInfoEntity();
 		entity.setCreatedAt(formatCurrentDateTime());
 		entity.setCreatedBy(groupInfoRequest.getCreatedBy());
 		entity.setGroupName(groupInfoRequest.getGroupName());
 		entity.setStatus("A");
+		entity.setUserId(entity2.getUserId());
 		return entity;
 	}
 
@@ -63,15 +67,19 @@ public class GroupHelper {
 		return currentDateTime.format(formatter);
 	}
 
-	public ProfUserGroupMappingEntity convertMappingInfoReqToMappingInfoEnt(
+	public List<ProfUserGroupMappingEntity> convertMappingInfoReqToMappingInfoEnt(
 			ProfUserGroupMappingRequest mappingRequest) {
-		ProfUserGroupMappingEntity entity = new ProfUserGroupMappingEntity();
-		entity.setGroupId(mappingRequest.getGroupId());
-		entity.setMappedAt(formatCurrentDateTime());
-		entity.setMappedBy(mappingRequest.getMappedBy());
-		entity.setStatus("A");
-		entity.setUserId(mappingRequest.getUserId());
-		return entity;
+		List<ProfUserGroupMappingEntity> entities = new ArrayList<>();
+		for (Integer groupId : mappingRequest.getGroupId()) {
+			ProfUserGroupMappingEntity entity = new ProfUserGroupMappingEntity();
+			entity.setGroupId(String.valueOf(groupId));
+			entity.setUserId(mappingRequest.getUserId());
+			entity.setMappedBy(mappingRequest.getMappedBy());
+			entity.setMappedAt(formatCurrentDateTime());
+			entity.setStatus("A");
+			entities.add(entity);
+		}
+		return entities;
 	}
 
 	public ProfOveralUserInfoResponse convertToOveralUserResponse(ProfUserInfoEntity profUserInfoEntity) {
@@ -155,5 +163,15 @@ public class GroupHelper {
 		entity.setUserName(userRequest.getUserName());
 		entity.setStatus(userRequest.getStatus());
 		return entity;
+	}
+
+	public ProfOverallGroupInfoResponse convertActiveGroupInfo(ProfGroupInfoEntity profGroupInfoEntity) {
+		ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+		groupInfoResponse.setGroupName(profGroupInfoEntity.getGroupName());
+		groupInfoResponse.setCreatedAt(profGroupInfoEntity.getCreatedAt());
+		groupInfoResponse.setCreatedBy(profGroupInfoEntity.getCreatedBy());
+		groupInfoResponse.setId(profGroupInfoEntity.getId());
+		groupInfoResponse.setUserId(profGroupInfoEntity.getUserId());
+		return groupInfoResponse;
 	}
 }

@@ -77,7 +77,6 @@ public class FolderHelper {
 			ProfUserPropertiesEntity propertiesEntity) {
 
 		FolderEntity ent = new FolderEntity();
-		String folderPath = "";
 //		folderPath = storeFolder(fileResponse, folderFO);
 		ent.setFolderName(folderFO.getFolderName());
 		ent.setIsParent(folderLocation);
