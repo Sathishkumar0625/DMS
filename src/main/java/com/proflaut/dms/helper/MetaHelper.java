@@ -351,13 +351,13 @@ public class MetaHelper {
 		allTableResponse.setTableName(dataEntity.getName());
 		String tableName = dataEntity.getTableName();
 		if (tableName != null) {
-			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose(tableName, dataEntity);
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose( dataEntity);
 			allTableResponse.setFieldNames(definitionResponses);
 		}
 		return allTableResponse;
 	}
 
-	private List<FieldDefinitionResponse> getColumnDetailsForRespose(String tableName, ProfMetaDataEntity dataEntity) {
+	private List<FieldDefinitionResponse> getColumnDetailsForRespose( ProfMetaDataEntity dataEntity) {
 
 		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
 		try {
@@ -371,9 +371,6 @@ public class MetaHelper {
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
-				// List<String> values = fetchDataFromMetaTable(property.getFieldNames(),
-				// tableName);
-				// fieldDefinitionResponse.setValue(String.join(",", values));
 
 				definitionResponses.add(fieldDefinitionResponse);
 			}
@@ -381,24 +378,6 @@ public class MetaHelper {
 			e.printStackTrace();
 		}
 		return definitionResponses;
-	}
-
-	private List<String> fetchDataFromMetaTable(String columnName, String tableName) {
-		List<String> values = new ArrayList<>();
-		try {
-			String sqlQuery = "SELECT " + columnName + " FROM " + tableName;
-
-			@SuppressWarnings("unchecked")
-			List<Object> results = entityManager.createNativeQuery(sqlQuery).getResultList();
-			for (Object result : results) {
-				if (result != null) {
-					values.add(result.toString());
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return values;
 	}
 
 }

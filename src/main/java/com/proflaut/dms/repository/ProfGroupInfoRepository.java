@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
-import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 
 public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEntity, Integer> {
 

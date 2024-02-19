@@ -210,6 +210,7 @@ public class GroupHelper {
 			groupInfoResponse.setCreatedAt(profGroupInfoEntity.getCreatedAt());
 			groupInfoResponse.setCreatedBy(profGroupInfoEntity.getCreatedBy());
 			groupInfoResponse.setUserId(profGroupInfoEntity.getUserId());
+			groupInfoResponse.setId(profGroupInfoEntity.getId());
 		}
 		return groupInfoResponse;
 	}

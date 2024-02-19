@@ -43,7 +43,6 @@ public class TransactionHelper {
 
 	private final AppConfiguration appConfiguration;
 
-	@Autowired
 	public TransactionHelper(AppConfiguration appConfiguration) {
 		this.appConfiguration = appConfiguration;
 	}

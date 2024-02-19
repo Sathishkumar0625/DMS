@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
-import com.proflaut.dms.entity.ProfMetaDataPropertiesEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -260,13 +258,11 @@ public class GroupServiceImpl {
 		try {
 			ProfUserGroupMappingEntity groupMappingEntity = mappingRepository
 					.findByGroupIdAndUserId(String.valueOf(groupId), userId);
-			ProfGroupUserMappingEntity groupUserMappingEntity = groupUserMappingRepository
-					.findByGroupIdAndUserId(groupId, userId);
-			if (groupMappingEntity != null && groupUserMappingEntity != null) {
+			if (groupMappingEntity != null ) {
 				mappingRepository.delete(groupMappingEntity);
-				groupUserMappingRepository.delete(groupUserMappingEntity);
 				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
+				groupInfoResponse.setErrorMessage(DMSConstant.USERID_NOT_EXIST);
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {

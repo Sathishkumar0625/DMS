@@ -115,8 +115,8 @@ public class FileHelper {
 					} catch (IOException e) {
 						handleIOException(e);
 					}
-					String fileSize=getBase64ImageSizeInKB(fileRequest.getImage());
-					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName,fileSize);
+					String fileSize = getBase64ImageSizeInKB(fileRequest.getImage());
+					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName, fileSize);
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, entity);
 					existingDocEntity.setDocPath(fileName);
@@ -132,8 +132,9 @@ public class FileHelper {
 					} catch (IOException e) {
 						handleIOException(e);
 					}
-					String fileSize=getBase64ImageSizeInKB(fileRequest.getImage());
-					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,fileSize);
+					String fileSize = getBase64ImageSizeInKB(fileRequest.getImage());
+					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,
+							fileSize);
 					docUploadRepository.save(profDocEnt);
 				}
 			}
@@ -156,7 +157,7 @@ public class FileHelper {
 		long sizeInBytes = imageData.length;
 
 		// Convert size to kilobytes
-		return ""+sizeInBytes / 1024+"kb";
+		return "" + sizeInBytes / 1024 + "kb";
 	}
 
 	private void rollbackAndDeleteFile(String fileName) {
@@ -182,7 +183,7 @@ public class FileHelper {
 		if (userProp != null) {
 			ent.setCreatedBy(userProp.getUserName());
 		}
-		 ent.setFileSize(fileSize);
+		ent.setFileSize(fileSize);
 		ent.setFolderId(entity.getId());
 		ent.setUploadTime(formatCurrentDateTime());
 		ent.setProspectId(entity.getFolderName());
@@ -194,7 +195,8 @@ public class FileHelper {
 		return ent;
 	}
 
-	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName, String fileSize) {
+	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName,
+			String fileSize) {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
@@ -238,7 +240,7 @@ public class FileHelper {
 		List<DocumentDetails> document = new ArrayList<>();
 
 		for (int i = 0; i < profDocEntity.size(); i++) {
-			FolderEntity entity = folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
+			folderRepository.findByProspectId(profDocEntity.get(i).getProspectId());
 
 			if (!org.springframework.util.StringUtils.isEmpty(profDocEntity.get(i).getDocPath())) {
 				try {

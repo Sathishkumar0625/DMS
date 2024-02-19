@@ -40,7 +40,7 @@ public class GroupController {
 	GroupServiceImpl groupServiceImpl;
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
 
-	@PostMapping("/create")
+	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,
 			@Valid @RequestBody ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
@@ -215,10 +215,10 @@ public class GroupController {
 	}
 
 	@DeleteMapping("/deleteAssignGroup")
-	public ResponseEntity<ProfGroupInfoResponse> deleteAssignUser(@RequestParam int groupId, @RequestParam int userId) {
+	public ResponseEntity<ProfGroupInfoResponse> deleteAssignGroup(@RequestParam int groupId, @RequestParam int userId) {
 		ProfGroupInfoResponse groupInfoResponses = null;
 		try {
-			groupInfoResponses = groupServiceImpl.deleteAssUsers(groupId, userId);
+			groupInfoResponses = groupServiceImpl.deleteAssGroup(groupId, userId);
 			if (!groupInfoResponses.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {
@@ -239,6 +239,22 @@ public class GroupController {
 				return new ResponseEntity<>(overalUserInfoResponses, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@DeleteMapping("/deleteAssignUser")
+	public ResponseEntity<ProfGroupInfoResponse> deleteAssignUser(@RequestParam int groupId, @RequestParam int userId) {
+		ProfGroupInfoResponse groupInfoResponses = null;
+		try {
+			groupInfoResponses = groupServiceImpl.deleteAssUsers(groupId, userId);
+			if (!groupInfoResponses.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
