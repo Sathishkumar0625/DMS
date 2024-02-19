@@ -290,9 +290,20 @@ public class MetaHelper {
 	private String getFormattedValue(FieldDefnition fieldValue) {
 		if (fieldValue.getFieldType().equalsIgnoreCase("Integer")) {
 			return fieldValue.getValue();
+		} else if (containsInteger(fieldValue.getValue())) {
+			return "'" + fieldValue.getValue().replace("'", "''") + "'";
 		} else {
 			return "'" + fieldValue.getValue().replace("'", "''") + "'";
 		}
+	}
+
+	private static boolean containsInteger(String inputString) {
+		for (char c : inputString.toCharArray()) {
+			if (Character.isDigit(c)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<String> getColumnNames(String tableName) {

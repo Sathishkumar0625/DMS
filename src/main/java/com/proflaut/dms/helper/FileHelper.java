@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -105,8 +106,6 @@ public class FileHelper {
 
 				if (existingDocEntity != null) {
 					File newFile = new File(path + File.separator + fileName);
-					String newFileSize = sizeInKiloBytes(newFile);
-					System.out.println(sizeInKiloBytes(newFile));
 					try (FileWriter fileWriter = new FileWriter(newFile)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -116,16 +115,14 @@ public class FileHelper {
 					} catch (IOException e) {
 						handleIOException(e);
 					}
-
-					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName);
+					String fileSize=getBase64ImageSizeInKB(fileRequest.getImage());
+					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName,fileSize);
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, entity);
 					existingDocEntity.setDocPath(fileName);
-					existingDocEntity.setFileSize(newFileSize);
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
-					String fileSize = sizeInKiloBytes(file);
 					try (FileWriter fileWriter = new FileWriter(file)) {
 						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
 						PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -135,8 +132,8 @@ public class FileHelper {
 					} catch (IOException e) {
 						handleIOException(e);
 					}
-					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,
-							fileSize);
+					String fileSize=getBase64ImageSizeInKB(fileRequest.getImage());
+					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,fileSize);
 					docUploadRepository.save(profDocEnt);
 				}
 			}
@@ -149,6 +146,17 @@ public class FileHelper {
 			}
 		}
 		return isFileCreated;
+	}
+
+	public static String getBase64ImageSizeInKB(String base64Image) {
+		// Decode Base64 string into byte array
+		byte[] imageData = Base64.getDecoder().decode(base64Image);
+
+		// Calculate size of byte array
+		long sizeInBytes = imageData.length;
+
+		// Convert size to kilobytes
+		return ""+sizeInBytes / 1024+"kb";
 	}
 
 	private void rollbackAndDeleteFile(String fileName) {
@@ -174,7 +182,7 @@ public class FileHelper {
 		if (userProp != null) {
 			ent.setCreatedBy(userProp.getUserName());
 		}
-		ent.setFileSize(fileSize);
+		 ent.setFileSize(fileSize);
 		ent.setFolderId(entity.getId());
 		ent.setUploadTime(formatCurrentDateTime());
 		ent.setProspectId(entity.getFolderName());
@@ -186,7 +194,7 @@ public class FileHelper {
 		return ent;
 	}
 
-	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName) {
+	private ProfOldImageEntity convertFileReqToOldImage(ProfDocEntity existingDocEntity, int uId, String uName, String fileSize) {
 		ProfOldImageEntity oldImageEntity = new ProfOldImageEntity();
 		oldImageEntity.setDocName(existingDocEntity.getDocName());
 		oldImageEntity.setDocPath(existingDocEntity.getDocPath());
@@ -196,6 +204,7 @@ public class FileHelper {
 		oldImageEntity.setExtention(existingDocEntity.getExtention());
 		oldImageEntity.setFolderId(existingDocEntity.getFolderId());
 		oldImageEntity.setMetaId(existingDocEntity.getMetaId());
+		oldImageEntity.setFileSize(fileSize);
 		return oldImageEntity;
 	}
 
@@ -367,9 +376,4 @@ public class FileHelper {
 		configEntity.setSendAt(formatCurrentDateTime());
 		return configEntity;
 	}
-
-	private String sizeInKiloBytes(File file) {
-		return (double) file.length() / 1024 + " kb";
-	}
-
 }

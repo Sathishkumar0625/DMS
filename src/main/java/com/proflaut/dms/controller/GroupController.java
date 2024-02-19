@@ -229,6 +229,7 @@ public class GroupController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@GetMapping("/getAssignUserInfo/{groupId}")
 	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAssignUserInfo(@PathVariable int groupId) {
 		List<ProfOveralUserInfoResponse> overalUserInfoResponses = null;

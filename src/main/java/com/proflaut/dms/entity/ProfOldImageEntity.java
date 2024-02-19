@@ -42,6 +42,17 @@ public class ProfOldImageEntity {
 
 	@Column(name = "VERSION")
 	private String version;
+	
+	@Column(name = "FILE_SIZE")
+	private String fileSize;
+
+	public String getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(String fileSize) {
+		this.fileSize = fileSize;
+	}
 
 	public String getVersion() {
 		return version;
