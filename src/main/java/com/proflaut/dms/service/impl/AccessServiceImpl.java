@@ -181,7 +181,7 @@ public class AccessServiceImpl {
 				logoutResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
 				logoutResponse.setStatus(DMSConstant.FAILURE);
-				logoutResponse.setStatus(DMSConstant.USERID_NOT_EXIST);
+				logoutResponse.setErrorMessage(DMSConstant.USERID_NOT_EXIST);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

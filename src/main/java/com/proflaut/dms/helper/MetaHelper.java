@@ -56,7 +56,7 @@ public class MetaHelper {
 	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest, int id) {
 
 		StringBuilder queryBuilder = new StringBuilder();
-		String tableName = createTableRequest.getTableName().replace(" ", "_") + "_" + id;
+		String tableName = createTableRequest.getTableName().replace(" ", "_").trim() + "_" + id;
 
 		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
 		queryBuilder.append("ID SERIAL PRIMARY KEY, ");
@@ -67,7 +67,7 @@ public class MetaHelper {
 
 		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
 			FieldDefnition field = it.next();
-			String originalFieldName = field.getFieldName();
+			String originalFieldName = field.getFieldName().trim();
 			String fieldName = originalFieldName.replace(" ", "_");
 			String fieldType = field.getFieldType();
 			String mandatory = field.getMandatory();

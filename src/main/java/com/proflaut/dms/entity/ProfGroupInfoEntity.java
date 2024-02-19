@@ -5,10 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROF_GROUP_INFO")
+@Table(name = "PROF_GROUP_INFO", indexes = {@Index(columnList = "ID")})
 public class ProfGroupInfoEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
