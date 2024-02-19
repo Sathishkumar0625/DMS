@@ -215,7 +215,8 @@ public class GroupController {
 	}
 
 	@DeleteMapping("/deleteAssignGroup")
-	public ResponseEntity<ProfGroupInfoResponse> deleteAssignGroup(@RequestParam int groupId, @RequestParam int userId) {
+	public ResponseEntity<ProfGroupInfoResponse> deleteAssignGroup(@RequestParam int groupId,
+			@RequestParam int userId) {
 		ProfGroupInfoResponse groupInfoResponses = null;
 		try {
 			groupInfoResponses = groupServiceImpl.deleteAssGroup(groupId, userId);
@@ -245,7 +246,7 @@ public class GroupController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@DeleteMapping("/deleteAssignUser")
 	public ResponseEntity<ProfGroupInfoResponse> deleteAssignUser(@RequestParam int groupId, @RequestParam int userId) {
 		ProfGroupInfoResponse groupInfoResponses = null;

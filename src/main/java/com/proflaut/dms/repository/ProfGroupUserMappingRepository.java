@@ -11,6 +11,6 @@ public interface ProfGroupUserMappingRepository extends JpaRepository<ProfGroupU
 	List<ProfGroupUserMappingEntity> findByGroupId(int groupId);
 
 
-	ProfGroupUserMappingEntity findByGroupIdAndUserId(int groupId, int userId);
+	ProfGroupUserMappingEntity findByGroupIdAndUserId(String string, int userId);
 
 }

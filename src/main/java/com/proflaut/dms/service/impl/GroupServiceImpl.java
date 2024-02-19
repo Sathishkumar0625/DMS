@@ -253,12 +253,12 @@ public class GroupServiceImpl {
 		return groupInfoResponses;
 	}
 
-	public ProfGroupInfoResponse deleteAssUsers(int groupId, int userId) {
+	public ProfGroupInfoResponse deleteAssGroup(int groupId, int userId) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
 			ProfUserGroupMappingEntity groupMappingEntity = mappingRepository
 					.findByGroupIdAndUserId(String.valueOf(groupId), userId);
-			if (groupMappingEntity != null ) {
+			if (groupMappingEntity != null) {
 				mappingRepository.delete(groupMappingEntity);
 				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
@@ -289,6 +289,24 @@ public class GroupServiceImpl {
 			e.printStackTrace();
 		}
 		return overalUserInfoResponses;
+	}
+
+	public ProfGroupInfoResponse deleteAssUsers(int groupId, int userId) {
+		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
+		try {
+			ProfGroupUserMappingEntity groupUserMappingEntity = groupUserMappingRepository
+					.findByGroupIdAndUserId(String.valueOf(groupId), userId);
+			if (groupUserMappingEntity != null) {
+				groupUserMappingRepository.delete(groupUserMappingEntity);
+				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				groupInfoResponse.setErrorMessage(DMSConstant.USERID_NOT_EXIST);
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return groupInfoResponse;
 	}
 
 }
