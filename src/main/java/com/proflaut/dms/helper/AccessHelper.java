@@ -23,10 +23,11 @@ import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
 @Component
 public class AccessHelper {
-	
+
 	@Autowired
 	ProfUserInfoRepository userInfoRepository;
 	
+
 	private static final Logger logger = LogManager.getLogger(AccessHelper.class);
 
 	public static String formatCurrentDateTime() {
@@ -34,7 +35,7 @@ public class AccessHelper {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
 		return currentDateTime.format(formatter);
 	}
-	
+
 	public ProfUserInfoEntity convertUserInfotoProfUser(UserInfo userInfo) throws InvalidKeyException,
 			UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
 		PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -50,6 +51,7 @@ public class AccessHelper {
 		ent.setCreatedDate(formatCurrentDateTime());
 		ent.setMobileNo(userInfo.getMobileNo());
 		ent.setLocation(userInfo.getLocation());
+		ent.setLdap(userInfo.getLdap());
 		return ent;
 	}
 
@@ -66,12 +68,12 @@ public class AccessHelper {
 		}
 		return isValidate;
 	}
-	
+
 	public boolean usernameExists(String userName) {
 		ProfUserInfoEntity entity = userInfoRepository.findByUserName(userName);
 		return entity != null;
 	}
-	
+
 	public ProfUserPropertiesEntity convertUserInfotoProfUserProp(ProfUserInfoEntity profUserInfoEntity,
 			Map<String, String> tokenResp) {
 		ProfUserPropertiesEntity ent = new ProfUserPropertiesEntity();
@@ -83,6 +85,5 @@ public class AccessHelper {
 		ent.setUserName(profUserInfoEntity.getUserName());
 		return ent;
 	}
-
 
 }

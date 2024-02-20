@@ -16,7 +16,7 @@ public class ProfUserInfoEntity {
 	@Column(name = "USER_ID")
 	private Integer userId;
 
-	@Column(name = "USER_NAME", unique = true,nullable = false)
+	@Column(name = "USER_NAME", unique = true, nullable = false)
 	private String userName;
 
 	public Integer getUserId() {
@@ -67,10 +67,10 @@ public class ProfUserInfoEntity {
 		this.updatedDate = updatedDate;
 	}
 
-	@Column(name = "PASSWORD",nullable = false)
+	@Column(name = "PASSWORD", nullable = false)
 	private String password;
 
-	@Column(name = "EMAIL",nullable = false)
+	@Column(name = "EMAIL", nullable = false)
 	private String email;
 
 	@Column(name = "CREATED_DATE")
@@ -93,6 +93,17 @@ public class ProfUserInfoEntity {
 
 	@Column(name = "LOCATION")
 	private String location;
+
+	@Column(name = "LDAP")
+	private String ldap;
+
+	public String getLdap() {
+		return ldap;
+	}
+
+	public void setLdap(String ldap) {
+		this.ldap = ldap;
+	}
 
 	public String getMobileNo() {
 		return mobileNo;

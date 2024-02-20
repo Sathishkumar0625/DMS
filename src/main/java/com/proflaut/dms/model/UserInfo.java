@@ -8,8 +8,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
-@JsonPropertyOrder({"userName","password","email","useForceLogin"})
+@JsonPropertyOrder({ "userName", "password", "email", "useForceLogin" })
 public class UserInfo {
 
 	public String getUserName() {
@@ -43,34 +42,43 @@ public class UserInfo {
 	public void setUseForceLogin(String useForceLogin) {
 		this.useForceLogin = useForceLogin;
 	}
+
 	@NotBlank(message = "Username cannot be blank")
 	@Size(min = 3, max = 15, message = "Username must be between 4 and 10 characters")
 	@JsonProperty("userName")
 	private String userName;
-	
+
 	@Size(min = 4, max = 15, message = "Password must be between 4 and 10 characters")
 	@JsonProperty("password")
 	private String password;
-	
+
 	@JsonProperty("email")
 	private String email;
-	
+
 	@JsonProperty("useForceLogin")
 	private String useForceLogin;
-	
+
 	private String userId;
 
 	private Timestamp createdDate;
-	
+
 	private String adminAccess;
-	
+
 	private String webAccess;
-	
+
 	private String mobileNo;
-	
+
 	private String location;
-	
-	
+
+	private String ldap;
+
+	public String getLdap() {
+		return ldap;
+	}
+
+	public void setLdap(String ldap) {
+		this.ldap = ldap;
+	}
 
 	public String getMobileNo() {
 		return mobileNo;
@@ -95,8 +103,6 @@ public class UserInfo {
 	public void setAdminAccess(String adminAccess) {
 		this.adminAccess = adminAccess;
 	}
-
-	
 
 	public String getWebAccess() {
 		return webAccess;
