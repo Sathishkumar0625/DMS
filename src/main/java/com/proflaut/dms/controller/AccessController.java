@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -84,7 +85,7 @@ public class AccessController {
 		}
 	}
 
-	@PutMapping("/logout/{userId}")
+	@DeleteMapping("/logout/{userId}")
 	public ResponseEntity<ProfUserLogoutResponse> logout(@PathVariable int userId) {
 		ProfUserLogoutResponse logoutResponse = null;
 		try {

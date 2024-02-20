@@ -18,6 +18,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
@@ -77,10 +78,12 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	AccessRightsServiceImpl accessRightsServiceImpl;
-	
+
 	@Autowired
 	MetaServiceImpl metaServiceImpl;
 
+	@Value("${create.folderlocation}")
+	private String folderLocation;
 
 	@Transactional
 	public FileResponse storeFile(FileRequest fileRequest, String token, TransactionStatus status,
@@ -158,19 +161,15 @@ public class FileManagementServiceImpl {
 		return response;
 	}
 
-	
-
 	public ProfEmailShareResponse emailReader(ProfEmailShareRequest emailShareRequest) {
 		ProfEmailShareResponse emailShareResponse = new ProfEmailShareResponse();
 		try {
-			FolderEntity folderEntity = folderRepository.findById(emailShareRequest.getDocId());
-			ProfDocEntity docEntity = profDocUploadRepository.findByDocNameAndProspectId(emailShareRequest.getDocName(),
-					folderEntity.getProspectId());
+			ProfDocEntity docEntity = profDocUploadRepository.findById(emailShareRequest.getDocId());
 			String extension = docEntity.getExtention();
-			if (docEntity.getDocName() != null && folderEntity.getFolderPath() != null) {
+			if (docEntity.getDocName() != null) {
 				MailInfoRequest mailInfoRequest = new MailInfoRequest(emailShareRequest.getFrom(),
 						Arrays.asList(emailShareRequest.getTo()), "Subject");
-				String path = folderEntity.getFolderPath() + File.separator + docEntity.getDocPath();
+				String path = folderLocation + File.separator + docEntity.getDocPath();
 				String content = new String(Files.readAllBytes(Paths.get(path)));
 				PasswordEncDecrypt td = new PasswordEncDecrypt();
 				String decryptedBase64 = td.decrypt(content);
@@ -180,9 +179,8 @@ public class FileManagementServiceImpl {
 					ProfMailConfigEntity configEntity = fileHelper.convertemailShareReqToMailConf(emailShareRequest);
 					configRepository.save(configEntity);
 					docEntity.setEmilResId(String.valueOf(configEntity.getId()));
-					profDocUploadRepository.updateEmailResId(String.valueOf(configEntity.getId()), docEntity.getId());
-
-					profDocUploadRepository.updateIsEmail("Y", docEntity.getId());
+					profDocUploadRepository.updateEmailResIdAndIsEmail(String.valueOf(configEntity.getId()),"Y", docEntity.getId());
+//					profDocUploadRepository.updateIsEmail("Y", docEntity.getId());
 					emailShareResponse.setStatus(DMSConstant.MESSAGE);
 					emailShareResponse.setStatus(DMSConstant.SUCCESS);
 				} else {

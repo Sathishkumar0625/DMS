@@ -40,15 +40,16 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	ProfDocEntity findByDocName(String docName);
 
 	@Modifying
-	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET is_email = :isEmail" + " WHERE id = :id ")
+	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET is_email = :isEmail WHERE id = :id ")
 	void updateIsEmail(@Param("isEmail") String isEmail, @Param("id") int id);
-
-	@Modifying
-	@Query("UPDATE ProfDocEntity p SET p.emilResId = :emilResId WHERE p.id = :docId")
-	void updateEmailResId(@Param("emilResId") String emilResId, @Param("docId") Integer docId);
 
 	ProfDocEntity findByDocNameAndFolderId(String dockName, int folderId);
 
 	ProfDocEntity findByFolderIdAndMetaId(Integer id, int metaId);
+
+	@Modifying
+	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET is_email = :isEmail , email_res_id = :emailResId WHERE id = :id ")
+	void updateEmailResIdAndIsEmail(@Param("emailResId") String emailResId, @Param("isEmail") String isEmail,
+			@Param("id") int id);
 
 }
