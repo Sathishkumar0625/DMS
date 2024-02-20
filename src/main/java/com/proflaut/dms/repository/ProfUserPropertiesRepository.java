@@ -19,4 +19,8 @@ public interface ProfUserPropertiesRepository extends JpaRepository<ProfUserProp
 	ProfUserPropertiesEntity findByUserId(Integer userId);
 
 	ProfUserPropertiesEntity findByToken(String token);
+
+	ProfUserPropertiesEntity findById(int userId);
+
+	
 }

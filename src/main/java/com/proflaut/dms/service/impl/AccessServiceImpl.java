@@ -175,7 +175,7 @@ public class AccessServiceImpl {
 	public ProfUserLogoutResponse deleteUser(int userId) {
 		ProfUserLogoutResponse logoutResponse = new ProfUserLogoutResponse();
 		try {
-			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByUserId(userId);
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findById(userId);
 			if (entity != null) {
 				profUserPropertiesRepository.delete(entity);
 				logoutResponse.setStatus(DMSConstant.SUCCESS);
