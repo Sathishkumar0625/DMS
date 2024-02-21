@@ -29,4 +29,6 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
 	FolderEntity findByFolderNameIgnoreCase(String path);
 
+	List<FolderEntity> findAllByIdNot(int id);
+
 }

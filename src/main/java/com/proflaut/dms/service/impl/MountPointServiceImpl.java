@@ -6,30 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.nio.file.Files;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.entity.FolderEntity;
+import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.MountPointHelper;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.model.ProfMountPointOverallResponse;
 import com.proflaut.dms.model.ProfMountPointRequest;
 import com.proflaut.dms.model.ProfMountPointResponse;
 import com.proflaut.dms.repository.FolderRepository;
+import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
 import com.proflaut.dms.repository.ProfMountPointRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class MountPointServiceImpl {
-	
-	@Value("${search.folder}")
-	private String serachFolder;
-
 
 	@Autowired
 	MountPointHelper helper;
@@ -42,16 +41,19 @@ public class MountPointServiceImpl {
 
 	@Autowired
 	ProfMountFolderMappingRepository folderMappingRepository;
-	
+
 	@Autowired
 	FolderRepository folderRepository;
+
+	@Autowired
+	ProfDocUploadRepository docUploadRepository;
 
 	public ProfMountPointResponse saveMountPoint(ProfMountPointRequest pointRequest, String token) {
 		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
 		ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
-		Path directory=Paths.get(pointRequest.getPath());
+		Path directory = Paths.get(pointRequest.getPath());
 		try {
-			if (!entity.getToken().isEmpty() && Files.exists(directory) && Files.isDirectory(directory) ) {
+			if (!entity.getToken().isEmpty() && Files.exists(directory) && Files.isDirectory(directory)) {
 				ProfMountPointEntity mountPointEntity = helper.convertRequestToMountPointEntity(pointRequest, entity);
 				mountPointRepository.save(mountPointEntity);
 				mountPointResponse.setStatus(DMSConstant.SUCCESS);
@@ -108,7 +110,7 @@ public class MountPointServiceImpl {
 		try {
 			if (!entity.getToken().isEmpty()) {
 				ProfMountPointFolderMappingEntity folderMappingEntity = helper
-						.convertRequestToMappingEntity(folderMappingRequest,entity);
+						.convertRequestToMappingEntity(folderMappingRequest, entity);
 				folderMappingRepository.save(folderMappingEntity);
 				mountPointResponse.setStatus(DMSConstant.SUCCESS);
 
@@ -117,6 +119,39 @@ public class MountPointServiceImpl {
 				mountPointResponse.setStatus(DMSConstant.USERID_NOT_EXIST);
 			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mountPointResponse;
+	}
+
+	public List<FolderPathResponse> getAllNotAllocate(int id) {
+		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
+		ProfMountPointFolderMappingEntity folderMappingEntity = folderMappingRepository.findByMountPointId(id);
+		try {
+			if (folderMappingEntity == null) {
+				List<FolderEntity> entity = folderRepository.findAll();
+				for (FolderEntity folderEntity : entity) {
+					FolderPathResponse pathResponse = helper.convertRequestToFolderResponse(folderEntity);
+					folderPathResponses.add(pathResponse);
+				}
+			} else {
+				List<FolderEntity> entity = folderRepository.findAllByIdNot(id);
+				for (FolderEntity folderEntity : entity) {
+					FolderPathResponse pathResponse = helper.convertRequestToFolderResponse(folderEntity);
+					folderPathResponses.add(pathResponse);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return folderPathResponses;
+	}
+
+	public ProfMountPointResponse unAllocateFolders(int folderId) {
+		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
+		try {
+			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

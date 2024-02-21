@@ -5,9 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Component;
 
+import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.model.ProfMountPointOverallResponse;
 import com.proflaut.dms.model.ProfMountPointRequest;
@@ -52,7 +54,7 @@ public class MountPointHelper {
 
 		return overallResponse;
 	}
-
+	
 	public ProfMountPointFolderMappingEntity convertRequestToMappingEntity(
 			ProfMountFolderMappingRequest folderMappingRequest, ProfUserPropertiesEntity entity2) {
 		ProfMountPointFolderMappingEntity entity = new ProfMountPointFolderMappingEntity();
@@ -61,6 +63,13 @@ public class MountPointHelper {
 		entity.setFolderId(folderMappingRequest.getFolderId());
 		entity.setMountPointId(folderMappingRequest.getMountPointId());
 		return entity;
+	}
+
+	public FolderPathResponse convertRequestToFolderResponse(FolderEntity folderEntity) {
+		FolderPathResponse folderPathResponse=new FolderPathResponse();
+		folderPathResponse.setFolderID(folderEntity.getId());
+		folderPathResponse.setFolderName(folderEntity.getFolderName());
+		return folderPathResponse;
 	}
 
 }

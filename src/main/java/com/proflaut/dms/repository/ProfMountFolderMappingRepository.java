@@ -6,4 +6,6 @@ import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 
 public interface ProfMountFolderMappingRepository extends JpaRepository<ProfMountPointFolderMappingEntity, Integer>{
 
+	ProfMountPointFolderMappingEntity findByMountPointId(int id);
+
 }
