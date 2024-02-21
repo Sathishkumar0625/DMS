@@ -386,8 +386,8 @@ public class MetaServiceImpl {
 
 			// Add document details to record
 			if (!docEntities.isEmpty()) {
-				ProfDocEntity docEntity = docEntities.get(0); // Assuming only one document for each doc_id
-				reco.put("document_details", docEntity); // Add document details to record
+				ProfDocEntity docEntity = docEntities.get(0); 
+				reco.put("document_details", docEntity); 
 			}
 			// Add columns from ProfMetaDataPropertiesEntity
 			for (int i = 0; i < dataPropertiesEntity.size(); i++) {

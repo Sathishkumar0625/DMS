@@ -1,7 +1,6 @@
 package com.proflaut.dms.model;
 
 public class ProfSignupUserRequest {
-	private String userName;
 	private String webAccess;
 	private String adminAccess;
 	private String email;
@@ -13,14 +12,6 @@ public class ProfSignupUserRequest {
 
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	public String getWebAccess() {

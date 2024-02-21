@@ -23,6 +23,16 @@ public class ProfOveralUserInfoResponse {
 
 	private String mobileNo;
 
+	private String ldap;
+
+	public String getLdap() {
+		return ldap;
+	}
+
+	public void setLdap(String ldap) {
+		this.ldap = ldap;
+	}
+
 	public String getLocation() {
 		return location;
 	}

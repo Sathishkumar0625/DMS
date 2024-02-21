@@ -43,5 +43,15 @@
     "name": "json.headerFile.path",
     "type": "java.lang.String",
     "description": "A description for 'json.headerFile.path'"
+  },
+  {
+    "name": "json.headerFile.path",
+    "type": "java.lang.String",
+    "description": "A description for 'json.headerFile.path'"
+  },
+  {
+    "name": "invoice.output.fileName",
+    "type": "java.lang.String",
+    "description": "A description for 'invoice.output.fileName'"
   }
 ]}

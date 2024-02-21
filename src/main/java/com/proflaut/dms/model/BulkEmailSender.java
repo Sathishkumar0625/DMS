@@ -43,10 +43,15 @@ public class BulkEmailSender {
 	}
 
 	private MimeMessage buildMimeMessage() {
-		final String username = "pdineshofficial@gmail.com";// change accordingly
-		final String password = "ykkekdkvlautwqex";// change accordingly
+//		final String username = "pdineshofficial@gmail.com";// change accordingly
+//		final String password = "ykkekdkvlautwqex";// change accordingly
+//		final String username = "sathishsjroman@gmail.com";// change accordingly
+//		final String password = "heqrgvtwhjghjgmc";// change accordingly
+		final String username = "sathishkumar@proflaut.com";// change accordingly
+		final String password = "igwmiafnylucedbq";
 		// Get the Session object.
 		Session session = Session.getInstance(emailConfig, new javax.mail.Authenticator() {
+			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}

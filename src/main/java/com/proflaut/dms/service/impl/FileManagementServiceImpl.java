@@ -180,7 +180,6 @@ public class FileManagementServiceImpl {
 					configRepository.save(configEntity);
 					docEntity.setEmilResId(String.valueOf(configEntity.getId()));
 					profDocUploadRepository.updateEmailResIdAndIsEmail(String.valueOf(configEntity.getId()),"Y", docEntity.getId());
-//					profDocUploadRepository.updateIsEmail("Y", docEntity.getId());
 					emailShareResponse.setStatus(DMSConstant.MESSAGE);
 					emailShareResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
@@ -188,7 +187,7 @@ public class FileManagementServiceImpl {
 					emailShareResponse.setStatus(DMSConstant.FAILURE);
 				}
 			} else {
-				throw new CustomException("docName or folderPath is null");
+				throw new CustomException("docName is Null");
 			}
 
 		} catch (CustomException ce) {

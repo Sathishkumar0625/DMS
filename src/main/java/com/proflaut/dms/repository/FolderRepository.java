@@ -27,4 +27,6 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
 	List<FolderEntity> findByParentFolderID(int parentFolderID);
 
+	FolderEntity findByFolderNameIgnoreCase(String path);
+
 }

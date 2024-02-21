@@ -122,6 +122,7 @@ public class AccessRightsHelper {
 		accessRightsEntity.setView(accessRightsUpdateRequest.getView());
 		accessRightsEntity.setWrite(accessRightsUpdateRequest.getWrite());
 		return accessRightsEntity;
+		
 	}
 
 }

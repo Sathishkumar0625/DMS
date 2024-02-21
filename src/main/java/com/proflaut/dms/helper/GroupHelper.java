@@ -95,6 +95,7 @@ public class GroupHelper {
 		response.setWebAccess(profUserInfoEntity.getWebAccess());
 		response.setMobileNo(profUserInfoEntity.getMobileNo());
 		response.setLocation(profUserInfoEntity.getLocation());
+		response.setLdap(profUserInfoEntity.getLdap());
 		return response;
 	}
 
@@ -162,7 +163,6 @@ public class GroupHelper {
 		entity.setAdminAccesss(userRequest.getAdminAccess());
 		entity.setEmail(userRequest.getEmail());
 		entity.setWebAccess(userRequest.getWebAccess());
-		entity.setUserName(userRequest.getUserName());
 		entity.setStatus(userRequest.getStatus());
 		return entity;
 	}
