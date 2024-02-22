@@ -1,6 +1,7 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,12 +21,14 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
+import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
+import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
@@ -62,6 +65,9 @@ public class FolderServiceImpl {
 	@Autowired
 	ProfAccessRightRepository accessRightRepository;
 
+	@Autowired
+	MountPointServiceImpl pointServiceImpl;
+
 	public FileResponse saveFolder(FolderFO folderFO, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
 		try {
@@ -77,8 +83,13 @@ public class FolderServiceImpl {
 					return fileResponse;
 				}
 
-				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse, propertiesEntity);
+				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse, propertiesEntity, token);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
+				List<Integer> digits = convertToArrayList(folderEnt.getId());
+				ProfMountFolderMappingRequest folderMappingRequest = new ProfMountFolderMappingRequest();
+				folderMappingRequest.setMountPointId(folderFO.getMountId());
+				folderMappingRequest.setFolderId(digits);
+				pointServiceImpl.saveMountPointMapping(folderMappingRequest, token);
 				fileResponse.setId(folderRespEnt.getId());
 				fileResponse.setFolderPath(folderRespEnt.getFolderPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
@@ -91,6 +102,15 @@ public class FolderServiceImpl {
 			throw new CustomException(e.getMessage());
 		}
 		return fileResponse;
+	}
+
+	private List<Integer> convertToArrayList(Integer id) {
+		List<Integer> digits = new ArrayList<>();
+		while (id > 0) {
+			digits.add(0, id % 10);
+			id /= 10;
+		}
+		return digits;
 	}
 
 	public FileResponse retriveFile(Integer id) {

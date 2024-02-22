@@ -1,5 +1,7 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -16,6 +18,26 @@ public class FolderFO {
 
 	@NotBlank(message = "Meta Data Id cannot be blank")
 	private String metaDataId;
+
+	private int mountId;
+
+	private List<Integer> folderId;
+
+	public int getMountId() {
+		return mountId;
+	}
+
+	public void setMountId(int mountId) {
+		this.mountId = mountId;
+	}
+
+	public List<Integer> getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(List<Integer> folderId) {
+		this.folderId = folderId;
+	}
 
 	public String getFolderName() {
 		return folderName;

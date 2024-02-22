@@ -29,6 +29,7 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
+import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
@@ -36,6 +37,7 @@ import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
+import com.proflaut.dms.service.impl.MountPointServiceImpl;
 
 @Component
 public class FolderHelper {
@@ -64,6 +66,8 @@ public class FolderHelper {
 
 	@Autowired
 	ProfAccessRightRepository accessRightRepository;
+	@Autowired
+	MountPointServiceImpl mountPointServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(FolderHelper.class);
 
@@ -74,7 +78,7 @@ public class FolderHelper {
 	}
 
 	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse,
-			ProfUserPropertiesEntity propertiesEntity) {
+			ProfUserPropertiesEntity propertiesEntity, String token) {
 
 		FolderEntity ent = new FolderEntity();
 //		folderPath = storeFolder(fileResponse, folderFO);
