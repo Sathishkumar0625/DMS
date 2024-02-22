@@ -222,7 +222,7 @@ public class FolderHelper {
 			folderPathResponse.setIsParent(folderEntity.getIsParent());
 			folderPathResponse.setCreatedAt(folderEntity.getCreatedAt());
 			folderPathResponse.setCreatedBy(folderEntity.getCreatedBy());
-			folderPathResponse.setFolderID(folderEntity.getId());
+			folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 			folderPathResponse.setFolderName(folderEntity.getFolderName());
 			folderPathResponse.setMetaId(folderEntity.getMetaId());
 

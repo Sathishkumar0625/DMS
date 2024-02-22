@@ -33,4 +33,7 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
 	List<FolderEntity> getById(int folderId);
 
+	@Query("SELECT f FROM FolderEntity f WHERE f.id NOT IN :ids")
+	List<FolderEntity> findAllByIdNotIn(@Param("ids") List<Integer> ids);
+
 }

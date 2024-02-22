@@ -12,6 +12,7 @@ import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FolderPathResponse;
+import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.model.ProfMountPointOverallResponse;
 import com.proflaut.dms.model.ProfMountPointRequest;
@@ -74,27 +75,17 @@ public class MountPointHelper {
 
 	public FolderPathResponse convertRequestToFolderResponse(FolderEntity folderEntity) {
 		FolderPathResponse folderPathResponse = new FolderPathResponse();
-		folderPathResponse.setFolderID(folderEntity.getId());
+		folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 		folderPathResponse.setFolderName(folderEntity.getFolderName());
 		return folderPathResponse;
 	}
 
 	public FolderPathResponse convertrequestToAllocateResponse(List<FolderEntity> entities) {
-		FolderPathResponse folderPathResponse=new FolderPathResponse();
+		FolderPathResponse folderPathResponse = new FolderPathResponse();
 		for (FolderEntity folderEntity : entities) {
 			folderPathResponse.setFolderName(folderEntity.getFolderName());
-			folderPathResponse.setFolderID(folderEntity.getId());
+			folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 		}
 		return folderPathResponse;
 	}
-
-	public FolderPathResponse convertRequestToFolderResponses(List<FolderEntity> entity) {
-		FolderPathResponse folderPathResponse=new FolderPathResponse();
-		for (FolderEntity folderEntity : entity) {
-			folderPathResponse.setFolderID(folderEntity.getId());
-			folderPathResponse.setFolderName(folderEntity.getFolderName());
-		}
-		return folderPathResponse;
-	}
-
 }

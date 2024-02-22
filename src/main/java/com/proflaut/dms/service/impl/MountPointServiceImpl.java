@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.nio.file.Files;
@@ -135,10 +137,11 @@ public class MountPointServiceImpl {
 					folderPathResponses.add(pathResponse);
 				}
 			} else {
-
-				for (ProfMountPointFolderMappingEntity folderEntity : folderMappingEntity) {
-					List<FolderEntity> entity = folderRepository.findAllByIdNot(folderEntity.getFolderId());
-					FolderPathResponse pathResponse = helper.convertRequestToFolderResponses(entity);
+				List<Integer> folderIds = folderMappingEntity.stream().map(ProfMountPointFolderMappingEntity::getFolderId)
+						.collect(Collectors.toList());
+				List<FolderEntity> entities = folderRepository.findAllByIdNotIn(folderIds);
+				for (FolderEntity folderEntity : entities) {
+					FolderPathResponse pathResponse = helper.convertRequestToFolderResponse(folderEntity);
 					folderPathResponses.add(pathResponse);
 				}
 			}

@@ -1,5 +1,7 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -7,13 +9,22 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class FolderPathResponse {
 	private String folderPath;
 	private String isParent;
-	private int folderID;
+	private String folderID;
 	private String folderName;
 	private String metaId;
 	private String createdBy;
 	private String createdAt;
 	private String view;
 	private String write;
+	private List<Folders> folders;
+
+	public List<Folders> getFolders() {
+		return folders;
+	}
+
+	public void setFolders(List<Folders> folders) {
+		this.folders = folders;
+	}
 
 	public String getView() {
 		return view;
@@ -47,11 +58,11 @@ public class FolderPathResponse {
 		this.createdAt = createdAt;
 	}
 
-	public int getFolderID() {
+	public String getFolderID() {
 		return folderID;
 	}
 
-	public void setFolderID(int folderID) {
+	public void setFolderID(String folderID) {
 		this.folderID = folderID;
 	}
 
