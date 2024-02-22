@@ -154,14 +154,12 @@ public class MountPointServiceImpl {
 			ProfMountPointFolderMappingEntity entity = folderMappingRepository.findByFolderIdAndMountPointId(folderId,
 					mountId);
 			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(entity.getFolderId());
-			for (ProfDocEntity profDocEntity : docEntity) {
-				if (profDocEntity.getDocPath().isEmpty()) {
-					folderMappingRepository.delete(entity);
-					mountPointResponse.setStatus(DMSConstant.SUCCESS);
-				} else {
-					mountPointResponse.setStatus(DMSConstant.FAILURE);
-					mountPointResponse.setErrorMessage("File Exist in the Folder");
-				}
+			if (docEntity.isEmpty()) {
+				folderMappingRepository.delete(entity);
+				mountPointResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				mountPointResponse.setStatus(DMSConstant.FAILURE);
+				mountPointResponse.setErrorMessage("File Exist in the Folder");
 			}
 
 		} catch (Exception e) {
