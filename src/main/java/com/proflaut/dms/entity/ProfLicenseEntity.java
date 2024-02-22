@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "PROF_LICENSE")
-public class ProflautLicense {
+public class ProfLicenseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
