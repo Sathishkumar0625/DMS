@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,11 @@ public class MountPointController {
 	@PostMapping("/saveMountPoint")
 	public ResponseEntity<ProfMountPointResponse> saveMount(@RequestHeader("token") String token,
 			@RequestBody ProfMountPointRequest mountPointRequest) {
+		if (StringUtils.isEmpty(mountPointRequest.getPath())) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		ProfMountPointResponse mountPointResponse = null;
 		try {
 			mountPointResponse = mountPointServiceImpl.saveMountPoint(mountPointRequest, token);
@@ -72,6 +78,10 @@ public class MountPointController {
 
 	@GetMapping("/getMountPointById/{id}")
 	public ResponseEntity<ProfMountPointOverallResponse> getMountPoint(@PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfMountPointOverallResponse overallResponses = null;
 		try {
 			overallResponses = mountPointServiceImpl.findById(id);
@@ -91,6 +101,10 @@ public class MountPointController {
 	@PostMapping("/saveMountMapping")
 	public ResponseEntity<ProfMountPointResponse> saveFolderMapping(@RequestHeader("token") String token,
 			@RequestBody ProfMountFolderMappingRequest folderMappingRequest) {
+		if (StringUtils.isEmpty(folderMappingRequest.getMountPointId())) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfMountPointResponse mountPointResponse = null;
 		try {
 			mountPointResponse = mountPointServiceImpl.saveMountPointMapping(folderMappingRequest, token);
@@ -111,14 +125,18 @@ public class MountPointController {
 
 	@GetMapping("/getAllNotAllocateFolders/{id}")
 	public ResponseEntity<List<FolderPathResponse>> getAllNotAllocateFolders(@PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		List<FolderPathResponse> folderPathResponses = null;
 		try {
 			folderPathResponses = mountPointServiceImpl.getAllNotAllocate(id);
 			if (!folderPathResponses.isEmpty()) {
-				logger.info("GET ALL MOUNT POINT SUCCESS");
+				logger.info("GET ALL NOT ALLOCATE FOLDERS SUCCESS");
 				return new ResponseEntity<>(folderPathResponses, HttpStatus.OK);
 			} else {
-				logger.info("GET ALL MOUNT POINT FAILURE");
+				logger.info("GET ALL NOT ALLOCATE FOLDERS FAILURE");
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
@@ -130,14 +148,18 @@ public class MountPointController {
 
 	@GetMapping("/getAllAllocateFolders/{id}")
 	public ResponseEntity<List<FolderPathResponse>> getAllAllocateFolders(@PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		List<FolderPathResponse> folderPathResponses = null;
 		try {
 			folderPathResponses = mountPointServiceImpl.getAllAllocate(id);
 			if (!folderPathResponses.isEmpty()) {
-				logger.info("GET ALL MOUNT POINT SUCCESS");
+				logger.info("GET ALL ALLOCATE FOLDERS SUCCESS");
 				return new ResponseEntity<>(folderPathResponses, HttpStatus.OK);
 			} else {
-				logger.info("GET ALL MOUNT POINT FAILURE");
+				logger.info("GET ALL ALLOCATE FOLDERS FAILURE");
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
@@ -150,14 +172,18 @@ public class MountPointController {
 	@DeleteMapping("/unAllocateFolders")
 	public ResponseEntity<ProfMountPointResponse> unAllocate(@RequestParam("folderId") int folderId,
 			@RequestParam("mountId") int mountId) {
+		if (StringUtils.isEmpty(folderId) || StringUtils.isEmpty(mountId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		ProfMountPointResponse mountPointResponse = null;
 		try {
 			mountPointResponse = mountPointServiceImpl.unAllocateFolders(folderId, mountId);
 			if (!mountPointResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
-				logger.info("SAVE MOUNT POINT SUCCESS");
+				logger.info("UNALLOCATE FOLDERS SUCCESS");
 				return new ResponseEntity<>(mountPointResponse, HttpStatus.OK);
 			} else {
-				logger.info("SAVE MOUNT POINT FAILURE");
+				logger.info("UNALLOCATE FOLDERS FAILURE");
 				mountPointResponse.setStatus(DMSConstant.FAILURE);
 				return new ResponseEntity<>(mountPointResponse, HttpStatus.NOT_FOUND);
 			}

@@ -88,4 +88,13 @@ public class MountPointHelper {
 		return folderPathResponse;
 	}
 
+	public FolderPathResponse convertRequestToFolderResponses(List<FolderEntity> entity) {
+		FolderPathResponse folderPathResponse=new FolderPathResponse();
+		for (FolderEntity folderEntity : entity) {
+			folderPathResponse.setFolderID(folderEntity.getId());
+			folderPathResponse.setFolderName(folderEntity.getFolderName());
+		}
+		return folderPathResponse;
+	}
+
 }
