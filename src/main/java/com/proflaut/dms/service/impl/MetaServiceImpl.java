@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,6 +36,7 @@ import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.MetaHelper;
 import com.proflaut.dms.model.CreateTableRequest;
+import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
@@ -413,11 +416,56 @@ public class MetaServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity=metaDataRepository.findById(metaId);
 			String tableName=dataEntity.getTableName();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+			String currentTableName =tableName;
+	        String currentFileExtension = dataEntity.getFileExtension();
+	        
+	        // Extract updated table details from the request
+	        String updatedTableName = createTableRequest.getTableName();
+	        String updatedFileExtension = createTableRequest.getFileExtension();
+	        List<FieldDefnition> updatedFields = createTableRequest.getFields();
+
+	        // If the table name or file extension has changed, update them
+	        if (!currentTableName.equals(updatedTableName) || !currentFileExtension.equals(updatedFileExtension)) {
+	            dataEntity.setTableName(updatedTableName);
+	            dataEntity.setFileExtension(updatedFileExtension);
+	            metaDataRepository.save(dataEntity);
+	        }
+
+	        // Get the existing column names in the table
+	        List<ProfMetaDataPropertiesEntity> existingColumns = dataPropRepository.findByMetaId(String.valueOf(metaId));
+	        Set<String> existingColumnNames = existingColumns.stream()
+	                .map(ProfMetaDataPropertiesEntity::getFieldNames)
+	                .collect(Collectors.toSet());
+	        // Iterate over the updated fields and add new columns if necessary
+	        for (FieldDefnition updatedField : updatedFields) {
+	            String updatedFieldName = updatedField.getFieldName().trim().replace(" ", "_");
+	            String updatedDatabaseType = getDatabaseType(updatedField.getFieldType());
+
+	            // If the updated field name does not exist in the table, add a new column
+	            if (!existingColumnNames.contains(updatedFieldName)) {
+	                String addColumnQuery = "ALTER TABLE " + tableName + " ADD COLUMN " +
+	                        updatedFieldName + " " + updatedDatabaseType;
+	                entityManager.createNativeQuery(addColumnQuery).executeUpdate();
+	            }
+	        }
+
+	        dataResponse.setStatus(DMSConstant.SUCCESS);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        dataResponse.setStatus(DMSConstant.FAILURE);
+	        dataResponse.setErrorMessage("An error occurred while updating the table");
+	    }
+	    return dataResponse;
+	}
+	
+	private String getDatabaseType(String fieldType) {
+		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
+			return "VARCHAR(255)";
+		} else if ("Integer".equalsIgnoreCase(fieldType)) {
+			return "BIGINT";
+		} else {
+			return fieldType;
 		}
-		return null;
 	}
 
 	

@@ -50,7 +50,7 @@ public class FolderController {
 			@Valid @RequestBody FolderFO folderFO) {
 
 		if (StringUtils.isEmpty(folderFO.getFolderName()) || StringUtils.isEmpty(folderFO.getMetaDataId())
-				|| StringUtils.isEmpty(token)) {
+				|| StringUtils.isEmpty(token) || StringUtils.isEmpty(folderFO.getMountId())) {
 			logger.warn(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
