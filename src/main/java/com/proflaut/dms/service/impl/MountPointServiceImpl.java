@@ -109,9 +109,9 @@ public class MountPointServiceImpl {
 		ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
 		try {
 			if (!entity.getToken().isEmpty()) {
-				ProfMountPointFolderMappingEntity folderMappingEntity = helper
+				List<ProfMountPointFolderMappingEntity> folderMappingEntity = helper
 						.convertRequestToMappingEntity(folderMappingRequest, entity);
-				folderMappingRepository.save(folderMappingEntity);
+				folderMappingRepository.saveAll(folderMappingEntity);
 				mountPointResponse.setStatus(DMSConstant.SUCCESS);
 
 			} else {
@@ -127,7 +127,7 @@ public class MountPointServiceImpl {
 
 	public List<FolderPathResponse> getAllNotAllocate(int id) {
 		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
-		ProfMountPointFolderMappingEntity folderMappingEntity = folderMappingRepository.findByMountPointId(id);
+		List<ProfMountPointFolderMappingEntity> folderMappingEntity = folderMappingRepository.findByMountPointId(id);
 		try {
 			if (folderMappingEntity == null) {
 				List<FolderEntity> entity = folderRepository.findAll();
@@ -152,6 +152,7 @@ public class MountPointServiceImpl {
 		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
 		try {
 			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderId);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,8 +1,10 @@
 package com.proflaut.dms.model;
 
+import java.util.List;
+
 public class ProfMountFolderMappingRequest {
 	private int mountPointId;
-	private int folderId;
+	private List<Integer> folderId;
 
 	public int getMountPointId() {
 		return mountPointId;
@@ -12,11 +14,11 @@ public class ProfMountFolderMappingRequest {
 		this.mountPointId = mountPointId;
 	}
 
-	public int getFolderId() {
+	public List<Integer> getFolderId() {
 		return folderId;
 	}
 
-	public void setFolderId(int folderId) {
+	public void setFolderId(List<Integer> folderId) {
 		this.folderId = folderId;
 	}
 

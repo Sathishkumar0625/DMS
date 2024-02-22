@@ -2,6 +2,8 @@ package com.proflaut.dms.helper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -54,19 +56,24 @@ public class MountPointHelper {
 
 		return overallResponse;
 	}
-	
-	public ProfMountPointFolderMappingEntity convertRequestToMappingEntity(
+
+	public List<ProfMountPointFolderMappingEntity> convertRequestToMappingEntity(
 			ProfMountFolderMappingRequest folderMappingRequest, ProfUserPropertiesEntity entity2) {
-		ProfMountPointFolderMappingEntity entity = new ProfMountPointFolderMappingEntity();
-		entity.setCreatedAt(formatCurrentDateTime());
-		entity.setCreatedBy(entity2.getUserName());
-		entity.setFolderId(folderMappingRequest.getFolderId());
-		entity.setMountPointId(folderMappingRequest.getMountPointId());
-		return entity;
+		List<ProfMountPointFolderMappingEntity> entities = new ArrayList<>();
+
+		for (Integer folderId : folderMappingRequest.getFolderId()) {
+			ProfMountPointFolderMappingEntity entity = new ProfMountPointFolderMappingEntity();
+			entity.setFolderId(folderId);
+			entity.setCreatedAt(formatCurrentDateTime());
+			entity.setCreatedBy(entity2.getUserName());
+			entity.setMountPointId(folderMappingRequest.getMountPointId());
+			entities.add(entity);
+		}
+		return entities;
 	}
 
 	public FolderPathResponse convertRequestToFolderResponse(FolderEntity folderEntity) {
-		FolderPathResponse folderPathResponse=new FolderPathResponse();
+		FolderPathResponse folderPathResponse = new FolderPathResponse();
 		folderPathResponse.setFolderID(folderEntity.getId());
 		folderPathResponse.setFolderName(folderEntity.getFolderName());
 		return folderPathResponse;
