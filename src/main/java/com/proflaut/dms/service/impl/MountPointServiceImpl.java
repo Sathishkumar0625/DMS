@@ -148,14 +148,19 @@ public class MountPointServiceImpl {
 		return folderPathResponses;
 	}
 
-	public ProfMountPointResponse unAllocateFolders(int folderId) {
+	public ProfMountPointResponse unAllocateFolders(int folderId, int mountId) {
 		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
 		try {
-			ProfMountPointFolderMappingEntity entity = folderMappingRepository.findByFolderId(folderId);
-			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderId);
+			ProfMountPointFolderMappingEntity entity = folderMappingRepository.findByFolderIdAndMountPointId(folderId,
+					mountId);
+			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(entity.getFolderId());
 			for (ProfDocEntity profDocEntity : docEntity) {
-				if (profDocEntity.getDocPath() == null) {
-					folderMappingRepository.delete(null);
+				if (profDocEntity.getDocPath().isEmpty()) {
+					folderMappingRepository.delete(entity);
+					mountPointResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
+					mountPointResponse.setStatus(DMSConstant.FAILURE);
+					mountPointResponse.setErrorMessage("File Exist in the Folder");
 				}
 			}
 

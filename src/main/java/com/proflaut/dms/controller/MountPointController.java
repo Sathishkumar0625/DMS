@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.FolderPathResponse;
@@ -126,6 +127,7 @@ public class MountPointController {
 		}
 
 	}
+
 	@GetMapping("/getAllAllocateFolders/{id}")
 	public ResponseEntity<List<FolderPathResponse>> getAllAllocateFolders(@PathVariable int id) {
 		List<FolderPathResponse> folderPathResponses = null;
@@ -145,12 +147,12 @@ public class MountPointController {
 
 	}
 
-
-	@DeleteMapping("/unAllocateFolders/{folderId}")
-	public ResponseEntity<ProfMountPointResponse> unAllocate(@PathVariable int folderId) {
+	@DeleteMapping("/unAllocateFolders")
+	public ResponseEntity<ProfMountPointResponse> unAllocate(@RequestParam("folderId") int folderId,
+			@RequestParam("mountId") int mountId) {
 		ProfMountPointResponse mountPointResponse = null;
 		try {
-			mountPointResponse = mountPointServiceImpl.unAllocateFolders(folderId);
+			mountPointResponse = mountPointServiceImpl.unAllocateFolders(folderId, mountId);
 			if (!mountPointResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				logger.info("SAVE MOUNT POINT SUCCESS");
 				return new ResponseEntity<>(mountPointResponse, HttpStatus.OK);

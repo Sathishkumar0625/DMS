@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 
-public interface ProfMountFolderMappingRepository extends JpaRepository<ProfMountPointFolderMappingEntity, Integer>{
+public interface ProfMountFolderMappingRepository extends JpaRepository<ProfMountPointFolderMappingEntity, Integer> {
 
 	List<ProfMountPointFolderMappingEntity> findByMountPointId(int id);
 
 	ProfMountPointFolderMappingEntity findByFolderId(int folderId);
+
+	ProfMountPointFolderMappingEntity findByFolderIdAndMountPointId(int folderId, int mountId);
 
 }
