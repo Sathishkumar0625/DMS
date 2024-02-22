@@ -164,6 +164,11 @@ public class GroupHelper {
 		entity.setEmail(userRequest.getEmail());
 		entity.setWebAccess(userRequest.getWebAccess());
 		entity.setStatus(userRequest.getStatus());
+		entity.setLdap(userRequest.getLdap());
+		entity.setLocation(userRequest.getLocation());
+		entity.setMobileNo(userRequest.getMobileNumber());
+		entity.setPassword(userRequest.getPassword());
+		entity.setUserName(userRequest.getUserName());
 		return entity;
 	}
 
@@ -216,7 +221,7 @@ public class GroupHelper {
 	}
 
 	public ProfOveralUserInfoResponse convertGroupUserToResponse(List<ProfUserInfoEntity> infoEntities) {
-		ProfOveralUserInfoResponse infoResponses=new ProfOveralUserInfoResponse();
+		ProfOveralUserInfoResponse infoResponses = new ProfOveralUserInfoResponse();
 		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
 			infoResponses.setUserId(profUserInfoEntity.getUserId());
 			infoResponses.setUserName(profUserInfoEntity.getUserName());

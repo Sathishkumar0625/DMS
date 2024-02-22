@@ -39,6 +39,8 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
+import com.proflaut.dms.entity.ProfMountPointEntity;
+import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfOldImageEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
@@ -51,6 +53,7 @@ import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfMountPointRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
@@ -80,6 +83,9 @@ public class FileHelper {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	@Autowired
+	ProfMountPointRepository mountPointRepository;
 
 	private static final Logger logger = LogManager.getLogger(FileHelper.class);
 
@@ -90,14 +96,15 @@ public class FileHelper {
 	}
 
 	@Transactional
-	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token) throws CustomException {
+	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token, ProfMountPointFolderMappingEntity folderMappingEntity) throws CustomException {
 		boolean isFileCreated = false;
 		String fileName = null;
 		try {
+			ProfMountPointEntity mountPointEntity=mountPointRepository.findById(folderMappingEntity.getMountPointId());
 			FolderEntity entity = folderRepository.findById(Integer.parseInt(fileRequest.getFolderId()));
-
-			if (entity != null) {
-				String path = entity.getIsParent();
+			
+			if (entity != null && mountPointEntity.getPath() != null) {
+				String path = mountPointEntity.getPath();
 				UUID uuid = UUID.randomUUID();
 				fileName = uuid.toString();
 

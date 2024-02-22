@@ -81,7 +81,7 @@ public class AccessRightsHelper {
 	}
 
 	public ProfOverallAccessRightsResponse convertAccessEntityToResponse(ProfAccessRightsEntity accessRightsEntity,
-			ProfMetaDataEntity dataEntity, int id) {
+			ProfMetaDataEntity dataEntity) {
 		ProfOverallAccessRightsResponse accessRightsResponse = new ProfOverallAccessRightsResponse();
 		accessRightsResponse.setId(accessRightsEntity.getId());
 		accessRightsResponse.setMetaId(accessRightsEntity.getMetaId());

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -172,4 +173,28 @@ public class MetaController {
 		}
 		
 	}
+	@PostMapping("/updateTable/{metaId}")
+	public ResponseEntity<ProfMetaDataResponse> updateTable(@RequestHeader("token") String token,
+			@Valid @RequestBody CreateTableRequest createTableRequest,@PathVariable int metaId) {
+		if (StringUtils.isEmpty(metaId) || StringUtils.isEmpty(createTableRequest.getTableName())
+				|| StringUtils.isEmpty(createTableRequest.getFileExtension())) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
+		try {
+			metaDataResponse = metaServiceImpl.updateTable(createTableRequest,metaId);
+			if (!metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return ResponseEntity.ok(metaDataResponse);
+			} else {
+				return new ResponseEntity<>(metaDataResponse, HttpStatus.NOT_ACCEPTABLE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			metaDataResponse.setStatus(DMSConstant.FAILURE);
+			metaDataResponse.setErrorMessage(e.getMessage());
+			return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 }

@@ -331,7 +331,7 @@ public class MetaHelper {
 		for (FieldDefnition field : createTableRequest.getFields()) {
 			ProfMetaDataPropertiesEntity metaDataProperties = new ProfMetaDataPropertiesEntity();
 			metaDataProperties.setMetaId(String.valueOf(dataEnt.getId()));
-			String originalFieldName = field.getFieldName().replace(" ", "_");
+			String originalFieldName = field.getFieldName().trim().replace(" ", "_");
 			metaDataProperties.setFieldNames(originalFieldName);
 			metaDataProperties.setFieldType(field.getFieldType());
 			metaDataProperties.setMandatory(field.getMandatory());

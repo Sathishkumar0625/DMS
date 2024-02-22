@@ -24,6 +24,7 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
+import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -40,6 +41,7 @@ import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
+import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -81,6 +83,9 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	MetaServiceImpl metaServiceImpl;
+	
+	@Autowired
+	ProfMountFolderMappingRepository folderMappingRepository;
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -92,10 +97,11 @@ public class FileManagementServiceImpl {
 		try {
 			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
+			ProfMountPointFolderMappingEntity entity=folderMappingRepository.findByFolderId(Integer.parseInt( fileRequest.getFolderId()));
 			if (profUserInfoEntity == null) {
 				throw new CustomException("ProfUserInfoEntity not found for userId: " + userProp.getUserId());
 			}
-			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token)) {
+			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token,entity)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 				transactionManager.commit(status);

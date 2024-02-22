@@ -73,7 +73,7 @@ public class AccessRightsServiceImpl {
 				ProfMetaDataEntity dataEntity = dataRepository
 						.findById(Integer.parseInt(accessRightsEntity.getMetaId()));
 				if (dataEntity != null) {
-					accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity, dataEntity, id);
+					accessRightsResponse = helper.convertAccessEntityToResponse(accessRightsEntity, dataEntity);
 				}
 			}
 		} catch (Exception e) {

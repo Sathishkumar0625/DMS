@@ -13,6 +13,8 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.Valid;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.logging.log4j.LogManager;
@@ -404,4 +406,19 @@ public class MetaServiceImpl {
 		return documentRepository.findById(docId);
 	}
 
+	
+
+	public ProfMetaDataResponse updateTable(@Valid CreateTableRequest createTableRequest, int metaId) {
+		ProfMetaDataResponse dataResponse=new ProfMetaDataResponse();
+		try {
+			ProfMetaDataEntity dataEntity=metaDataRepository.findById(metaId);
+			String tableName=dataEntity.getTableName();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
 }

@@ -4,7 +4,52 @@ public class ProfSignupUserRequest {
 	private String webAccess;
 	private String adminAccess;
 	private String email;
+	private String userName;
+	private String location;
+	private String mobileNumber;
+	private String ldap;
+	private String password;
 	private String status;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+
+	public String getLdap() {
+		return ldap;
+	}
+
+	public void setLdap(String ldap) {
+		this.ldap = ldap;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 	public String getStatus() {
 		return status;

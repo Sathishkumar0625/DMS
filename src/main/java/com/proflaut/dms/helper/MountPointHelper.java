@@ -12,7 +12,6 @@ import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FolderPathResponse;
-import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.model.ProfMountPointOverallResponse;
 import com.proflaut.dms.model.ProfMountPointRequest;
