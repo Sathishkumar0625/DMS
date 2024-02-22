@@ -151,12 +151,37 @@ public class MountPointServiceImpl {
 	public ProfMountPointResponse unAllocateFolders(int folderId) {
 		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
 		try {
+			ProfMountPointFolderMappingEntity entity = folderMappingRepository.findByFolderId(folderId);
 			List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderId);
+			for (ProfDocEntity profDocEntity : docEntity) {
+				if (profDocEntity.getDocPath() == null) {
+					folderMappingRepository.delete(null);
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return mountPointResponse;
+	}
+
+	public List<FolderPathResponse> getAllAllocate(int mountId) {
+		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
+		try {
+			List<ProfMountPointFolderMappingEntity> mappingEntities = folderMappingRepository
+					.findByMountPointId(mountId);
+			if (!mappingEntities.isEmpty()) {
+				for (ProfMountPointFolderMappingEntity profMountPointFolderMappingEntity : mappingEntities) {
+					List<FolderEntity> entities = folderRepository
+							.getById(profMountPointFolderMappingEntity.getFolderId());
+					FolderPathResponse pathResponse = helper.convertrequestToAllocateResponse(entities);
+					folderPathResponses.add(pathResponse);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return folderPathResponses;
 	}
 
 }

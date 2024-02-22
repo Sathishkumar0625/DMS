@@ -126,6 +126,26 @@ public class MountPointController {
 		}
 
 	}
+	@GetMapping("/getAllAllocateFolders/{id}")
+	public ResponseEntity<List<FolderPathResponse>> getAllAllocateFolders(@PathVariable int id) {
+		List<FolderPathResponse> folderPathResponses = null;
+		try {
+			folderPathResponses = mountPointServiceImpl.getAllAllocate(id);
+			if (!folderPathResponses.isEmpty()) {
+				logger.info("GET ALL MOUNT POINT SUCCESS");
+				return new ResponseEntity<>(folderPathResponses, HttpStatus.OK);
+			} else {
+				logger.info("GET ALL MOUNT POINT FAILURE");
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+
 	@DeleteMapping("/unAllocateFolders/{folderId}")
 	public ResponseEntity<ProfMountPointResponse> unAllocate(@PathVariable int folderId) {
 		ProfMountPointResponse mountPointResponse = null;
@@ -145,5 +165,4 @@ public class MountPointController {
 		}
 	}
 
-	
 }

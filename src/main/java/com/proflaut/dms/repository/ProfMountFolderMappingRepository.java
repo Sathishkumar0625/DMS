@@ -10,4 +10,6 @@ public interface ProfMountFolderMappingRepository extends JpaRepository<ProfMoun
 
 	List<ProfMountPointFolderMappingEntity> findByMountPointId(int id);
 
+	ProfMountPointFolderMappingEntity findByFolderId(int folderId);
+
 }
