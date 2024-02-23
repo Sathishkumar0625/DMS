@@ -128,7 +128,7 @@ public class AccessRightsHelper {
 		accessRightsEntity.setWrite(accessRightsUpdateRequest.getWrite());
 
 		List<ProfAccessGroupMappingEntity> groupMappingEntities = new ArrayList<>();
-		for (ProfAccessGroupMappingRequest groupMappingRequest : accessRightsUpdateRequest.getGroups()) {
+		for (ProfAccessGroupMappingRequest groupMappingRequest : accessRightsUpdateRequest.getGroup()) {
 			ProfAccessGroupMappingEntity groupMappingEntity = new ProfAccessGroupMappingEntity();
 			groupMappingEntity.setGroupId(groupMappingRequest.getGroupId());
 			groupMappingEntity.setGroupName(groupMappingRequest.getGroupName());
@@ -138,7 +138,7 @@ public class AccessRightsHelper {
 		accessRightsEntity.setAccessGroupMappingEntities(groupMappingEntities);
 
 		List<ProfAccessUserMappingEntity> userMappingEntities = new ArrayList<>();
-		for (ProfAccessUserMappingRequest userMappingRequest : accessRightsUpdateRequest.getUsers()) {
+		for (ProfAccessUserMappingRequest userMappingRequest : accessRightsUpdateRequest.getUser()) {
 			ProfAccessUserMappingEntity userMappingEntity = new ProfAccessUserMappingEntity();
 			userMappingEntity.setUserId(userMappingRequest.getUserId());
 			userMappingEntity.setUserName(userMappingRequest.getUserName());

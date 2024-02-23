@@ -6,8 +6,8 @@ public class ProfAccessRightsUpdateRequest {
 	private String metaId;
 	private String view;
 	private String write;
-	private List<ProfAccessGroupMappingRequest> groups;
-	private List<ProfAccessUserMappingRequest> users;
+	private List<ProfAccessGroupMappingRequest> group;
+	private List<ProfAccessUserMappingRequest> user;
 
 	public String getMetaId() {
 		return metaId;
@@ -17,20 +17,20 @@ public class ProfAccessRightsUpdateRequest {
 		this.metaId = metaId;
 	}
 
-	public List<ProfAccessGroupMappingRequest> getGroups() {
-		return groups;
+	public List<ProfAccessGroupMappingRequest> getGroup() {
+		return group;
 	}
 
-	public void setGroups(List<ProfAccessGroupMappingRequest> groups) {
-		this.groups = groups;
+	public void setGroup(List<ProfAccessGroupMappingRequest> group) {
+		this.group = group;
 	}
 
-	public List<ProfAccessUserMappingRequest> getUsers() {
-		return users;
+	public List<ProfAccessUserMappingRequest> getUser() {
+		return user;
 	}
 
-	public void setUsers(List<ProfAccessUserMappingRequest> users) {
-		this.users = users;
+	public void setUser(List<ProfAccessUserMappingRequest> user) {
+		this.user = user;
 	}
 
 	public String getView() {
