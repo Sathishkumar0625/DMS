@@ -155,7 +155,7 @@ public class GroupHelper {
 
 	public ProfGroupInfoEntity updateGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
 			ProfGroupInfoEntity groupInfo) {
-		groupInfo.setStatus(groupInfoRequest.getStatus());
+		groupInfo.setStatus(groupInfoRequest.getGroupName());
 		return groupInfo;
 	}
 

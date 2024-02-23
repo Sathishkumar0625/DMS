@@ -31,11 +31,9 @@ public class AccessRightsServiceImpl {
 
 	@Autowired
 	FileManagementServiceImpl serviceImpl;
-	
+
 	@Autowired
 	ProfAccessUserMappingRepository accessUserMappingRepository;
-
-
 
 	public ProfAccessRightResponse create(ProfAccessRightRequest accessRightRequest) {
 		ProfAccessRightResponse accessRightResponse = new ProfAccessRightResponse();
@@ -56,7 +54,8 @@ public class AccessRightsServiceImpl {
 		try {
 			List<ProfAccessRightsEntity> accessRightsEntity = accessRightRepository.findAll();
 			for (ProfAccessRightsEntity profAccessRightsEntity : accessRightsEntity) {
-				ProfMetaDataEntity dataEntity = dataRepository.findById(Integer.parseInt(profAccessRightsEntity.getMetaId()));
+				ProfMetaDataEntity dataEntity = dataRepository
+						.findById(Integer.parseInt(profAccessRightsEntity.getMetaId()));
 				if (dataEntity != null) {
 					ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity,
 							dataEntity);
@@ -88,14 +87,15 @@ public class AccessRightsServiceImpl {
 	}
 
 	public ProfAccessRightResponse updateAccessRights(ProfAccessRightsUpdateRequest accessRightsUpdateRequest, int id) {
-		ProfAccessRightResponse accessRightResponse=new ProfAccessRightResponse();
+		ProfAccessRightResponse accessRightResponse = new ProfAccessRightResponse();
 		try {
-			ProfAccessRightsEntity accessRightsEntity=accessRightRepository.findById(id);
+			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(id);
 			if (accessRightsEntity != null) {
-				ProfAccessRightsEntity entity=helper.convertRequestToUpdateAcess(accessRightsEntity,accessRightsUpdateRequest);
+				ProfAccessRightsEntity entity = helper.convertRequestToUpdateAcess(accessRightsEntity,
+						accessRightsUpdateRequest);
 				accessRightRepository.save(entity);
 				accessRightResponse.setStatus(DMSConstant.SUCCESS);
-			}else {
+			} else {
 				accessRightResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
@@ -105,11 +105,28 @@ public class AccessRightsServiceImpl {
 	}
 
 	public ProfAccessRightResponse deleteUserAccess(int userId, int accessId) {
-		ProfAccessRightResponse accessRightResponse=new ProfAccessRightResponse();
+		ProfAccessRightResponse accessRightResponse = new ProfAccessRightResponse();
 		try {
-			ProfAccessUserMappingEntity accessUserMappingEntity=accessUserMappingRepository.findByAccessIdAndUserId(accessId,String.valueOf(userId));
+			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(accessId);
+			if (accessRightsEntity != null) {
+				ProfAccessUserMappingEntity accessUserMappingEntity = accessUserMappingRepository
+						.findByAccessRightsEntityIdAndUserId(accessId, String.valueOf(userId));
+				if (accessUserMappingEntity != null) {
+					accessUserMappingRepository.delete(accessUserMappingEntity);
+					accessRightResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
+					accessRightResponse.setStatus(DMSConstant.FAILURE);
+					accessRightResponse.setErrorMessage(
+							"Access user mapping entity not found for userId " + userId + " and accessId " + accessId);
+				}
+			} else {
+				accessRightResponse.setStatus(DMSConstant.FAILURE);
+				accessRightResponse.setErrorMessage("Access rights entity not found for accessId " + accessId);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			accessRightResponse.setStatus(DMSConstant.FAILURE);
+			accessRightResponse.setErrorMessage("An error occurred while deleting user access");
 		}
 		return accessRightResponse;
 	}

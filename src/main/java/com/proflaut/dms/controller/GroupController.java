@@ -66,7 +66,7 @@ public class GroupController {
 		ProfGroupInfoResponse groupInfoResponse = null;
 		try {
 			int groupId = Integer.parseInt(id);
-			groupInfoResponse = groupServiceImpl.updateStatus(groupId, groupInfoRequest);
+			groupInfoResponse = groupServiceImpl.updateGroup(groupId, groupInfoRequest);
 			if (groupInfoResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 				return new ResponseEntity<>(groupInfoResponse, HttpStatus.OK);
 			} else {

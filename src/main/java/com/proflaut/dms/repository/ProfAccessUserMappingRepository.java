@@ -11,5 +11,6 @@ public interface ProfAccessUserMappingRepository extends JpaRepository<ProfAcces
 
 	List<ProfAccessUserMappingEntity> findByUserId(String userId);
 
-	ProfAccessUserMappingEntity findByAccessIdAndUserId(int accessId, String userId);
+
+	ProfAccessUserMappingEntity findByAccessRightsEntityIdAndUserId(int accessId, String valueOf);
 }

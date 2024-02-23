@@ -60,13 +60,12 @@ public class GroupServiceImpl {
 	@Autowired
 	ProfGroupUserMappingRepository groupUserMappingRepository;
 
-	public ProfGroupInfoResponse updateStatus(Integer id, ProfGroupInfoRequest groupInfoRequest) {
+	public ProfGroupInfoResponse updateGroup(int id, ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
-			Optional<ProfGroupInfoEntity> groupInfo = groupInfoRepository.findById(id);
-			if (!groupInfo.isEmpty()) {
-				ProfGroupInfoEntity updatedGroupInfo = groupHelper.updateGroupInfoEnt(groupInfoRequest,
-						groupInfo.get());
+			ProfGroupInfoEntity groupInfo = groupInfoRepository.findById(id);
+			if (groupInfo != null) {
+				ProfGroupInfoEntity updatedGroupInfo = groupHelper.updateGroupInfoEnt(groupInfoRequest, groupInfo);
 				groupInfoRepository.save(updatedGroupInfo);
 				groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
