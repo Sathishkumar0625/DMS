@@ -8,8 +8,6 @@ public class ProfSignupUserRequest {
 	private String location;
 	private String mobileNumber;
 	private String ldap;
-	private String password;
-	private String status;
 
 	public String getUserName() {
 		return userName;
@@ -41,22 +39,6 @@ public class ProfSignupUserRequest {
 
 	public void setLdap(String ldap) {
 		this.ldap = ldap;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getWebAccess() {
