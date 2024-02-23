@@ -24,8 +24,9 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
-import com.proflaut.dms.model.ProfMountPointResponse;
+import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
+import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.service.impl.AccessRightsServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 
@@ -122,7 +123,7 @@ public class AccessRightsController {
 		}
 
 	}
-	
+
 	@DeleteMapping("/deleteUserAccess")
 	public ResponseEntity<ProfAccessRightResponse> deleteAccess(@RequestParam("userId") int userId,
 			@RequestParam("accessId") int accessId) {
@@ -132,12 +133,10 @@ public class AccessRightsController {
 		}
 		ProfAccessRightResponse accessRightResponse = null;
 		try {
-			accessRightResponse = accessRightsServiceImpl.deleteUserAccess(userId,accessId);
+			accessRightResponse = accessRightsServiceImpl.deleteUserAccess(userId, accessId);
 			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
-				logger.info("UNALLOCATE FOLDERS SUCCESS");
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
 			} else {
-				logger.info("UNALLOCATE FOLDERS FAILURE");
 				accessRightResponse.setStatus(DMSConstant.FAILURE);
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
 			}
@@ -146,6 +145,59 @@ public class AccessRightsController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@DeleteMapping("/deleteGroupAccess")
+	public ResponseEntity<ProfAccessRightResponse> deleteAccessgroup(@RequestParam("groupId") int groupId,
+			@RequestParam("accessId") int accessId) {
+		if (StringUtils.isEmpty(groupId) || StringUtils.isEmpty(accessId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfAccessRightResponse accessRightResponse = null;
+		try {
+			accessRightResponse = accessRightsServiceImpl.deleteGroupAccess(groupId, accessId);
+			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
+			} else {
+				accessRightResponse.setStatus(DMSConstant.FAILURE);
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getAllNotAccessUsers")
+	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAllNotAccessUsers() {
+		List<ProfOveralUserInfoResponse> overalUserInfoResponses = null;
+		try {
+			overalUserInfoResponses = accessRightsServiceImpl.findAllNotAccessUsers();
+			if (!overalUserInfoResponses.isEmpty()) {
+				return new ResponseEntity<>(overalUserInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
+	@GetMapping("/getAllNotAccessGroups")
+	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAllNotAccessGroups() {
+		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
+		try {
+			groupInfoResponses = accessRightsServiceImpl.getAllNotAccessGroups();
+			if (!groupInfoResponses.isEmpty()) {
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

@@ -11,12 +11,16 @@ import org.springframework.stereotype.Component;
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
+import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
+import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.model.ProfAccessGroupMappingRequest;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
 import com.proflaut.dms.model.ProfAccessUserMappingRequest;
+import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
+import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 
@@ -117,12 +121,47 @@ public class AccessRightsHelper {
 		return accessRightsResponse;
 	}
 
-	public ProfAccessRightsEntity convertRequestToUpdateAcess(ProfAccessRightsEntity accessRightsEntity,
+	public ProfAccessRightsEntity convertRequestToUpdateAccess(ProfAccessRightsEntity accessRightsEntity,
 			ProfAccessRightsUpdateRequest accessRightsUpdateRequest) {
+		accessRightsEntity.setMetaId(accessRightsUpdateRequest.getMetaId());
 		accessRightsEntity.setView(accessRightsUpdateRequest.getView());
 		accessRightsEntity.setWrite(accessRightsUpdateRequest.getWrite());
+
+		List<ProfAccessGroupMappingEntity> groupMappingEntities = new ArrayList<>();
+		for (ProfAccessGroupMappingRequest groupMappingRequest : accessRightsUpdateRequest.getGroups()) {
+			ProfAccessGroupMappingEntity groupMappingEntity = new ProfAccessGroupMappingEntity();
+			groupMappingEntity.setGroupId(groupMappingRequest.getGroupId());
+			groupMappingEntity.setGroupName(groupMappingRequest.getGroupName());
+			groupMappingEntity.setAccessRightsEntity(accessRightsEntity);
+			groupMappingEntities.add(groupMappingEntity);
+		}
+		accessRightsEntity.setAccessGroupMappingEntities(groupMappingEntities);
+
+		List<ProfAccessUserMappingEntity> userMappingEntities = new ArrayList<>();
+		for (ProfAccessUserMappingRequest userMappingRequest : accessRightsUpdateRequest.getUsers()) {
+			ProfAccessUserMappingEntity userMappingEntity = new ProfAccessUserMappingEntity();
+			userMappingEntity.setUserId(userMappingRequest.getUserId());
+			userMappingEntity.setUserName(userMappingRequest.getUserName());
+			userMappingEntity.setAccessRightsEntity(accessRightsEntity);
+			userMappingEntities.add(userMappingEntity);
+		}
+		accessRightsEntity.setAccessUserMappingEntities(userMappingEntities);
+
 		return accessRightsEntity;
-		
+	}
+
+	public ProfOveralUserInfoResponse convertUserInfoToRequest(ProfUserInfoEntity infoEntity) {
+		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
+		infoResponse.setUserId(infoEntity.getUserId());
+		infoResponse.setUserName(infoEntity.getUserName());
+		return infoResponse;
+	}
+
+	public ProfOverallGroupInfoResponse convertGroupInfoToRequest(ProfGroupInfoEntity infoEntity) {
+		ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+		groupInfoResponse.setId(infoEntity.getId());
+		groupInfoResponse.setGroupName(infoEntity.getGroupName());
+		return groupInfoResponse;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 
@@ -21,5 +22,7 @@ public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEnti
 
 	List<ProfGroupInfoEntity> getById(int groupId);
 
+	@Query("SELECT f FROM ProfGroupInfoEntity f WHERE f.id NOT IN :groupId")
+	List<ProfGroupInfoEntity> findbyIdNotIn(List<Integer> groupId);
 
 }

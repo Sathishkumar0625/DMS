@@ -28,7 +28,6 @@ import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
-import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 

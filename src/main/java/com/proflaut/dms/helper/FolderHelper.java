@@ -29,7 +29,6 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
-import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;

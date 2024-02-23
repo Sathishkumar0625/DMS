@@ -3,6 +3,8 @@ package com.proflaut.dms.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.proflaut.dms.entity.ProfUserInfoEntity;
@@ -18,5 +20,8 @@ public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity
 	ProfUserInfoEntity findByUserId(int userId);
 
 	List<ProfUserInfoEntity> getByUserId(int userId);
+	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userId NOT IN :userIdsAsInt")
+	List<ProfUserInfoEntity> findbyUserIdNotIn(@Param("userIdsAsInt")List<Integer> userIdsAsInt);
+
 
 }
