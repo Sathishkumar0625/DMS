@@ -87,7 +87,7 @@ public class GroupHelper {
 	public ProfOveralUserInfoResponse convertToOveralUserResponse(ProfUserInfoEntity profUserInfoEntity) {
 		ProfOveralUserInfoResponse response = new ProfOveralUserInfoResponse();
 		response.setUserId(profUserInfoEntity.getUserId());
-		response.setAdminAccesss(profUserInfoEntity.getAdminAccesss());
+		response.setAdminAccess(profUserInfoEntity.getAdminAccesss());
 		response.setCreatedDate(profUserInfoEntity.getCreatedDate());
 		response.setEmail(profUserInfoEntity.getEmail());
 		response.setStatus(profUserInfoEntity.getStatus());
@@ -163,7 +163,7 @@ public class GroupHelper {
 		entity.setAdminAccesss(userRequest.getAdminAccess());
 		entity.setEmail(userRequest.getEmail());
 		entity.setWebAccess(userRequest.getWebAccess());
-		entity.setLdap(userRequest.getLdap());
+		entity.setLdap(userRequest.getIdap());
 		entity.setLocation(userRequest.getLocation());
 		entity.setMobileNo(userRequest.getMobileNumber());
 		entity.setUserName(userRequest.getUserName());

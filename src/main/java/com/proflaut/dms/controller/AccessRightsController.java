@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.ProfAccessRightRequest;
 import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
+import com.proflaut.dms.model.ProfMountPointResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.service.impl.AccessRightsServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
@@ -120,5 +122,30 @@ public class AccessRightsController {
 		}
 
 	}
+	
+	@DeleteMapping("/deleteUserAccess")
+	public ResponseEntity<ProfAccessRightResponse> deleteAccess(@RequestParam("userId") int userId,
+			@RequestParam("accessId") int accessId) {
+		if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(accessId)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfAccessRightResponse accessRightResponse = null;
+		try {
+			accessRightResponse = accessRightsServiceImpl.deleteUserAccess(userId,accessId);
+			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				logger.info("UNALLOCATE FOLDERS SUCCESS");
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
+			} else {
+				logger.info("UNALLOCATE FOLDERS FAILURE");
+				accessRightResponse.setStatus(DMSConstant.FAILURE);
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 
 }

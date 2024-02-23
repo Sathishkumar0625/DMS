@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
+import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.helper.AccessRightsHelper;
 import com.proflaut.dms.model.ProfAccessRightRequest;
@@ -14,6 +15,7 @@ import com.proflaut.dms.model.ProfAccessRightResponse;
 import com.proflaut.dms.model.ProfAccessRightsUpdateRequest;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
+import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 
 @Service
@@ -29,6 +31,9 @@ public class AccessRightsServiceImpl {
 
 	@Autowired
 	FileManagementServiceImpl serviceImpl;
+	
+	@Autowired
+	ProfAccessUserMappingRepository accessUserMappingRepository;
 
 
 
@@ -93,6 +98,16 @@ public class AccessRightsServiceImpl {
 			}else {
 				accessRightResponse.setStatus(DMSConstant.FAILURE);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return accessRightResponse;
+	}
+
+	public ProfAccessRightResponse deleteUserAccess(int userId, int accessId) {
+		ProfAccessRightResponse accessRightResponse=new ProfAccessRightResponse();
+		try {
+			ProfAccessUserMappingEntity accessUserMappingEntity=accessUserMappingRepository.findByAccessIdAndUserId(accessId,String.valueOf(userId));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

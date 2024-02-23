@@ -17,7 +17,7 @@ public class ProfOveralUserInfoResponse {
 
 	private String webAccess;
 
-	private String adminAccesss;
+	private String adminAccess;
 
 	private String location;
 
@@ -97,11 +97,12 @@ public class ProfOveralUserInfoResponse {
 		this.webAccess = webAccess;
 	}
 
-	public String getAdminAccesss() {
-		return adminAccesss;
+	public String getAdminAccess() {
+		return adminAccess;
 	}
 
-	public void setAdminAccesss(String adminAccesss) {
-		this.adminAccesss = adminAccesss;
+	public void setAdminAccess(String adminAccess) {
+		this.adminAccess = adminAccess;
 	}
+
 }
