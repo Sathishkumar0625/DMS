@@ -168,11 +168,11 @@ public class AccessRightsController {
 		}
 	}
 
-	@GetMapping("/getAllNotAccessUsers")
-	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAllNotAccessUsers() {
+	@GetMapping("/getAllNotAccessUsers/{accessId}")
+	public ResponseEntity<List<ProfOveralUserInfoResponse>> getAllNotAccessUsers(@PathVariable int accessId) {
 		List<ProfOveralUserInfoResponse> overalUserInfoResponses = null;
 		try {
-			overalUserInfoResponses = accessRightsServiceImpl.findAllNotAccessUsers();
+			overalUserInfoResponses = accessRightsServiceImpl.findAllNotAccessUsers(accessId);
 			if (!overalUserInfoResponses.isEmpty()) {
 				return new ResponseEntity<>(overalUserInfoResponses, HttpStatus.OK);
 			} else {
@@ -184,8 +184,8 @@ public class AccessRightsController {
 		}
 	}
 	
-	@GetMapping("/getAllNotAccessGroups")
-	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAllNotAccessGroups() {
+	@GetMapping("/getAllNotAccessGroups/{accessId}")
+	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAllNotAccessGroups(@PathVariable int accessId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
 		try {
 			groupInfoResponses = accessRightsServiceImpl.getAllNotAccessGroups();

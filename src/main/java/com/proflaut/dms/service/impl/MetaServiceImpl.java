@@ -312,7 +312,7 @@ public class MetaServiceImpl {
 				String whereClause = buildWhereClause(requestBody, tableName);
 				String selectQuery = buildSelectQuery(tableName, whereClause, metaDataId);
 
-				System.out.println(selectQuery);
+				logger.info(selectQuery);
 				Query query = entityManager.createNativeQuery(selectQuery);
 				@SuppressWarnings("unchecked")
 				List<Object[]> resultList = query.getResultList();
@@ -341,7 +341,7 @@ public class MetaServiceImpl {
 				if (value instanceof String) {
 					whereClause.append(tableName).append(".").append(fieldName).append(" LIKE '%").append(value)
 							.append("%'");
-				} else if((Integer) value != 0) {
+				} else if ((Integer) value != 0) {
 					whereClause.append(tableName).append(".").append(fieldName).append(" = ").append(value);
 				}
 			}
@@ -391,8 +391,8 @@ public class MetaServiceImpl {
 
 			// Add document details to record
 			if (!docEntities.isEmpty()) {
-				ProfDocEntity docEntity = docEntities.get(0); 
-				reco.put("document_details", docEntity); 
+				ProfDocEntity docEntity = docEntities.get(0);
+				reco.put("document_details", docEntity);
 			}
 			// Add columns from ProfMetaDataPropertiesEntity
 			for (int i = 0; i < dataPropertiesEntity.size(); i++) {
@@ -409,55 +409,53 @@ public class MetaServiceImpl {
 		return documentRepository.findById(docId);
 	}
 
-	
-
 	public ProfMetaDataResponse updateTable(@Valid CreateTableRequest createTableRequest, int metaId) {
-		ProfMetaDataResponse dataResponse=new ProfMetaDataResponse();
+		ProfMetaDataResponse dataResponse = new ProfMetaDataResponse();
 		try {
-			ProfMetaDataEntity dataEntity=metaDataRepository.findById(metaId);
-			String tableName=dataEntity.getTableName();
-			String currentTableName =tableName;
-	        String currentFileExtension = dataEntity.getFileExtension();
-	        
-	        // Extract updated table details from the request
-	        String updatedTableName = createTableRequest.getTableName();
-	        String updatedFileExtension = createTableRequest.getFileExtension();
-	        List<FieldDefnition> updatedFields = createTableRequest.getFields();
+			ProfMetaDataEntity dataEntity = metaDataRepository.findById(metaId);
+			String tableName = dataEntity.getTableName();
+			String currentTableName = tableName;
+			String currentFileExtension = dataEntity.getFileExtension();
 
-	        // If the table name or file extension has changed, update them
-	        if (!currentTableName.equals(updatedTableName) || !currentFileExtension.equals(updatedFileExtension)) {
-	            dataEntity.setTableName(updatedTableName);
-	            dataEntity.setFileExtension(updatedFileExtension);
-	            metaDataRepository.save(dataEntity);
-	        }
+			// Extract updated table details from the request
+			String updatedTableName = createTableRequest.getTableName();
+			String updatedFileExtension = createTableRequest.getFileExtension();
+			List<FieldDefnition> updatedFields = createTableRequest.getFields();
 
-	        // Get the existing column names in the table
-	        List<ProfMetaDataPropertiesEntity> existingColumns = dataPropRepository.findByMetaId(String.valueOf(metaId));
-	        Set<String> existingColumnNames = existingColumns.stream()
-	                .map(ProfMetaDataPropertiesEntity::getFieldNames)
-	                .collect(Collectors.toSet());
-	        // Iterate over the updated fields and add new columns if necessary
-	        for (FieldDefnition updatedField : updatedFields) {
-	            String updatedFieldName = updatedField.getFieldName().trim().replace(" ", "_");
-	            String updatedDatabaseType = getDatabaseType(updatedField.getFieldType());
+			// If the table name or file extension has changed, update them
+			if (!currentTableName.equals(updatedTableName) || !currentFileExtension.equals(updatedFileExtension)) {
+				dataEntity.setTableName(updatedTableName);
+				dataEntity.setFileExtension(updatedFileExtension);
+				metaDataRepository.save(dataEntity);
+			}
 
-	            // If the updated field name does not exist in the table, add a new column
-	            if (!existingColumnNames.contains(updatedFieldName)) {
-	                String addColumnQuery = "ALTER TABLE " + tableName + " ADD COLUMN " +
-	                        updatedFieldName + " " + updatedDatabaseType;
-	                entityManager.createNativeQuery(addColumnQuery).executeUpdate();
-	            }
-	        }
+			// Get the existing column names in the table
+			List<ProfMetaDataPropertiesEntity> existingColumns = dataPropRepository
+					.findByMetaId(String.valueOf(metaId));
+			Set<String> existingColumnNames = existingColumns.stream().map(ProfMetaDataPropertiesEntity::getFieldNames)
+					.collect(Collectors.toSet());
+			// Iterate over the updated fields and add new columns if necessary
+			for (FieldDefnition updatedField : updatedFields) {
+				String updatedFieldName = updatedField.getFieldName().trim().replace(" ", "_");
+				String updatedDatabaseType = getDatabaseType(updatedField.getFieldType());
 
-	        dataResponse.setStatus(DMSConstant.SUCCESS);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        dataResponse.setStatus(DMSConstant.FAILURE);
-	        dataResponse.setErrorMessage("An error occurred while updating the table");
-	    }
-	    return dataResponse;
+				// If the updated field name does not exist in the table, add a new column
+				if (!existingColumnNames.contains(updatedFieldName)) {
+					String addColumnQuery = "ALTER TABLE " + tableName + " ADD COLUMN " + updatedFieldName + " "
+							+ updatedDatabaseType;
+					entityManager.createNativeQuery(addColumnQuery).executeUpdate();
+				}
+			}
+
+			dataResponse.setStatus(DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			e.printStackTrace();
+			dataResponse.setStatus(DMSConstant.FAILURE);
+			dataResponse.setErrorMessage("An error occurred while updating the table");
+		}
+		return dataResponse;
 	}
-	
+
 	private String getDatabaseType(String fieldType) {
 		if (DMSConstant.STRING.equalsIgnoreCase(fieldType)) {
 			return "VARCHAR(255)";
@@ -468,5 +466,4 @@ public class MetaServiceImpl {
 		}
 	}
 
-	
 }

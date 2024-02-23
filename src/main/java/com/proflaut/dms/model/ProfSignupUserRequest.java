@@ -7,7 +7,7 @@ public class ProfSignupUserRequest {
 	private String userName;
 	private String location;
 	private String mobileNumber;
-	private String idap;
+	private String ldap;
 
 	public String getUserName() {
 		return userName;
@@ -33,12 +33,12 @@ public class ProfSignupUserRequest {
 		this.mobileNumber = mobileNumber;
 	}
 
-	public String getIdap() {
-		return idap;
+	public String getLdap() {
+		return ldap;
 	}
 
-	public void setIdap(String idap) {
-		this.idap = idap;
+	public void setLdap(String ldap) {
+		this.ldap = ldap;
 	}
 
 	public String getWebAccess() {

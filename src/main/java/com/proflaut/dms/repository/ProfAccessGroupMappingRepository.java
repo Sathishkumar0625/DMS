@@ -13,4 +13,6 @@ public interface ProfAccessGroupMappingRepository extends JpaRepository<ProfAcce
 
 	ProfAccessGroupMappingEntity findByAccessRightsEntityIdAndGroupId(int accessId, String valueOf);
 
+	List<ProfAccessGroupMappingEntity> findByAccessRightsEntityId(int id);
+
 }

@@ -70,7 +70,7 @@ public class ProfUserInfoEntity {
 	@Column(name = "PASSWORD", nullable = false)
 	private String password;
 
-	@Column(name = "EMAIL", nullable = false)
+	@Column(name = "EMAIL", nullable = false,unique = true)
 	private String email;
 
 	@Column(name = "CREATED_DATE")
@@ -88,7 +88,7 @@ public class ProfUserInfoEntity {
 	@Column(name = "ADMIN_ACCESS")
 	private String adminAccesss;
 
-	@Column(name = "MOBILE_NUMBER")
+	@Column(name = "MOBILE_NUMBER",unique = true)
 	private String mobileNo;
 
 	@Column(name = "LOCATION")

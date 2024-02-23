@@ -180,10 +180,11 @@ public class AccessRightsServiceImpl {
 		return accessRightResponse;
 	}
 
-	public List<ProfOveralUserInfoResponse> findAllNotAccessUsers() {
+	public List<ProfOveralUserInfoResponse> findAllNotAccessUsers(int accessId) {
 		List<ProfOveralUserInfoResponse> overalUserInfoResponses = new ArrayList<>();
 		try {
-			List<ProfAccessUserMappingEntity> accessUserMappingEntities = accessUserMappingRepository.findAll();
+			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(accessId);
+			List<ProfAccessUserMappingEntity> accessUserMappingEntities = accessUserMappingRepository.findByAccessRightsEntityId(accessRightsEntity.getId());
 
 			if (!accessUserMappingEntities.isEmpty()) {
 				List<String> userIds = accessUserMappingEntities.stream().map(ProfAccessUserMappingEntity::getUserId)
@@ -207,10 +208,11 @@ public class AccessRightsServiceImpl {
 		return overalUserInfoResponses;
 	}
 
-	public List<ProfOverallGroupInfoResponse> getAllNotAccessGroups() {
+	public List<ProfOverallGroupInfoResponse> getAllNotAccessGroups(int accessId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
 		try {
-			List<ProfAccessGroupMappingEntity> accessGroupMappingEntities = accessGroupMappingRepository.findAll();
+			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(accessId);
+			List<ProfAccessGroupMappingEntity> accessGroupMappingEntities = accessGroupMappingRepository.findByAccessRightsEntityId(accessRightsEntity.getId());
 
 			if (!accessGroupMappingEntities.isEmpty()) {
 				List<String> groupIds = accessGroupMappingEntities.stream()

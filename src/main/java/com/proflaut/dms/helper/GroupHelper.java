@@ -163,7 +163,7 @@ public class GroupHelper {
 		entity.setAdminAccesss(userRequest.getAdminAccess());
 		entity.setEmail(userRequest.getEmail());
 		entity.setWebAccess(userRequest.getWebAccess());
-		entity.setLdap(userRequest.getIdap());
+		entity.setLdap(userRequest.getLdap());
 		entity.setLocation(userRequest.getLocation());
 		entity.setMobileNo(userRequest.getMobileNumber());
 		entity.setUserName(userRequest.getUserName());
