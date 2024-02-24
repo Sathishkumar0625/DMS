@@ -22,6 +22,8 @@ public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity
 	List<ProfUserInfoEntity> getByUserId(int userId);
 	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userId NOT IN :userIdsAsInt")
 	List<ProfUserInfoEntity> findbyUserIdNotIn(@Param("userIdsAsInt")List<Integer> userIdsAsInt);
+	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userId IN :users")
+	List<ProfUserInfoEntity> findByUserIdIn(List<Integer> users);
 
 
 }

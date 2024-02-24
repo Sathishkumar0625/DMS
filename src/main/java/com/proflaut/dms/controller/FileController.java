@@ -40,6 +40,7 @@ import com.proflaut.dms.model.FileRetreiveResponse;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
+import com.proflaut.dms.model.ProfOverallCountResponse;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.MetaServiceImpl;
@@ -192,5 +193,24 @@ public class FileController {
 		}
 
 	}
+	@GetMapping("/getCount")
+	public ResponseEntity<ProfOverallCountResponse> getCount() {
+		ProfOverallCountResponse countResponse=null;
+		try {
+			countResponse = fileManagementServiceImpl.reteriveCount();
+			if (countResponse != null) {
+				logger.info(" Download BY Success");
+				return new ResponseEntity<>(countResponse, HttpStatus.OK);
+
+			} else {
+				logger.info(" Download BY is Failure");
+				return new ResponseEntity<>(countResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 
 }

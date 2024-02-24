@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Component;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
 import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
@@ -49,12 +51,16 @@ import com.proflaut.dms.model.BulkEmailSender;
 import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.GroupUserList;
+import com.proflaut.dms.model.Groups;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfMountPointRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
+import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
+import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 import com.proflaut.dms.util.Compression;
@@ -62,6 +68,9 @@ import com.proflaut.dms.util.Compression;
 @Component
 @Transactional
 public class FileHelper {
+
+	@Autowired
+	ProfUserInfoRepository infoRepository;
 
 	@Autowired
 	FolderRepository folderRepository;
@@ -83,9 +92,12 @@ public class FileHelper {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
 	@Autowired
 	ProfMountPointRepository mountPointRepository;
+
+	@Autowired
+	ProfUserGroupMappingRepository groupMappingRepository;
 
 	private static final Logger logger = LogManager.getLogger(FileHelper.class);
 
@@ -96,13 +108,15 @@ public class FileHelper {
 	}
 
 	@Transactional
-	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token, ProfMountPointFolderMappingEntity folderMappingEntity) throws CustomException {
+	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token,
+			ProfMountPointFolderMappingEntity folderMappingEntity) throws CustomException {
 		boolean isFileCreated = false;
 		String fileName = null;
 		try {
-			ProfMountPointEntity mountPointEntity=mountPointRepository.findById(folderMappingEntity.getMountPointId());
+			ProfMountPointEntity mountPointEntity = mountPointRepository
+					.findById(folderMappingEntity.getMountPointId());
 			FolderEntity entity = folderRepository.findById(Integer.parseInt(fileRequest.getFolderId()));
-			
+
 			if (entity != null && mountPointEntity.getPath() != null) {
 				String path = mountPointEntity.getPath();
 				UUID uuid = UUID.randomUUID();
@@ -127,6 +141,7 @@ public class FileHelper {
 					imageRepository.save(imageEntity);
 					moveDocumentToBackup(existingDocEntity, entity);
 					existingDocEntity.setDocPath(fileName);
+					existingDocEntity.setFileSize(fileSize);
 					docUploadRepository.save(existingDocEntity);
 				} else {
 					File file = new File(path + File.separator + fileName);
@@ -385,4 +400,37 @@ public class FileHelper {
 		configEntity.setSendAt(formatCurrentDateTime());
 		return configEntity;
 	}
+
+	public long getTotalFileSize(List<ProfDocEntity> docEntities) {
+		long totalFileSize = 0;
+		for (ProfDocEntity docEntity : docEntities) {
+			String fileSizeString = docEntity.getFileSize();
+			String numericValue = fileSizeString.replaceAll("[^\\d.]", "");
+			long fileSize = Long.parseLong(numericValue);
+			totalFileSize += fileSize;
+		}
+		return totalFileSize;
+	}
+
+	public List<Groups> getGroupInfo(ProfGroupInfoEntity groupInfoEntity, List<Groups> groups) {
+		Groups group = new Groups();
+		group.setGroupName(groupInfoEntity.getGroupName());
+
+		String userCount = groupMappingRepository.countByGroupId(String.valueOf(groupInfoEntity.getId()));
+		group.setUserCount(String.valueOf(userCount));
+
+		List<Integer> userIds = groupMappingRepository.findUserIdsByGroupId(String.valueOf(groupInfoEntity.getId()));
+		List<ProfUserInfoEntity> userIdsAndNames = infoRepository.findByUserIdIn(userIds);
+		List<GroupUserList> groupUserLists = userIdsAndNames.stream().map(userId -> {
+			GroupUserList groupUserList = new GroupUserList();
+			groupUserList.setUserId(userId.getUserId());
+			groupUserList.setUserName(userId.getUserName());
+			return groupUserList;
+		}).collect(Collectors.toList());
+
+		group.setGroupUserLists(groupUserLists);
+		groups.add(group);
+		return groups;
+	}
+
 }

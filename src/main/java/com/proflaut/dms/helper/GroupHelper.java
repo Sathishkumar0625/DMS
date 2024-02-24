@@ -9,6 +9,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfMetaDataEntity;
@@ -177,6 +179,7 @@ public class GroupHelper {
 		groupInfoResponse.setCreatedBy(profGroupInfoEntity.getCreatedBy());
 		groupInfoResponse.setId(profGroupInfoEntity.getId());
 		groupInfoResponse.setUserId(profGroupInfoEntity.getUserId());
+		groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 		return groupInfoResponse;
 	}
 

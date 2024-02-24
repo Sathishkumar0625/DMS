@@ -52,4 +52,7 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	void updateEmailResIdAndIsEmail(@Param("emailResId") String emailResId, @Param("isEmail") String isEmail,
 			@Param("id") int id);
 
+	@Query("SELECT p FROM ProfDocEntity p WHERE p.createdBy IN :userNames")
+	List<ProfDocEntity> findByCreatedByIn(@Param("userNames") List<String> userNames);
+
 }

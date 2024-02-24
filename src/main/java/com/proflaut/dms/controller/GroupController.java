@@ -171,10 +171,10 @@ public class GroupController {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
 		try {
 			groupInfoResponses = groupServiceImpl.findById(userId);
-			if (!groupInfoResponses.isEmpty()) {
+			if (!groupInfoResponses.get(0).getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(groupInfoResponses,HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

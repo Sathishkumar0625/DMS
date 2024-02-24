@@ -3,11 +3,13 @@ package com.proflaut.dms.service.impl;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -16,15 +18,15 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
+import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -34,15 +36,19 @@ import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
 import com.proflaut.dms.model.GetAllTableResponse;
+import com.proflaut.dms.model.Groups;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
+import com.proflaut.dms.model.ProfOverallCountResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
+import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.statiClass.PasswordEncDecrypt;
@@ -83,9 +89,15 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	MetaServiceImpl metaServiceImpl;
-	
+
 	@Autowired
 	ProfMountFolderMappingRepository folderMappingRepository;
+
+	@Autowired
+	ProfGroupInfoRepository groupInfoRepository;
+
+	@Autowired
+	ProfUserGroupMappingRepository groupMappingRepository;
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -97,11 +109,13 @@ public class FileManagementServiceImpl {
 		try {
 			ProfUserPropertiesEntity userProp = fileHelper.callProfUserConnection(token);
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserId(userProp.getUserId());
-			ProfMountPointFolderMappingEntity entity=folderMappingRepository.findByFolderId(Integer.parseInt( fileRequest.getFolderId()));
+			ProfMountPointFolderMappingEntity entity = folderMappingRepository
+					.findByFolderId(Integer.parseInt(fileRequest.getFolderId()));
 			if (profUserInfoEntity == null) {
 				throw new CustomException("ProfUserInfoEntity not found for userId: " + userProp.getUserId());
 			}
-			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token,entity)) {
+			if (fileHelper.storeDocument(fileRequest, userProp.getUserId(), profUserInfoEntity.getUserName(), token,
+					entity)) {
 				fileResponse.setFolderPath(fileRequest.getDockPath());
 				fileResponse.setStatus(DMSConstant.SUCCESS);
 				transactionManager.commit(status);
@@ -185,7 +199,8 @@ public class FileManagementServiceImpl {
 					ProfMailConfigEntity configEntity = fileHelper.convertemailShareReqToMailConf(emailShareRequest);
 					configRepository.save(configEntity);
 					docEntity.setEmilResId(String.valueOf(configEntity.getId()));
-					profDocUploadRepository.updateEmailResIdAndIsEmail(String.valueOf(configEntity.getId()),"Y", docEntity.getId());
+					profDocUploadRepository.updateEmailResIdAndIsEmail(String.valueOf(configEntity.getId()), "Y",
+							docEntity.getId());
 					emailShareResponse.setStatus(DMSConstant.MESSAGE);
 					emailShareResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
@@ -206,6 +221,53 @@ public class FileManagementServiceImpl {
 		}
 
 		return emailShareResponse;
+	}
+
+	public ProfOverallCountResponse reteriveCount() {
+		ProfOverallCountResponse countResponse = new ProfOverallCountResponse();
+		try {
+			
+			// overall File Size
+			List<ProfDocEntity> docEntities = profDocUploadRepository.findAll();
+			long totalFileSize = fileHelper.getTotalFileSize(docEntities);
+			countResponse.setFileSizeCount(totalFileSize + "kb");
+			// Overall User Count
+			long infoEntity = profUserInfoRepository.count();
+			countResponse.setUserCount(String.valueOf(infoEntity));
+			// Overall Group Count
+			long groupInfoEntities = groupInfoRepository.count();
+			countResponse.setGroupCount(String.valueOf(groupInfoEntities));
+
+			// User File Size
+			List<ProfUserInfoEntity> entity = profUserInfoRepository.findAll();
+			List<String> userNames = entity.stream().map(ProfUserInfoEntity::getUserName).collect(Collectors.toList());
+			List<ProfDocEntity> entities = profDocUploadRepository.findByCreatedByIn(userNames);
+			long totaluserFileSize = fileHelper.getTotalFileSize(entities);
+			countResponse.setUserFileSize(totaluserFileSize + "kb");
+
+			// Group Upload File Size
+			List<ProfUserGroupMappingEntity> groupMappingEntities = groupMappingRepository.findAll();
+			List<Integer> users = groupMappingEntities.stream().map(ProfUserGroupMappingEntity::getUserId)
+					.collect(Collectors.toList());
+			List<ProfUserInfoEntity> infoEntities = profUserInfoRepository.findByUserIdIn(users);
+			List<String> userNamesInGroup = infoEntities.stream().map(ProfUserInfoEntity::getUserName)
+					.collect(Collectors.toList());
+			List<ProfDocEntity> entitiesInGroup = profDocUploadRepository.findByCreatedByIn(userNamesInGroup);
+			long totalGroupFileSize = fileHelper.getTotalFileSize(entitiesInGroup);
+			countResponse.setGroupFileSize(totalGroupFileSize + "kb");
+			
+			//get User Group List 
+			List<ProfGroupInfoEntity> profGroupInfoEntities = groupInfoRepository.findAll();
+			List<Groups> groups = new ArrayList<>(); 
+			for (ProfGroupInfoEntity groupInfoEntity : profGroupInfoEntities) {
+				List<Groups> updatedGroups = fileHelper.getGroupInfo(groupInfoEntity, groups);
+				countResponse.setGroups(updatedGroups);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return countResponse;
 	}
 
 }

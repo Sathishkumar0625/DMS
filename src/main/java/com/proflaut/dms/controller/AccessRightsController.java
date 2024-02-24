@@ -188,7 +188,7 @@ public class AccessRightsController {
 	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAllNotAccessGroups(@PathVariable int accessId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
 		try {
-			groupInfoResponses = accessRightsServiceImpl.getAllNotAccessGroups();
+			groupInfoResponses = accessRightsServiceImpl.getAllNotAccessGroups(accessId);
 			if (!groupInfoResponses.isEmpty()) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {

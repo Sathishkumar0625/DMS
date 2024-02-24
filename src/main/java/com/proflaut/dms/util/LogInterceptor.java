@@ -45,7 +45,7 @@ public class LogInterceptor implements HandlerInterceptor {
 	    @Override
 	    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 	            ModelAndView modelAndView) throws Exception {
-	    	// TODO document why this method is empty
+       // TODO document why this method is empty
      }
 
 	    @Override

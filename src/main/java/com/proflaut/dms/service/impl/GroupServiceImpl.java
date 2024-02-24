@@ -187,13 +187,30 @@ public class GroupServiceImpl {
 			ProfUserInfoEntity entity = userInfoRepository.findByUserId(userId);
 			if (entity != null) {
 				List<ProfGroupInfoEntity> infoEntity = groupInfoRepository.findByUserId(userId);
-				for (ProfGroupInfoEntity profGroupInfoEntity : infoEntity) {
-					if (!profGroupInfoEntity.getStatus().equalsIgnoreCase("I")) {
-						ProfOverallGroupInfoResponse groupInfoResponse = groupHelper
-								.convertActiveGroupInfo(profGroupInfoEntity);
-						groupInfoResponses.add(groupInfoResponse);
+				if (!infoEntity.isEmpty()) {
+					for (ProfGroupInfoEntity profGroupInfoEntity : infoEntity) {
+						if (!profGroupInfoEntity.getStatus().equalsIgnoreCase("I")) {
+							ProfOverallGroupInfoResponse groupInfoResponse = groupHelper
+									.convertActiveGroupInfo(profGroupInfoEntity);
+							groupInfoResponses.add(groupInfoResponse);
+						} else {
+							ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+							groupInfoResponse.setStatus(DMSConstant.FAILURE);
+							groupInfoResponse.setErrorMessage("This Group Is INACTIVE");
+							groupInfoResponses.add(groupInfoResponse);
+						}
 					}
+				} else {
+					ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+					groupInfoResponse.setStatus(DMSConstant.FAILURE);
+					groupInfoResponse.setErrorMessage("Group Is Not Assigned For This User");
+					groupInfoResponses.add(groupInfoResponse);
 				}
+			} else {
+				ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+				groupInfoResponse.setStatus(DMSConstant.FAILURE);
+				groupInfoResponse.setErrorMessage(DMSConstant.USERID_NOT_EXIST);
+				groupInfoResponses.add(groupInfoResponse);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

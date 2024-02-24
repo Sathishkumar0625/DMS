@@ -12,6 +12,15 @@ public class ProfOverallGroupInfoResponse {
 	private String createdBy;
 	private String createdAt;
 	private int userId;
+	private String errorMessage;
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 
 	public int getUserId() {
 		return userId;

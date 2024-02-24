@@ -27,6 +27,13 @@ public class ProfGroupInfoEntity {
 
 	@Column(name = "USER_ID")
 	private int userId;
+	
+	
+	public ProfGroupInfoEntity() {}
+	public ProfGroupInfoEntity(int id, String groupName) {
+		this.id = id;
+		this.groupName = groupName;
+	}
 
 	public int getUserId() {
 		return userId;
