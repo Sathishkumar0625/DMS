@@ -55,4 +55,8 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	@Query("SELECT p FROM ProfDocEntity p WHERE p.createdBy IN :userNames")
 	List<ProfDocEntity> findByCreatedByIn(@Param("userNames") List<String> userNames);
 
+	long countByCreatedBy(String userId);
+
+	List<ProfDocEntity> findByCreatedBy(String userName);
+
 }
