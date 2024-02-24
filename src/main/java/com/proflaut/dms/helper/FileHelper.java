@@ -420,17 +420,25 @@ public class FileHelper {
 		group.setUserCount(String.valueOf(userCount));
 
 		List<Integer> userIds = groupMappingRepository.findUserIdsByGroupId(String.valueOf(groupInfoEntity.getId()));
-		List<ProfUserInfoEntity> userIdsAndNames = infoRepository.findByUserIdIn(userIds);
-		List<GroupUserList> groupUserLists = userIdsAndNames.stream().map(userId -> {
-			GroupUserList groupUserList = new GroupUserList();
-			groupUserList.setUserId(userId.getUserId());
-			groupUserList.setUserName(userId.getUserName());
-			return groupUserList;
-		}).collect(Collectors.toList());
+		if (!userIds.isEmpty()) {
+			List<ProfUserInfoEntity> userIdsAndNames = infoRepository.findByUserIdIn(userIds);
+			List<GroupUserList> groupUserLists = userIdsAndNames.stream().map(userId -> {
+				GroupUserList groupUserList = new GroupUserList();
+				groupUserList.setUserId(userId.getUserId());
+				groupUserList.setUserName(userId.getUserName());
+				return groupUserList;
+			}).collect(Collectors.toList());
 
-		group.setGroupUserLists(groupUserLists);
-		groups.add(group);
-		return groups;
+			group.setGroupUserLists(groupUserLists);
+			groups.add(group);
+			return groups;
+		} else {
+			GroupUserList groupUserList = new GroupUserList();
+			groupUserList.setErrorMessage("No user Found In That Group");
+			groups.add(group);
+			return groups;
+		}
+
 	}
 
 }
