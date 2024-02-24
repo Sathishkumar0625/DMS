@@ -58,10 +58,10 @@ public class DashboardServiceImpl {
 
 				for (Integer groupId : listOfGroupId) {
 					List<Integer> userIdsForGroup = userMappingRepository
-							.findUserIdsByGroupId(String.valueOf(groupId));
+							.findUserIdsByGroupId(groupId);
 					userIds.addAll(userIdsForGroup);
 				}
-				List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserNameIn(userIds);
+				List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserNamesByUserIds(userIds);
 				long totalFileSize = 0;
 				for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
 					String userName = profUserInfoEntity.getUserName();
