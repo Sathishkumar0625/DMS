@@ -1,8 +1,18 @@
 package com.proflaut.dms.service.impl;
 
-import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -11,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
@@ -37,6 +47,8 @@ import com.proflaut.dms.model.FileRetreiveByResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
 import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.Groups;
+import com.proflaut.dms.model.ImageRequest;
+import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.MailInfoRequest;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
@@ -98,6 +110,9 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
+
+	@Autowired
+	RestTemplate restTemplatel;
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -226,7 +241,7 @@ public class FileManagementServiceImpl {
 	public ProfOverallCountResponse reteriveCount() {
 		ProfOverallCountResponse countResponse = new ProfOverallCountResponse();
 		try {
-			
+
 			// overall File Size
 			List<ProfDocEntity> docEntities = profDocUploadRepository.findAll();
 			long totalFileSize = fileHelper.getTotalFileSize(docEntities);
@@ -255,10 +270,10 @@ public class FileManagementServiceImpl {
 			List<ProfDocEntity> entitiesInGroup = profDocUploadRepository.findByCreatedByIn(userNamesInGroup);
 			long totalGroupFileSize = fileHelper.getTotalFileSize(entitiesInGroup);
 			countResponse.setGroupFileSize(totalGroupFileSize + "kb");
-			
-			//get User Group List 
+
+			// get User Group List
 			List<ProfGroupInfoEntity> profGroupInfoEntities = groupInfoRepository.findAll();
-			List<Groups> groups = new ArrayList<>(); 
+			List<Groups> groups = new ArrayList<>();
 			for (ProfGroupInfoEntity groupInfoEntity : profGroupInfoEntities) {
 				List<Groups> updatedGroups = fileHelper.getGroupInfo(groupInfoEntity, groups);
 				countResponse.setGroups(updatedGroups);
@@ -268,6 +283,28 @@ public class FileManagementServiceImpl {
 			e.printStackTrace();
 		}
 		return countResponse;
+	}
+
+	public ImageResponse getImage(ImageRequest imageRequest) {
+		ImageResponse imageResponse = new ImageResponse();
+		try {
+			byte[] byteArray = Base64Utils.decodeFromString(imageRequest.getImage());
+			// Set headers
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+			// Create request entity with image file
+			HttpEntity<Resource> requestEntity = new HttpEntity<>(new ByteArrayResource(byteArray), headers);
+
+			// Send POST request to Python server
+			ResponseEntity<ImageResponse> responseEntity = restTemplatel.exchange("http://127.0.0.1:5000/processImage",
+					HttpMethod.POST, requestEntity, ImageResponse.class);
+
+			imageResponse = responseEntity.getBody();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return imageResponse;
 	}
 
 }

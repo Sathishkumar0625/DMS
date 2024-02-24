@@ -37,6 +37,8 @@ import com.proflaut.dms.model.DocumentDetails;
 import com.proflaut.dms.model.FileRequest;
 import com.proflaut.dms.model.FileResponse;
 import com.proflaut.dms.model.FileRetreiveResponse;
+import com.proflaut.dms.model.ImageRequest;
+import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.ProfEmailShareRequest;
 import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
@@ -205,6 +207,27 @@ public class FileController {
 			} else {
 				logger.info(" Download BY is Failure");
 				return new ResponseEntity<>(countResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/sharpenedImage")
+	public ResponseEntity<ImageResponse> getImage(@RequestBody ImageRequest imageRequest) {
+		if (StringUtils.isEmpty(imageRequest.getImage())) {
+			logger.warn(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ImageResponse imageResponse=null;
+		try {
+			imageResponse = fileManagementServiceImpl.getImage(imageRequest);
+			if (imageResponse != null) {
+				return new ResponseEntity<>(imageResponse, HttpStatus.OK);
+
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
