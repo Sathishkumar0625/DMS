@@ -35,7 +35,7 @@ public class DashboardServiceImpl {
 
 	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
-	
+
 	@Autowired
 	ProfGroupUserMappingRepository userMappingRepository;
 
@@ -57,18 +57,18 @@ public class DashboardServiceImpl {
 				List<Integer> userIds = new ArrayList<>();
 
 				for (Integer groupId : listOfGroupId) {
-					List<Integer> userIdsForGroup = userMappingRepository
-							.findUserIdsByGroupId(groupId);
+					List<Integer> userIdsForGroup = userMappingRepository.findUserIdsByGroupId(groupId);
 					userIds.addAll(userIdsForGroup);
 				}
-				List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserNamesByUserIds(userIds);
+				List<String> userNames = infoRepository.findUserNamesByUserIds(userIds);
 				long totalFileSize = 0;
-				for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
-					String userName = profUserInfoEntity.getUserName();
+
+				for (String userName : userNames) {
 					List<ProfDocEntity> entities = docUploadRepository.findByCreatedBy(userName);
 					long userFileSize = fileHelper.getTotalFileSize(entities);
 					totalFileSize += userFileSize;
 				}
+
 				long userGroupFileOccupiedSize = totalFileSize - userDocSize;
 				detailsResponse.setUserGroupFileOccupiedSize(String.valueOf(userGroupFileOccupiedSize));
 			}

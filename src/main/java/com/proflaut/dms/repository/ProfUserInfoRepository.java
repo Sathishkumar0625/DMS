@@ -11,7 +11,7 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.model.UserInfo;
 
 @Repository
-public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity, Integer>{
+public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity, Integer> {
 
 	ProfUserInfoEntity save(UserInfo userInfo);
 
@@ -20,16 +20,18 @@ public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity
 	ProfUserInfoEntity findByUserId(int userId);
 
 	List<ProfUserInfoEntity> getByUserId(int userId);
+
 	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userId NOT IN :userIdsAsInt")
-	List<ProfUserInfoEntity> findbyUserIdNotIn(@Param("userIdsAsInt")List<Integer> userIdsAsInt);
+	List<ProfUserInfoEntity> findbyUserIdNotIn(@Param("userIdsAsInt") List<Integer> userIdsAsInt);
+
 	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userId IN :users")
-	List<ProfUserInfoEntity> findByUserIdIn(@Param("users")List<Integer> users);
-	
+	List<ProfUserInfoEntity> findByUserIdIn(@Param("users") List<Integer> users);
+
 	@Query("SELECT f FROM ProfUserInfoEntity f WHERE f.userName IN :userIds")
-	List<ProfUserInfoEntity> findByUserNameIn(@Param("userIds")List<Integer> userIds);
+	List<ProfUserInfoEntity> findByUserNameIn(@Param("userIds") List<Integer> userIds);
+
 
 	@Query("SELECT userName FROM ProfUserInfoEntity f WHERE f.userId IN :userIds")
-	List<ProfUserInfoEntity> findByUserNamesByUserIds(List<Integer> userIds);
-
+	List<String> findUserNamesByUserIds(List<Integer> userIds);
 
 }
