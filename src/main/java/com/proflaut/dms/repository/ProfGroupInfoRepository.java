@@ -25,4 +25,6 @@ public interface ProfGroupInfoRepository extends JpaRepository<ProfGroupInfoEnti
 	@Query("SELECT f FROM ProfGroupInfoEntity f WHERE f.id NOT IN :groupId")
 	List<ProfGroupInfoEntity> findbyIdNotIn(List<Integer> groupId);
 
+	long countByUserId(int userId);
+
 }

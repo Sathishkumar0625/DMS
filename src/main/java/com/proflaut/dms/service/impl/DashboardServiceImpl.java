@@ -14,6 +14,7 @@ import com.proflaut.dms.helper.FileHelper;
 import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
+import com.proflaut.dms.repository.ProfGroupUserMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 
@@ -34,6 +35,9 @@ public class DashboardServiceImpl {
 
 	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
+	
+	@Autowired
+	ProfGroupUserMappingRepository userMappingRepository;
 
 	public ProfUserUploadDetailsResponse getUploadedDetails(int userId) {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
@@ -45,7 +49,7 @@ public class DashboardServiceImpl {
 				List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(entity.getUserName());
 				long userDocSize = fileHelper.getTotalFileSize(docEntities);
 				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize));
-				long noOfGroupAssignd = groupMappingRepository.countByUserId(userId);
+				long noOfGroupAssignd = groupInfoRepository.countByUserId(userId);
 				detailsResponse.setNoOfGroupAssigned(String.valueOf(noOfGroupAssignd));
 				List<ProfGroupInfoEntity> groupInfoEntities = groupInfoRepository.findByUserId(userId);
 				List<Integer> listOfGroupId = groupInfoEntities.stream().map(ProfGroupInfoEntity::getId)
@@ -53,7 +57,7 @@ public class DashboardServiceImpl {
 				List<Integer> userIds = new ArrayList<>();
 
 				for (Integer groupId : listOfGroupId) {
-					List<Integer> userIdsForGroup = groupMappingRepository
+					List<Integer> userIdsForGroup = userMappingRepository
 							.findUserIdsByGroupId(String.valueOf(groupId));
 					userIds.addAll(userIdsForGroup);
 				}
