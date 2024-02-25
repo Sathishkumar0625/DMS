@@ -13,6 +13,7 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.helper.FileHelper;
 import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
+import com.proflaut.dms.model.ProfUserGroupDetailsResponse;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfGroupUserMappingRepository;
@@ -40,7 +41,7 @@ public class DashboardServiceImpl {
 
 	@Autowired
 	ProfGroupUserMappingRepository userMappingRepository;
-	
+
 	@Autowired
 	ProfUserPropertiesRepository userPropertiesRepository;
 
@@ -48,7 +49,7 @@ public class DashboardServiceImpl {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
 		try {
 			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
-			int userId=entity.getUserId();
+			int userId = entity.getUserId();
 			if (entity.getUserName() != null) {
 				long count = docUploadRepository.countByCreatedBy(entity.getUserName());
 				detailsResponse.setUserUploadedCount(String.valueOf(count));
@@ -78,6 +79,41 @@ public class DashboardServiceImpl {
 				long userGroupFileOccupiedSize = totalFileSize - userDocSize;
 				detailsResponse.setUserGroupFileOccupiedSize(String.valueOf(userGroupFileOccupiedSize));
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return detailsResponse;
+	}
+
+	public List<ProfUserGroupDetailsResponse> getUserDetails(String token) {
+		List<ProfUserGroupDetailsResponse> detailsResponse = new ArrayList<>();
+		try {
+			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+			int userId = entity.getUserId();
+			List<ProfGroupInfoEntity> groupInfoEntity = groupInfoRepository.findByUserId(userId);
+			for (ProfGroupInfoEntity profGroupInfoEntity : groupInfoEntity) {
+				ProfUserGroupDetailsResponse response = new ProfUserGroupDetailsResponse();
+				response.setGroupName(profGroupInfoEntity.getGroupName());
+				long userGroupCount = groupInfoRepository.countByUserId(userId);
+				response.setGroupCount(String.valueOf(userGroupCount));
+				List<Integer> userIds = userMappingRepository.findUserIdsByGroupId(profGroupInfoEntity.getId());
+				List<String> groupMembers = new ArrayList<>();
+				for (Integer userIdss : userIds) {
+					ProfUserInfoEntity userInfoEntity = infoRepository.findByUserId(userIdss);
+					if (userInfoEntity != null) {
+						groupMembers.add(userInfoEntity.getUserName());
+					}
+				}
+				response.setGroupMembers(groupMembers);
+				List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserIdIn(userIds);
+				List<String> userNames = infoEntities.stream().map(ProfUserInfoEntity::getUserName)
+						.collect(Collectors.toList());
+				List<ProfDocEntity> entities = docUploadRepository.findByCreatedByIn(userNames);
+				long totaluserFileSize = fileHelper.getTotalFileSize(entities);
+				response.setGroupUploadedFileSize(String.valueOf(totaluserFileSize));
+
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
