@@ -98,20 +98,24 @@ public class DashboardServiceImpl {
 				response.setGroupCount(String.valueOf(userGroupCount));
 				List<Integer> userIds = userMappingRepository.findUserIdsByGroupId(profGroupInfoEntity.getId());
 				List<String> groupMembers = new ArrayList<>();
-				for (Integer userIdss : userIds) {
-					ProfUserInfoEntity userInfoEntity = infoRepository.findByUserId(userIdss);
-					if (userInfoEntity != null) {
-						groupMembers.add(userInfoEntity.getUserName());
+				if (!userIds.isEmpty()) {
+					for (Integer userIdss : userIds) {
+						ProfUserInfoEntity userInfoEntity = infoRepository.findByUserId(userIdss);
+						if (userInfoEntity != null) {
+							groupMembers.add(userInfoEntity.getUserName());
+						}
 					}
+					response.setGroupMembers(groupMembers);
 				}
-				response.setGroupMembers(groupMembers);
-				List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserIdIn(userIds);
-				List<String> userNames = infoEntities.stream().map(ProfUserInfoEntity::getUserName)
-						.collect(Collectors.toList());
-				List<ProfDocEntity> entities = docUploadRepository.findByCreatedByIn(userNames);
-				long totaluserFileSize = fileHelper.getTotalFileSize(entities);
-				response.setGroupUploadedFileSize(String.valueOf(totaluserFileSize));
-
+				if (!userIds.isEmpty()) {
+					List<ProfUserInfoEntity> infoEntities = infoRepository.findByUserIdIn(userIds);
+					List<String> userNames = infoEntities.stream().map(ProfUserInfoEntity::getUserName)
+							.collect(Collectors.toList());
+					List<ProfDocEntity> entities = docUploadRepository.findByCreatedByIn(userNames);
+					long totaluserFileSize = fileHelper.getTotalFileSize(entities);
+					response.setGroupUploadedFileSize(String.valueOf(totaluserFileSize));
+				}
+				detailsResponse.add(response);
 			}
 
 		} catch (Exception e) {

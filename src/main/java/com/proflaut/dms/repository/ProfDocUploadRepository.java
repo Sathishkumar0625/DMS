@@ -18,14 +18,11 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 
 	List<ProfDocEntity> findByCreatedBy(Integer id);
 
-	// ProfDocEntity findByDocName(String dockName);
-
 	@Modifying
 	@Query(nativeQuery = true, value = "UPDATE PROF_DOCUMENT_PROPERTY SET document_name = :docName"
 			+ " WHERE created_by = :createdBy ")
 	void updatedocName(@Param("docName") String dockName, @Param("createdBy") int createdBy);
 
-	// ProfDocEntity findByUserName(String userName);
 
 	ProfDocEntity findByProspectIdAndDocName(String prospectId, String docName);
 
@@ -58,5 +55,9 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	long countByCreatedBy(String userId);
 
 	List<ProfDocEntity> findByCreatedBy(String userName);
+
+	List<ProfDocEntity> findByCreatedByIgnoreCase(String string);
+
+	List<ProfDocEntity> getById(int i);
 
 }
