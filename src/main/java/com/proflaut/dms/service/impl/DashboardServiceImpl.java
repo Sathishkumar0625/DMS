@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
+import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.helper.FileHelper;
@@ -56,7 +58,7 @@ public class DashboardServiceImpl {
 				List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(entity.getUserName());
 				long userDocSize = fileHelper.getTotalFileSize(docEntities);
 				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize));
-				long noOfGroupAssignd = groupInfoRepository.countByUserId(userId);
+				long noOfGroupAssignd = userMappingRepository.countByUserId(userId);
 				detailsResponse.setNoOfGroupAssigned(String.valueOf(noOfGroupAssignd));
 				List<ProfGroupInfoEntity> groupInfoEntities = groupInfoRepository.findByUserId(userId);
 				List<Integer> listOfGroupId = groupInfoEntities.stream().map(ProfGroupInfoEntity::getId)
@@ -90,13 +92,14 @@ public class DashboardServiceImpl {
 		try {
 			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
 			int userId = entity.getUserId();
-			List<ProfGroupInfoEntity> groupInfoEntity = groupInfoRepository.findByUserId(userId);
-			for (ProfGroupInfoEntity profGroupInfoEntity : groupInfoEntity) {
+			List<ProfGroupUserMappingEntity> groupInfoEntity = userMappingRepository.findByUserId(userId);
+			for (ProfGroupUserMappingEntity profGroupInfoEntity : groupInfoEntity) {
 				ProfUserGroupDetailsResponse response = new ProfUserGroupDetailsResponse();
-				response.setGroupName(profGroupInfoEntity.getGroupName());
+				ProfGroupInfoEntity ent=groupInfoRepository.findById(profGroupInfoEntity.getGroupId());
+				response.setGroupName(ent.getGroupName());
 				long userGroupCount = groupInfoRepository.countByUserId(userId);
 				response.setGroupCount(String.valueOf(userGroupCount));
-				List<Integer> userIds = userMappingRepository.findUserIdsByGroupId(profGroupInfoEntity.getId());
+				List<Integer> userIds = userMappingRepository.findUserIdsByGroupId(profGroupInfoEntity.getGroupId());
 				List<String> groupMembers = new ArrayList<>();
 				if (!userIds.isEmpty()) {
 					for (Integer userIdss : userIds) {
@@ -124,4 +127,19 @@ public class DashboardServiceImpl {
 		return detailsResponse;
 	}
 
+	public String usersCount() {
+		long count = 0;
+		try {
+			count = infoRepository.count();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return String.valueOf(count);
+	}
+
+	@Scheduled(fixedRate = 2 * 24 * 60 * 60 * 1000)
+	public void updateUserCount() {
+		String count = usersCount();
+		System.out.println("User count: " + count);
+	}
 }

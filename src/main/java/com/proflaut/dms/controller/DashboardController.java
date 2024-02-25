@@ -40,7 +40,8 @@ public class DashboardController {
 	}
 
 	@GetMapping("/getUserGroupDetails")
-	public ResponseEntity<List<ProfUserGroupDetailsResponse>> getUserGroupDetails(@RequestHeader("token") String token) {
+	public ResponseEntity<List<ProfUserGroupDetailsResponse>> getUserGroupDetails(
+			@RequestHeader("token") String token) {
 		List<ProfUserGroupDetailsResponse> detailsResponse = null;
 		try {
 			detailsResponse = dashboardServiceImpl.getUserDetails(token);
@@ -54,5 +55,17 @@ public class DashboardController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+	@GetMapping("/usersGraph")
+	public ResponseEntity<String> getUsersGraph(@RequestHeader("token") String token) {
+		String count = null;
+		try {
+			count = dashboardServiceImpl.usersCount();
+			return new ResponseEntity<>(count, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

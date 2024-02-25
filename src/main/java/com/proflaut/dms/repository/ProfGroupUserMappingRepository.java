@@ -17,4 +17,10 @@ public interface ProfGroupUserMappingRepository extends JpaRepository<ProfGroupU
 	@Query("SELECT userId FROM ProfGroupUserMappingEntity WHERE groupId = :groupId")
 	List<Integer> findUserIdsByGroupId(int groupId);
 
+
+	long countByUserId(int userId);
+
+
+	List<ProfGroupUserMappingEntity> findByUserId(int userId);
+
 }
