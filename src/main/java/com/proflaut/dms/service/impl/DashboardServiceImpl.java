@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
+import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.helper.FileHelper;
 import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
@@ -17,6 +18,7 @@ import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfGroupUserMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
+import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class DashboardServiceImpl {
@@ -38,11 +40,15 @@ public class DashboardServiceImpl {
 
 	@Autowired
 	ProfGroupUserMappingRepository userMappingRepository;
+	
+	@Autowired
+	ProfUserPropertiesRepository userPropertiesRepository;
 
-	public ProfUserUploadDetailsResponse getUploadedDetails(int userId) {
+	public ProfUserUploadDetailsResponse getUploadedDetails(String token) {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
 		try {
-			ProfUserInfoEntity entity = infoRepository.findByUserId(userId);
+			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+			int userId=entity.getUserId();
 			if (entity.getUserName() != null) {
 				long count = docUploadRepository.countByCreatedBy(entity.getUserName());
 				detailsResponse.setUserUploadedCount(String.valueOf(count));
