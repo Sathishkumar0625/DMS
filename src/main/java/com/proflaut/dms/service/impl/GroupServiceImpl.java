@@ -324,4 +324,16 @@ public class GroupServiceImpl {
 		return groupInfoResponse;
 	}
 
+	public ProfOveralUserInfoResponse findUserByToken(String token) {
+		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
+		try {
+			ProfUserPropertiesEntity entity = profUserPropertiesRepository.findByToken(token);
+			ProfUserInfoEntity infoEntity = userInfoRepository.findByUserId(entity.getUserId());
+			infoResponse = groupHelper.convertToDashboardUserResponse(infoEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return infoResponse;
+	}
+
 }

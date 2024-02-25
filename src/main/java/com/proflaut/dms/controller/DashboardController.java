@@ -55,7 +55,6 @@ public class DashboardController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
 	@GetMapping("/usersGraph")
 	public ResponseEntity<String> getUsersGraph(@RequestHeader("token") String token) {
 		String count = null;

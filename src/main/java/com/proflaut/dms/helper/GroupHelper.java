@@ -230,4 +230,19 @@ public class GroupHelper {
 		}
 		return infoResponses;
 	}
+
+	public ProfOveralUserInfoResponse convertToDashboardUserResponse(ProfUserInfoEntity infoEntity) {
+		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
+		infoResponse.setAdminAccess(infoEntity.getAdminAccesss());
+		infoResponse.setCreatedDate(infoEntity.getCreatedDate());
+		infoResponse.setEmail(infoEntity.getEmail());
+		infoResponse.setLdap(infoEntity.getLdap());
+		infoResponse.setLocation(infoEntity.getLocation());
+		infoResponse.setMobileNo(infoEntity.getMobileNo());
+		infoResponse.setStatus(infoEntity.getStatus());
+		infoResponse.setUserId(infoEntity.getUserId());
+		infoResponse.setUserName(infoEntity.getUserName());
+		infoResponse.setWebAccess(infoEntity.getWebAccess());
+		return infoResponse;
+	}
 }

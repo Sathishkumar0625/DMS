@@ -118,7 +118,7 @@ public class DashboardServiceImpl {
 					long totaluserFileSize = fileHelper.getTotalFileSize(entities);
 					response.setGroupUploadedFileSize(String.valueOf(totaluserFileSize));
 				}
-				detailsResponse.add(response);
+				detailsResponse.add(response);	
 			}
 
 		} catch (Exception e) {

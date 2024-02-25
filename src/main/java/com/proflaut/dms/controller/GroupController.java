@@ -262,5 +262,22 @@ public class GroupController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/getUser")
+	public ResponseEntity<ProfOveralUserInfoResponse> getUserById(@RequestHeader("token") String token) {
+		ProfOveralUserInfoResponse userInfoResponses = null;
+		try {
+			userInfoResponses = groupServiceImpl.findUserByToken(token);
+			if (userInfoResponses != null) {
+				return new ResponseEntity<>(userInfoResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 
 }
