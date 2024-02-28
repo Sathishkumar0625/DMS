@@ -1,7 +1,6 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +54,12 @@ public class DashboardController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@GetMapping("/usersGraph")
-	public ResponseEntity<String> getUsersGraph(@RequestHeader("token") String token) {
-		String count = null;
+	public ResponseEntity<List<String>> getUsersGraph(@RequestHeader("token") String token) {
 		try {
-			count = dashboardServiceImpl.usersCount();
-			return new ResponseEntity<>(count, HttpStatus.OK);
+			List<String> counts = dashboardServiceImpl.getUserCounts();
+			return new ResponseEntity<>(counts, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

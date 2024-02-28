@@ -237,11 +237,11 @@ public class GroupHelper {
 		infoResponse.setCreatedDate(infoEntity.getCreatedDate());
 		infoResponse.setEmail(infoEntity.getEmail());
 		infoResponse.setLdap(infoEntity.getLdap());
-		infoResponse.setLocation(infoEntity.getLocation());
+		infoResponse.setLocation(infoEntity.getLocation().toUpperCase());	
 		infoResponse.setMobileNo(infoEntity.getMobileNo());
 		infoResponse.setStatus(infoEntity.getStatus());
 		infoResponse.setUserId(infoEntity.getUserId());
-		infoResponse.setUserName(infoEntity.getUserName());
+		infoResponse.setUserName(infoEntity.getUserName().toUpperCase());
 		infoResponse.setWebAccess(infoEntity.getWebAccess());
 		return infoResponse;
 	}

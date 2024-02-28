@@ -47,6 +47,12 @@ public class DashboardServiceImpl {
 	@Autowired
 	ProfUserPropertiesRepository userPropertiesRepository;
 
+	private List<String> userCounts = new ArrayList<>();
+
+	public List<String> getUserCounts() {
+		return userCounts;
+	}
+
 	public ProfUserUploadDetailsResponse getUploadedDetails(String token) {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
 		try {
@@ -95,7 +101,7 @@ public class DashboardServiceImpl {
 			List<ProfGroupUserMappingEntity> groupInfoEntity = userMappingRepository.findByUserId(userId);
 			for (ProfGroupUserMappingEntity profGroupInfoEntity : groupInfoEntity) {
 				ProfUserGroupDetailsResponse response = new ProfUserGroupDetailsResponse();
-				ProfGroupInfoEntity ent=groupInfoRepository.findById(profGroupInfoEntity.getGroupId());
+				ProfGroupInfoEntity ent = groupInfoRepository.findById(profGroupInfoEntity.getGroupId());
 				response.setGroupName(ent.getGroupName());
 				long userGroupCount = groupInfoRepository.countByUserId(userId);
 				response.setGroupCount(String.valueOf(userGroupCount));
@@ -118,7 +124,7 @@ public class DashboardServiceImpl {
 					long totaluserFileSize = fileHelper.getTotalFileSize(entities);
 					response.setGroupUploadedFileSize(String.valueOf(totaluserFileSize));
 				}
-				detailsResponse.add(response);	
+				detailsResponse.add(response);
 			}
 
 		} catch (Exception e) {
@@ -138,8 +144,12 @@ public class DashboardServiceImpl {
 	}
 
 	@Scheduled(fixedRate = 2 * 24 * 60 * 60 * 1000)
+//	@Scheduled(fixedRate = 10 * 1000)
 	public void updateUserCount() {
 		String count = usersCount();
-		System.out.println("User count: " + count);
+		userCounts.add(count);
+		if (userCounts.size() > 10) {
+			userCounts.clear();
+		}
 	}
 }
