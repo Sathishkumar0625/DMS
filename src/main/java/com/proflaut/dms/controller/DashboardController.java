@@ -1,6 +1,8 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,14 +58,25 @@ public class DashboardController {
 	}
 
 	@GetMapping("/usersGraph")
-	public ResponseEntity<List<String>> getUsersGraph(@RequestHeader("token") String token) {
+	public ResponseEntity<List<Map<String, String>>> getUsersGraph(@RequestHeader("token") String token) {
 		try {
-			List<String> counts = dashboardServiceImpl.getUserCounts();
+			List<Map<String, String>> counts = dashboardServiceImpl.getUserCounts();
 			return new ResponseEntity<>(counts, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+//	@GetMapping("/usersAndGroupGraph")
+//	public ResponseEntity<List<String>> getUsersAndGroupsGrs(@RequestHeader("token") String token) {
+//		try {
+//			List<String> counts = dashboardServiceImpl.getUserCounts();
+//			return new ResponseEntity<>(counts, HttpStatus.OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+//	
 
 }

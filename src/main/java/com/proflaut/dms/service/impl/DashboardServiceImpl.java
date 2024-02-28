@@ -1,13 +1,15 @@
 package com.proflaut.dms.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
@@ -47,9 +49,15 @@ public class DashboardServiceImpl {
 	@Autowired
 	ProfUserPropertiesRepository userPropertiesRepository;
 
-	private List<String> userCounts = new ArrayList<>();
+	private List<Map<String, String>> userCounts = new ArrayList<>();
 
-	public List<String> getUserCounts() {
+	public String formatCurrentDate() {
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		return currentDateTime.format(formatter);
+	}
+
+	public List<Map<String, String>> getUserCounts() {
 		return userCounts;
 	}
 
@@ -147,9 +155,14 @@ public class DashboardServiceImpl {
 //	@Scheduled(fixedRate = 10 * 1000)
 	public void updateUserCount() {
 		String count = usersCount();
-		userCounts.add(count);
+		String date = formatCurrentDate();
+		Map<String, String> countMap = new HashMap<>();
+		countMap.put("date", date);
+		countMap.put("count", count);
+		userCounts.add(countMap);
 		if (userCounts.size() > 10) {
-			userCounts.clear();
+			userCounts.remove(0);
 		}
 	}
+
 }
