@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
@@ -49,6 +50,7 @@ import com.proflaut.dms.model.ProfEmailShareResponse;
 import com.proflaut.dms.model.ProfOverallCountResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfDownloadHistoryRepo;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
@@ -107,6 +109,9 @@ public class FileManagementServiceImpl {
 
 	@Autowired
 	RestTemplate restTemplatel;
+
+	@Autowired
+	ProfDownloadHistoryRepo downloadHistoryRepo;
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -299,6 +304,24 @@ public class FileManagementServiceImpl {
 			e.printStackTrace();
 		}
 		return imageResponse;
+	}
+
+	public ProfEmailShareResponse downloadHist(int docId, String token, long startTime) {
+		ProfEmailShareResponse emailShareResponse = new ProfEmailShareResponse();
+		try {
+			ProfUserPropertiesEntity profUserPropertiesEntity = profUserPropertiesRepository.findByToken(token);
+			ProfDownloadHistoryEntity historyEntity = fileHelper.convertRequestToDownloadHistory(docId,
+					profUserPropertiesEntity);
+			downloadHistoryRepo.save(historyEntity);
+			emailShareResponse.setStatus(DMSConstant.SUCCESS);
+			long endTime = System.nanoTime();
+			long executionTime = (endTime - startTime) / 1000000;
+			historyEntity.setDownloadExecutionSpeed((int)executionTime);
+		    downloadHistoryRepo.save(historyEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return emailShareResponse;
 	}
 
 }

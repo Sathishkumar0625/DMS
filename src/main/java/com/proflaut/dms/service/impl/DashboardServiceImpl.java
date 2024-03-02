@@ -8,17 +8,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
+import org.springframework.web.client.RestTemplate;
+
+import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.helper.FileHelper;
 import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
+import com.proflaut.dms.model.ImageRequest;
+import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.ProfUserGroupDetailsResponse;
+import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
+import com.proflaut.dms.repository.ProfDownloadHistoryRepo;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfGroupUserMappingRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
@@ -48,6 +64,15 @@ public class DashboardServiceImpl {
 
 	@Autowired
 	ProfUserPropertiesRepository userPropertiesRepository;
+
+	@Autowired
+	RestTemplate restTemplate;
+
+	@Autowired
+	ProfDownloadHistoryRepo downloadHistoryRepo;
+
+	@Autowired
+	FolderRepository folderRepository;
 
 	private List<Map<String, String>> userCounts = new ArrayList<>();
 
@@ -163,6 +188,84 @@ public class DashboardServiceImpl {
 		if (userCounts.size() > 10) {
 			userCounts.remove(0);
 		}
+	}
+
+	public List<ImageResponse> getOcrImage(ImageRequest imageRequest) {
+		List<ImageResponse> imageResponses = new ArrayList<>();
+		try {
+			byte[] byteArray = Base64Utils.decodeFromString(imageRequest.getImage());
+			// Set headers
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+			// Create request entity with image file
+			HttpEntity<Resource> requestEntity = new HttpEntity<>(new ByteArrayResource(byteArray), headers);
+
+			// Send POST request to Python server
+			ResponseEntity<ImageResponse> responseEntity = restTemplate.exchange("http://127.0.0.1:5000/ocrImage",
+					HttpMethod.POST, requestEntity, ImageResponse.class);
+			ImageResponse responseBody = responseEntity.getBody();
+			// String cleanedText = responseBody.getSharpenImage().replace("\n",
+			// "").replace("\n\n", "");
+
+			if (responseBody.getSharpenImage() != null) {
+				String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
+				ImageResponse imageResponse = new ImageResponse();
+				for (String response : text) {
+					imageResponse.setSharpenImage(response);
+				}
+			}
+//			imageResponses.add(imageResponse);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return imageResponses;
+	}
+
+	public ProfUserUploadDetailsResponse getUserFullDetails(String token) {
+		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
+		try {
+			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+			int userId = entity.getUserId();
+			if (entity.getUserName() != null) {
+				long count = docUploadRepository.countByCreatedBy(entity.getUserName());
+				detailsResponse.setUserUploadedCount(String.valueOf(count));
+				List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(entity.getUserName());
+				long userDocSize = fileHelper.getTotalFileSize(docEntities);
+				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize));
+				List<ProfDownloadHistoryEntity> historyEntities = downloadHistoryRepo.findByUserId(userId);
+				detailsResponse.setUserDownloadCount(String.valueOf(historyEntities.size()));
+				List<FolderEntity> folderEntities = folderRepository.findByCreatedBy(entity.getUserName());
+				detailsResponse.setUserFolderCreated(String.valueOf(folderEntities.size()));
+				String average = calculateAverage(count, userDocSize);
+				detailsResponse.setAverageFileUploade(average);
+				String averageExecutionTime = calculateAverageExecutionTime(docEntities);
+				detailsResponse.setAverageUploadSpeed(averageExecutionTime);
+				String averageDownloadSpeed=calculateAverageDownloadSpeed(historyEntities.size(),historyEntities);
+				detailsResponse.setAverageDownloadSpeed(averageDownloadSpeed);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return detailsResponse;
+	}
+
+	private String calculateAverageDownloadSpeed(int size, List<ProfDownloadHistoryEntity> historyEntities) {
+		long sum = historyEntities.stream().mapToLong(ProfDownloadHistoryEntity::getDownloadExecutionSpeed).sum();
+		return sum / size + "ms";
+	}
+
+	private String calculateAverageExecutionTime(List<ProfDocEntity> docEntities) {
+		if (docEntities.isEmpty()) {
+			return null;
+		}
+		long sum = docEntities.stream().mapToLong(ProfDocEntity::getUploadExecutionTime).sum();
+		return sum / docEntities.size() + "ms";
+	}
+
+	private String calculateAverage(long count, long userDocSize) {
+		long average = (userDocSize / count);
+		return average + "kb";
 	}
 
 }

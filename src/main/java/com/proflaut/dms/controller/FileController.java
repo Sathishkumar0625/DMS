@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -72,6 +73,8 @@ public class FileController {
 	@Transactional
 	public ResponseEntity<FileResponse> fileUpload(@RequestHeader(value = "token") String token,
 			@Valid @RequestBody FileRequest fileRequest, BindingResult bindingResult) throws IOException {
+		long startTime = System.nanoTime();
+
 		logger.info("Getting into Upload");
 		FileResponse fileResponse = new FileResponse();
 		if (bindingResult.hasErrors()) {
@@ -81,7 +84,7 @@ public class FileController {
 			fileResponse.setErrorMessage(errorMessage.toString());
 			return new ResponseEntity<>(fileResponse, HttpStatus.BAD_REQUEST);
 		}
-		Path paths=null;
+		Path paths = null;
 		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			fileResponse = fileManagementServiceImpl.storeFile(fileRequest, token, status, transactionManager);
@@ -91,11 +94,16 @@ public class FileController {
 						Integer.valueOf(fileRequest.getFolderId()));
 				String path = folderLocation + File.separator + docEntity.getDocPath();
 				paths = Paths.get(path);
-				ProfMetaDataResponse metaDataResponse = metaServiceImpl
-						.save(fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths,docEntity);
+				ProfMetaDataResponse metaDataResponse = metaServiceImpl.save(
+						fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths, docEntity);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
 					logger.error("INSERT META DATA SUCCESS");
+					long endTime = System.nanoTime();
+					long executionTime = (endTime - startTime) / 1000000;
+					docEntity.setUploadExecutionTime((int)executionTime);
+					uploadRepository.save(docEntity);
+					logger.info("Counting to 10000000 takes --> {} " , executionTime);
 					return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 				} else {
 					logger.error("Failed to create meta table");
@@ -105,7 +113,7 @@ public class FileController {
 			} else {
 				logger.warn("Upload Failure");
 				metaServiceImpl.delete(paths);
-				transactionManager.rollback(status);				
+				transactionManager.rollback(status);
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
@@ -114,6 +122,7 @@ public class FileController {
 			transactionManager.rollback(status);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 	}
 
 	@GetMapping("/download")
@@ -124,7 +133,7 @@ public class FileController {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
+		
 		logger.info("Getting into Download");
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		try {
@@ -195,9 +204,10 @@ public class FileController {
 		}
 
 	}
+
 	@GetMapping("/getCount")
 	public ResponseEntity<ProfOverallCountResponse> getCount() {
-		ProfOverallCountResponse countResponse=null;
+		ProfOverallCountResponse countResponse = null;
 		try {
 			countResponse = fileManagementServiceImpl.reteriveCount();
 			if (countResponse != null) {
@@ -213,14 +223,14 @@ public class FileController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/sharpenedImage")
 	public ResponseEntity<ImageResponse> getImage(@RequestBody ImageRequest imageRequest) {
 		if (StringUtils.isEmpty(imageRequest.getImage())) {
 			logger.warn(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		ImageResponse imageResponse=null;
+		ImageResponse imageResponse = null;
 		try {
 			imageResponse = fileManagementServiceImpl.getImage(imageRequest);
 			if (imageResponse != null) {
@@ -235,5 +245,29 @@ public class FileController {
 		}
 	}
 	
+	@PostMapping("/downloadHistory/{docId}")
+	public ResponseEntity<ProfEmailShareResponse> downloadHistory(@RequestHeader("token") String token,@PathVariable int docId) {
+		long startTime = System.nanoTime();
+		if (StringUtils.isEmpty(docId) || StringUtils.isEmpty(token)) {
+			logger.warn(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfEmailShareResponse emailShareResponse = null;
+
+		try {
+			emailShareResponse = fileManagementServiceImpl.downloadHist(docId,token,startTime);
+			if (!emailShareResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(emailShareResponse, HttpStatus.OK);
+			} else {
+				emailShareResponse.setStatus(DMSConstant.FAILURE);
+				return new ResponseEntity<>(emailShareResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
 
 }

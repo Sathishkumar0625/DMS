@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PTOF_MOUNTPOINT_FOLDER_MAPPING")
+@Table(name = "PROF_MOUNTPOINT_FOLDER_MAPPING")
 public class ProfMountPointFolderMappingEntity {
 
 	@Id

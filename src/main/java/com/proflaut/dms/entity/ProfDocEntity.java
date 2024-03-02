@@ -50,6 +50,17 @@ public class ProfDocEntity {
 	@Column(name = "FILE_SIZE")
 	private String fileSize;
 
+	@Column(name = "UPLOAD_EXECUTION_TIME")
+	private int uploadExecutionTime;
+
+	public int getUploadExecutionTime() {
+		return uploadExecutionTime;
+	}
+
+	public void setUploadExecutionTime(int uploadExecutionTime) {
+		this.uploadExecutionTime = uploadExecutionTime;
+	}
+
 	public String getFileSize() {
 		return fileSize;
 	}

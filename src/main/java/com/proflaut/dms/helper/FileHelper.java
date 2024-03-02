@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
 import com.proflaut.dms.entity.ProfMountPointEntity;
@@ -439,6 +440,15 @@ public class FileHelper {
 			return groups;
 		}
 
+	}
+
+	public ProfDownloadHistoryEntity convertRequestToDownloadHistory(int docId,
+			ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfDownloadHistoryEntity downloadHistoryEntity=new ProfDownloadHistoryEntity();
+		downloadHistoryEntity.setDocId(docId);
+		downloadHistoryEntity.setDownloadedDate(formatCurrentDateTime());
+		downloadHistoryEntity.setUserId(profUserPropertiesEntity.getUserId());
+		return downloadHistoryEntity;
 	}
 
 }
