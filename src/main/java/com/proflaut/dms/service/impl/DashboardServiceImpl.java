@@ -204,18 +204,16 @@ public class DashboardServiceImpl {
 			// Send POST request to Python server
 			ResponseEntity<ImageResponse> responseEntity = restTemplate.exchange("http://127.0.0.1:5000/ocrImage",
 					HttpMethod.POST, requestEntity, ImageResponse.class);
-			ImageResponse responseBody = responseEntity.getBody();
-			// String cleanedText = responseBody.getSharpenImage().replace("\n",
-			// "").replace("\n\n", "");
-
-			if (responseBody.getSharpenImage() != null) {
-				String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
-				ImageResponse imageResponse = new ImageResponse();
-				for (String response : text) {
-					imageResponse.setSharpenImage(response);
-				}
+			if ( responseEntity.getBody() != null) {
+				ImageResponse responseBody = responseEntity.getBody();
+			    String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
+			    for (String response : text) {
+			        ImageResponse imageResponse = new ImageResponse(); // Create a new instance inside the loop
+			        imageResponse.setSharpenImage(response);
+			        imageResponses.add(imageResponse); // Add the new instance to the list
+			    }
 			}
-//			imageResponses.add(imageResponse);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -232,7 +230,7 @@ public class DashboardServiceImpl {
 				detailsResponse.setUserUploadedCount(String.valueOf(count));
 				List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(entity.getUserName());
 				long userDocSize = fileHelper.getTotalFileSize(docEntities);
-				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize));
+				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize)+"kb");
 				List<ProfDownloadHistoryEntity> historyEntities = downloadHistoryRepo.findByUserId(userId);
 				detailsResponse.setUserDownloadCount(String.valueOf(historyEntities.size()));
 				List<FolderEntity> folderEntities = folderRepository.findByCreatedBy(entity.getUserName());
