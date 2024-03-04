@@ -15,10 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenGenerator {
+	private TokenGenerator() {}
+	
 	private static final Logger logger = LogManager.getLogger(TokenGenerator.class);
 	static Cipher cipher;
 
-	public Map<String, String> generateToken(String userName) {
+	public static Map<String, String> generateToken(String userName) {
 		String encryptedText = "";
 		Map<String, String> resp = new HashMap<>();
 		try {
@@ -27,7 +29,7 @@ public class TokenGenerator {
 			SecretKey secretKey = keyGenerator.generateKey();
 			String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-			cipher = Cipher.getInstance("AES");
+			cipher = Cipher.getInstance("AES/GCM/NoPadding");
 
 			encryptedText = encrypt(userName, secretKey);
 			logger.info("Encrypted Text After Encryption --> {}",encryptedText);
