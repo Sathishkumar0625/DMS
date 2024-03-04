@@ -208,9 +208,11 @@ public class DashboardServiceImpl {
 				ImageResponse responseBody = responseEntity.getBody();
 			    String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
 			    for (String response : text) {
-			        ImageResponse imageResponse = new ImageResponse(); // Create a new instance inside the loop
-			        imageResponse.setSharpenImage(response);
-			        imageResponses.add(imageResponse); // Add the new instance to the list
+			    	if (!response.trim().isEmpty()) { 
+			            ImageResponse imageResponse = new ImageResponse(); 
+			            imageResponse.setSharpenImage(response.trim()); 
+			            imageResponses.add(imageResponse); 
+			        }
 			    }
 			}
 
