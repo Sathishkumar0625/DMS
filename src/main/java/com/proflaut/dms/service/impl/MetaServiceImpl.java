@@ -127,11 +127,11 @@ public class MetaServiceImpl {
 				throw new CustomException("Token or userName is null");
 			}
 		} catch (CustomException ce) {
-			ce.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, ce.getMessage(), ce);
 			metaDataResponse.setStatus(DMSConstant.FAILURE);
 			metaDataResponse.setErrorMessage(ce.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			metaDataResponse.setStatus(DMSConstant.FAILURE);
 			metaDataResponse.setErrorMessage("An error occurred");
 		}
@@ -148,9 +148,9 @@ public class MetaServiceImpl {
 				throw new CustomException("DataEntity not found for name: " + docEntity.getId());
 			}
 		} catch (CustomException ce) {
-			ce.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, ce.getMessage(), ce);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		} finally {
 			if (entityManager != null && entityManager.isOpen()) {
 				entityManager.close();
@@ -171,7 +171,7 @@ public class MetaServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return metaResponses;
 	}
@@ -184,7 +184,7 @@ public class MetaServiceImpl {
 				dataResponse = metaHelper.convertMetaEntityToResponse(dataEntity);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 
 		return dataResponse;
@@ -208,7 +208,7 @@ public class MetaServiceImpl {
 			if (path != null) {
 				delete(path);
 			}
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return dataResponse;
 	}
@@ -249,7 +249,7 @@ public class MetaServiceImpl {
 				responseMap.put("error", "Table not found");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return responseMap;
 	}
@@ -285,7 +285,7 @@ public class MetaServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return accessResponses;
 	}
@@ -300,9 +300,9 @@ public class MetaServiceImpl {
 				throw new CustomException("DataEntity not found for name: ");
 			}
 		} catch (CustomException ce) {
-			ce.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, ce.getMessage(), ce);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		} finally {
 			if (entityManager != null && entityManager.isOpen()) {
 				entityManager.close();
@@ -331,7 +331,7 @@ public class MetaServiceImpl {
 				response.put("records", records);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return response;
 	}
@@ -459,7 +459,7 @@ public class MetaServiceImpl {
 
 			dataResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			dataResponse.setStatus(DMSConstant.FAILURE);
 			dataResponse.setErrorMessage("An error occurred while updating the table");
 		}

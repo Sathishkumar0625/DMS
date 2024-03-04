@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,9 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class FolderServiceImpl {
-
+	
+	private static final Logger logger = LogManager.getLogger(FolderServiceImpl.class);
+	
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
@@ -107,7 +111,7 @@ public class FolderServiceImpl {
 				fileResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			throw new CustomException(e.getMessage());
 		}
 		return fileResponse;
@@ -134,7 +138,7 @@ public class FolderServiceImpl {
 				fileResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return fileResponse;
 	}
@@ -148,7 +152,7 @@ public class FolderServiceImpl {
 				folders = helper.convertFolderEntityToFolderFo(folderEntity, docEntity);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 
 		}
 		return folders;
@@ -168,7 +172,7 @@ public class FolderServiceImpl {
 				throw new CustomException("Token Not Found" + token);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			folderRetreiveResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return folderRetreiveResponse;
@@ -184,7 +188,7 @@ public class FolderServiceImpl {
 				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity, accessRights);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return folders;
 	}

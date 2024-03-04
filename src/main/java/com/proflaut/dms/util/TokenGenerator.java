@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import com.proflaut.dms.constant.DMSConstant;
+
 @Component
 public class TokenGenerator {
 	private TokenGenerator() {}
@@ -35,8 +37,8 @@ public class TokenGenerator {
 			logger.info("Encrypted Text After Encryption --> {}",encryptedText);
 			resp.put("token", encryptedText);
 			resp.put("seckey", encodedKey);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);;
 		}
 		return resp;
 	}

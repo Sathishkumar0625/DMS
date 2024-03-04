@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.controller.AccessController;
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
@@ -29,6 +32,7 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class AccessRightsServiceImpl {
+	private static final Logger logger = LogManager.getLogger(AccessRightsServiceImpl.class);
 	
 	ProfMetaDataRepository dataRepository;
 	AccessRightsHelper helper;
@@ -65,7 +69,7 @@ public class AccessRightsServiceImpl {
 			accessRightRepository.save(accessRights);
 			accessRightResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			accessRightResponse.setStatus(DMSConstant.FAILURE);
 			accessRightResponse.setErrorMessage(e.getMessage());
 		}
@@ -86,7 +90,7 @@ public class AccessRightsServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return accessRightsResponses;
 	}
@@ -104,7 +108,7 @@ public class AccessRightsServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return accessRightsResponse;
 	}
@@ -148,7 +152,7 @@ public class AccessRightsServiceImpl {
 				accessRightResponse.setErrorMessage("Access rights entity not found for accessId " + accessId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			accessRightResponse.setStatus(DMSConstant.FAILURE);
 			accessRightResponse.setErrorMessage("An error occurred while deleting user access");
 		}
@@ -175,7 +179,7 @@ public class AccessRightsServiceImpl {
 				accessRightResponse.setErrorMessage("Access rights entity not found for accessId " + accessId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			accessRightResponse.setStatus(DMSConstant.FAILURE);
 			accessRightResponse.setErrorMessage("An error occurred while deleting user access");
 		}
@@ -205,7 +209,7 @@ public class AccessRightsServiceImpl {
 				overalUserInfoResponses = groupServiceImpl.findUsers();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return overalUserInfoResponses;
 	}
@@ -233,7 +237,7 @@ public class AccessRightsServiceImpl {
 				groupInfoResponses = groupServiceImpl.find();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponses;
 	}

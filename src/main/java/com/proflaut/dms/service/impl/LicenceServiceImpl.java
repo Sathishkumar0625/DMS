@@ -3,6 +3,8 @@ package com.proflaut.dms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
 @Service
 public class LicenceServiceImpl {
-	
+	private static final Logger logger = LogManager.getLogger(LicenceServiceImpl.class);
 	ProfLicenseRepository licenseRepository;
 	LicenceHelper helper;
 	
@@ -35,7 +37,7 @@ public class LicenceServiceImpl {
 			licenceResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			licenceResponse.setStatus(DMSConstant.FAILURE);
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return licenceResponse;
 	}
@@ -52,7 +54,7 @@ public class LicenceServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return licenceResponses;
 	}

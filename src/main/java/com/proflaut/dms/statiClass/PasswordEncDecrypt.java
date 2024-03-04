@@ -15,6 +15,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.proflaut.dms.constant.DMSConstant;
+
 public class PasswordEncDecrypt {
 	private static final Logger logger = LogManager.getLogger(PasswordEncDecrypt.class);
 	public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
@@ -46,7 +48,7 @@ public class PasswordEncDecrypt {
 			byte[] encryptedText = cipher.doFinal(plainText);
 			encryptedString = new String(Base64.encodeBase64(encryptedText));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return encryptedString;
 	}
@@ -59,7 +61,7 @@ public class PasswordEncDecrypt {
 			byte[] plainText = cipher.doFinal(encryptedText);
 			decryptedText = new String(plainText);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return decryptedText;
 	}

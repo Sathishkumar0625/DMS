@@ -7,6 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,9 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 @Service
 @Transactional
 public class GroupServiceImpl {
-
+	
+	private static final Logger logger = LogManager.getLogger(GroupServiceImpl.class);
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -76,7 +80,7 @@ public class GroupServiceImpl {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -98,7 +102,7 @@ public class GroupServiceImpl {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			throw new CustomException(e.getMessage());
 		}
 		return groupInfoResponse;
@@ -118,7 +122,7 @@ public class GroupServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponses;
 	}
@@ -132,7 +136,7 @@ public class GroupServiceImpl {
 			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			groupInfoResponse.setStatus(DMSConstant.FAILURE);
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -150,7 +154,7 @@ public class GroupServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return infoResponses;
 	}
@@ -168,7 +172,7 @@ public class GroupServiceImpl {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -205,7 +209,7 @@ public class GroupServiceImpl {
 				groupInfoResponses.add(groupInfoResponse);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponses;
 	}
@@ -218,7 +222,7 @@ public class GroupServiceImpl {
 			groupUserMappingRepository.saveAll(userMappingEntities);
 			groupInfoResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -236,7 +240,7 @@ public class GroupServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return userInfoResponses;
 	}
@@ -255,7 +259,7 @@ public class GroupServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponses;
 	}
@@ -273,7 +277,7 @@ public class GroupServiceImpl {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -293,7 +297,7 @@ public class GroupServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return overalUserInfoResponses;
 	}
@@ -311,7 +315,7 @@ public class GroupServiceImpl {
 				groupInfoResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponse;
 	}
@@ -323,7 +327,7 @@ public class GroupServiceImpl {
 			ProfUserInfoEntity infoEntity = userInfoRepository.findByUserId(entity.getUserId());
 			infoResponse = groupHelper.convertToDashboardUserResponse(infoEntity);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return infoResponse;
 	}

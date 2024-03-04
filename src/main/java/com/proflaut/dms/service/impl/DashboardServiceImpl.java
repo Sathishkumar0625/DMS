@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
@@ -43,7 +47,8 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class DashboardServiceImpl {
-
+	
+	private static final Logger logger = LogManager.getLogger(DashboardServiceImpl.class);
 	ProfUserInfoRepository infoRepository;
 	ProfDocUploadRepository docUploadRepository;
 	FileHelper fileHelper;
@@ -120,7 +125,7 @@ public class DashboardServiceImpl {
 				detailsResponse.setUserGroupFileOccupiedSize(String.valueOf(userGroupFileOccupiedSize));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return detailsResponse;
 	}
@@ -160,7 +165,7 @@ public class DashboardServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return detailsResponse;
 	}
@@ -170,7 +175,7 @@ public class DashboardServiceImpl {
 		try {
 			count = infoRepository.count();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return String.valueOf(count);
 	}
@@ -216,7 +221,7 @@ public class DashboardServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 
 		return imageResponses;
@@ -245,7 +250,7 @@ public class DashboardServiceImpl {
 				detailsResponse.setAverageDownloadSpeed(averageDownloadSpeed);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return detailsResponse;
 	}

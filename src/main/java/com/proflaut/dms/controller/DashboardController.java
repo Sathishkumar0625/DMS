@@ -2,6 +2,9 @@ package com.proflaut.dms.controller;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.model.ImageRequest;
 import com.proflaut.dms.model.ImageResponse;
@@ -25,7 +30,7 @@ import com.proflaut.dms.service.impl.DashboardServiceImpl;
 public class DashboardController {
 
 	DashboardServiceImpl dashboardServiceImpl;
-		
+	private static final Logger logger = LogManager.getLogger(DashboardController.class);	
 	@Autowired
 	public DashboardController(DashboardServiceImpl dashboardServiceImpl) {
 		this.dashboardServiceImpl = dashboardServiceImpl;
@@ -42,7 +47,7 @@ public class DashboardController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -59,7 +64,7 @@ public class DashboardController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -70,7 +75,7 @@ public class DashboardController {
 			List<Map<String, String>> counts = dashboardServiceImpl.getUserCounts();
 			return new ResponseEntity<>(counts, HttpStatus.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -89,7 +94,7 @@ public class DashboardController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -105,7 +110,7 @@ public class DashboardController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -1,5 +1,7 @@
 package com.proflaut.dms.service.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -65,6 +67,8 @@ import com.proflaut.dms.util.Compression;
 @Service
 @Transactional
 public class FileManagementServiceImpl {
+	
+	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
 	
 	ProfDocUploadRepository profDocUploadRepository;
 
@@ -150,7 +154,7 @@ public class FileManagementServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			transactionManager.rollback(status);
 			throw new CustomException(e.getMessage());
 		}
@@ -203,7 +207,7 @@ public class FileManagementServiceImpl {
 				response.put("image", fileRetreiveByResponse);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			fileRetreiveByResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return response;
@@ -240,11 +244,11 @@ public class FileManagementServiceImpl {
 			}
 
 		} catch (CustomException ce) {
-			ce.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, ce.getMessage(), ce);
 			emailShareResponse.setStatus(DMSConstant.FAILURE);
 			emailShareResponse.setMessage(ce.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			emailShareResponse.setStatus(DMSConstant.FAILURE);
 		}
 
@@ -293,7 +297,7 @@ public class FileManagementServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return countResponse;
 	}
@@ -315,7 +319,7 @@ public class FileManagementServiceImpl {
 
 			imageResponse = responseEntity.getBody();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return imageResponse;
 	}
@@ -333,7 +337,7 @@ public class FileManagementServiceImpl {
 			historyEntity.setDownloadExecutionSpeed((int)executionTime);
 		    downloadHistoryRepo.save(historyEntity);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return emailShareResponse;
 	}

@@ -23,4 +23,5 @@ public class DMSConstant {
 	public static final String INTEGER="Integer";
 	public static final String STRING="String";
 	public static final String USERID_NOT_EXIST="User ID Not Exist";
+	public static final String PRINTSTACKTRACE="An error occurred: {}";
 }

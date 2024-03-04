@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +47,7 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class TransactionServiceImpl {
-
+	private static final Logger logger = LogManager.getLogger(TransactionServiceImpl.class);
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
@@ -95,7 +97,7 @@ public class TransactionServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			activityResponse.setStatus(DMSConstant.FAILURE);
 			activityResponse.setErrorMessage("Error occurred while saving activity: " + e.getMessage());
 		}
@@ -131,7 +133,7 @@ public class TransactionServiceImpl {
 			dmsMainRepository.save(makerEntity);
 			activityResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return activityResponse;
 	}
@@ -146,7 +148,7 @@ public class TransactionServiceImpl {
 				dmsMainReterives.add(dmsMainReterive);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return dmsMainReterives;
 	}
@@ -165,7 +167,7 @@ public class TransactionServiceImpl {
 				dmsMainResponse.setErrorMessage(DMSConstant.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return dmsMainResponse;
 	}
@@ -178,7 +180,7 @@ public class TransactionServiceImpl {
 			mainResponse.setStatus(DMSConstant.SUCCESS);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			mainResponse.setStatus(DMSConstant.FAILURE);
 
 		}
@@ -202,7 +204,7 @@ public class TransactionServiceImpl {
 					headerList.addAll(innerHeaders);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			}
 		});
 
@@ -224,7 +226,7 @@ public class TransactionServiceImpl {
 			profExecutionResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			profExecutionResponse.setStatus(DMSConstant.FAILURE);
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return profExecutionResponse;
 	}
@@ -239,7 +241,7 @@ public class TransactionServiceImpl {
 				executionResponse.add(executionResponses);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return executionResponse;
 	}
@@ -249,7 +251,7 @@ public class TransactionServiceImpl {
 		try {
 			invoiceResponse = transactionHelper.invoicegenerator(invoiceRequest);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return invoiceResponse;
 	}
@@ -271,7 +273,7 @@ public class TransactionServiceImpl {
 
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return Collections.emptyMap();
 		}
 	}

@@ -39,6 +39,7 @@ public class AccessServiceImpl {
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 	AccessHelper accessHelper;
 	TokenGenerator tokenGenerator;
+	
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
@@ -89,7 +90,7 @@ public class AccessServiceImpl {
 
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			throw new CustomException(e.getMessage());
 
 		}
@@ -186,7 +187,7 @@ public class AccessServiceImpl {
 				logoutResponse.setErrorMessage(DMSConstant.USERID_NOT_EXIST);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return logoutResponse;
 	}

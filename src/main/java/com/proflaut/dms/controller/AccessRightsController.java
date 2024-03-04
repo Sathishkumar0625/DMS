@@ -38,8 +38,7 @@ public class AccessRightsController {
 	FileManagementServiceImpl fileManagementServiceImpl;
 
 	AccessRightsServiceImpl accessRightsServiceImpl;
-	
-	
+
 	@Autowired
 	public AccessRightsController(FileManagementServiceImpl fileManagementServiceImpl,
 			AccessRightsServiceImpl accessRightsServiceImpl) {
@@ -66,7 +65,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -83,7 +82,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -103,7 +102,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(accessRightsResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -124,7 +123,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -147,7 +146,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -169,7 +168,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -185,11 +184,11 @@ public class AccessRightsController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getAllNotAccessGroups/{accessId}")
 	public ResponseEntity<List<ProfOverallGroupInfoResponse>> getAllNotAccessGroups(@PathVariable int accessId) {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
@@ -201,7 +200,7 @@ public class AccessRightsController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

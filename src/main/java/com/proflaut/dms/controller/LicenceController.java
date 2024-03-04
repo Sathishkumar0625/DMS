@@ -3,6 +3,8 @@ package com.proflaut.dms.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,8 @@ import com.proflaut.dms.service.impl.LicenceServiceImpl;
 @CrossOrigin
 public class LicenceController {
 
-
+	private static final Logger logger = LogManager.getLogger(LicenceController.class);
+	
 	LicenceServiceImpl licenceServiceImpl;
 	
 	
@@ -40,7 +43,7 @@ public class LicenceController {
 				return new ResponseEntity<>(licenceResponse, HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -56,7 +59,7 @@ public class LicenceController {
 				return new ResponseEntity<>(licenceResponse, HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

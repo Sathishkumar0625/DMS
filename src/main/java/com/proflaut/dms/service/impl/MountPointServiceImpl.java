@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.nio.file.Files;
@@ -30,7 +32,7 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class MountPointServiceImpl {
-
+	private static final Logger logger = LogManager.getLogger(MountPointServiceImpl.class);
 	MountPointHelper helper;
 
 	ProfMountPointRepository mountPointRepository;
@@ -71,7 +73,7 @@ public class MountPointServiceImpl {
 				mountPointResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return mountPointResponse;
 	}
@@ -91,7 +93,7 @@ public class MountPointServiceImpl {
 				throw new CustomException("ProfMountPointEntity Is Null" + mountPointEntities);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return pointOverallResponses;
 	}
@@ -107,7 +109,7 @@ public class MountPointServiceImpl {
 				throw new CustomException("Id Not Found " + mountPointEntities);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return pointOverallResponse;
 	}
@@ -129,7 +131,7 @@ public class MountPointServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return mountPointResponse;
 	}
@@ -154,7 +156,7 @@ public class MountPointServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return folderPathResponses;
 	}
@@ -174,7 +176,7 @@ public class MountPointServiceImpl {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return mountPointResponse;
 	}
@@ -193,7 +195,7 @@ public class MountPointServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return folderPathResponses;
 	}

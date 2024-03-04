@@ -31,10 +31,9 @@ import com.proflaut.dms.service.impl.AccessServiceImpl;
 public class AccessController {
 
 	private static final Logger logger = LogManager.getLogger(AccessController.class);
-	
+
 	AccessServiceImpl accessServiceImpl;
-	
-	
+
 	@Autowired
 	public AccessController(AccessServiceImpl accessServiceImpl) {
 		this.accessServiceImpl = accessServiceImpl;
@@ -66,6 +65,7 @@ public class AccessController {
 			userRegResponse.setUserId(0);
 			userRegResponse.setEmail(userInfo.getEmail());
 			userRegResponse.setUserName(userInfo.getUserName());
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(userRegResponse, HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
@@ -80,7 +80,7 @@ public class AccessController {
 		try {
 			loginResponse = accessServiceImpl.getUser(userInfo);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 
 		if (loginResponse != null && (!loginResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE))) {
@@ -101,6 +101,7 @@ public class AccessController {
 				return new ResponseEntity<>(logoutResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
