@@ -15,10 +15,16 @@ import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 
 @Service
 public class LicenceServiceImpl {
-	@Autowired
+	
 	ProfLicenseRepository licenseRepository;
-	@Autowired
 	LicenceHelper helper;
+	
+	
+	@Autowired
+	public LicenceServiceImpl(ProfLicenseRepository licenseRepository, LicenceHelper helper) {
+		this.licenseRepository = licenseRepository;
+		this.helper = helper;
+	}
 
 	public ProfLicenceResponse createLicence() {
 		ProfLicenceResponse licenceResponse = new ProfLicenceResponse();

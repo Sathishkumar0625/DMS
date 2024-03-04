@@ -65,53 +65,67 @@ import com.proflaut.dms.util.Compression;
 @Service
 @Transactional
 public class FileManagementServiceImpl {
-	@Autowired
+	
 	ProfDocUploadRepository profDocUploadRepository;
 
-	@Autowired
-	ProfUserPropertiesRepository profUserPropertiesRepository;
-
-	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
 
-	@Autowired
 	FileHelper fileHelper;
 
-	@Autowired
 	FolderRepository folderRepository;
 
-	@Autowired
 	ProfOldImageRepository imageRepository;
 
 	@PersistenceContext
 	EntityManager entityManager;
 
-	@Autowired
 	ProfMailConfigRepository configRepository;
 
-	@Autowired
 	ProfMetaDataRepository metaDataRepository;
 
 	@Autowired
 	AccessRightsServiceImpl accessRightsServiceImpl;
 
-	@Autowired
 	MetaServiceImpl metaServiceImpl;
 
-	@Autowired
 	ProfMountFolderMappingRepository folderMappingRepository;
-
-	@Autowired
+	
 	ProfGroupInfoRepository groupInfoRepository;
 
-	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
 
-	@Autowired
 	RestTemplate restTemplatel;
 
-	@Autowired
 	ProfDownloadHistoryRepo downloadHistoryRepo;
+	
+	ProfUserPropertiesRepository profUserPropertiesRepository;
+	
+	
+	@Autowired
+	public FileManagementServiceImpl(ProfDocUploadRepository profDocUploadRepository,
+			ProfUserPropertiesRepository profUserPropertiesRepository, ProfUserInfoRepository profUserInfoRepository,
+			FileHelper fileHelper, FolderRepository folderRepository, ProfOldImageRepository imageRepository,
+			EntityManager entityManager, ProfMailConfigRepository configRepository,
+			ProfMetaDataRepository metaDataRepository,
+			MetaServiceImpl metaServiceImpl, ProfMountFolderMappingRepository folderMappingRepository,
+			ProfGroupInfoRepository groupInfoRepository, ProfUserGroupMappingRepository groupMappingRepository,
+			RestTemplate restTemplatel, ProfDownloadHistoryRepo downloadHistoryRepo) {
+		this.profDocUploadRepository = profDocUploadRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.profUserInfoRepository = profUserInfoRepository;
+		this.fileHelper = fileHelper;
+		this.folderRepository = folderRepository;
+		this.imageRepository = imageRepository;
+		this.entityManager = entityManager;
+		this.configRepository = configRepository;
+		this.metaDataRepository = metaDataRepository;
+		this.metaServiceImpl = metaServiceImpl;
+		this.folderMappingRepository = folderMappingRepository;
+		this.groupInfoRepository = groupInfoRepository;
+		this.groupMappingRepository = groupMappingRepository;
+		this.restTemplatel = restTemplatel;
+		this.downloadHistoryRepo = downloadHistoryRepo;
+	}
 
 	@Value("${create.folderlocation}")
 	private String folderLocation;

@@ -21,8 +21,13 @@ import com.proflaut.dms.service.impl.LicenceServiceImpl;
 public class LicenceController {
 
 
-	@Autowired
 	LicenceServiceImpl licenceServiceImpl;
+	
+	
+	@Autowired
+	public LicenceController(LicenceServiceImpl licenceServiceImpl) {
+		this.licenceServiceImpl = licenceServiceImpl;
+	}
 
 	@PostMapping("/createLicence")
 	public ResponseEntity<ProfLicenceResponse> create() {

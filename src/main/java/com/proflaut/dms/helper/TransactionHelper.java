@@ -38,13 +38,14 @@ public class TransactionHelper {
 
 	private final Random random = new Random();
 
-	@Autowired
 	FolderServiceImpl folderServiceImpl;
 
 	private final AppConfiguration appConfiguration;
-
-	public TransactionHelper(AppConfiguration appConfiguration) {
+	
+	@Autowired
+	public TransactionHelper(AppConfiguration appConfiguration,FolderServiceImpl folderServiceImpl) {
 		this.appConfiguration = appConfiguration;
+		this.folderServiceImpl=folderServiceImpl;
 	}
 
 	private String generateUniqueId() {

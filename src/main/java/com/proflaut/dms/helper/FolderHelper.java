@@ -40,33 +40,37 @@ import com.proflaut.dms.service.impl.MountPointServiceImpl;
 
 @Component
 public class FolderHelper {
-	@Autowired
+	
 	FolderRepository folderRepository;
 	@Value("${create.folderlocation}")
 	private String folderLocation;
-
-	@Autowired
 	FolderRepository folderRepo;
-
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-
-	@Autowired
 	ProfMetaDataRepository dataRepository;
-
-	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
-
-	@Autowired
 	ProfAccessGroupMappingRepository accessGroupMappingRepository;
-
-	@Autowired
 	ProfAccessUserMappingRepository accessUserMappingRepository;
-
-	@Autowired
 	ProfAccessRightRepository accessRightRepository;
-	@Autowired
 	MountPointServiceImpl mountPointServiceImpl;
+	
+	
+	@Autowired
+	public FolderHelper(FolderRepository folderRepository, FolderRepository folderRepo,
+			ProfUserPropertiesRepository profUserPropertiesRepository, ProfMetaDataRepository dataRepository,
+			ProfUserGroupMappingRepository groupMappingRepository,
+			ProfAccessGroupMappingRepository accessGroupMappingRepository,
+			ProfAccessUserMappingRepository accessUserMappingRepository,
+			ProfAccessRightRepository accessRightRepository, MountPointServiceImpl mountPointServiceImpl) {
+		this.folderRepository = folderRepository;
+		this.folderRepo = folderRepo;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.dataRepository = dataRepository;
+		this.groupMappingRepository = groupMappingRepository;
+		this.accessGroupMappingRepository = accessGroupMappingRepository;
+		this.accessUserMappingRepository = accessUserMappingRepository;
+		this.accessRightRepository = accessRightRepository;
+		this.mountPointServiceImpl = mountPointServiceImpl;
+	}
 
 	private static final Logger logger = LogManager.getLogger(FolderHelper.class);
 
@@ -77,7 +81,7 @@ public class FolderHelper {
 	}
 
 	public FolderEntity convertFOtoBO(FolderFO folderFO, 
-			ProfUserPropertiesEntity propertiesEntity, String token) {
+			ProfUserPropertiesEntity propertiesEntity) {
 
 		FolderEntity ent = new FolderEntity();
 		ent.setFolderName(folderFO.getFolderName());

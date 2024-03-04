@@ -35,11 +35,17 @@ import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 @CrossOrigin
 public class AccessRightsController {
 
-	@Autowired
 	FileManagementServiceImpl fileManagementServiceImpl;
 
-	@Autowired
 	AccessRightsServiceImpl accessRightsServiceImpl;
+	
+	
+	@Autowired
+	public AccessRightsController(FileManagementServiceImpl fileManagementServiceImpl,
+			AccessRightsServiceImpl accessRightsServiceImpl) {
+		this.fileManagementServiceImpl = fileManagementServiceImpl;
+		this.accessRightsServiceImpl = accessRightsServiceImpl;
+	}
 
 	private static final Logger logger = LogManager.getLogger(AccessRightsController.class);
 

@@ -32,8 +32,13 @@ public class MountPointController {
 
 	private static final Logger logger = LogManager.getLogger(MountPointController.class);
 
-	@Autowired
 	MountPointServiceImpl mountPointServiceImpl;
+	
+	
+	@Autowired
+	public MountPointController(MountPointServiceImpl mountPointServiceImpl) {
+		this.mountPointServiceImpl = mountPointServiceImpl;
+	}
 
 	@PostMapping("/saveMountPoint")
 	public ResponseEntity<ProfMountPointResponse> saveMount(@RequestHeader("token") String token,

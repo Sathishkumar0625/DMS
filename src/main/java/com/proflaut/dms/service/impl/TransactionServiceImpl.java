@@ -49,29 +49,36 @@ public class TransactionServiceImpl {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
 
-	@Autowired
 	ProfActivityRepository activityRepository;
 
-	@Autowired
 	ProfDmsMainRepository dmsMainRepository;
 
-	@Autowired
 	FolderServiceImpl folderServiceImpl;
 
-	@Autowired
 	ProfExecutionRepository executionRepository;
 
-	@Autowired
 	private EntityManager entityManager;
 
-	@Autowired
 	ProfDmsHeaderRepository headerRepository;
 
-	@Autowired
 	TransactionHelper transactionHelper;
+	
+	
+	@Autowired
+	public TransactionServiceImpl(ProfUserInfoRepository profUserInfoRepository,
+			ProfActivityRepository activityRepository, ProfDmsMainRepository dmsMainRepository,
+			FolderServiceImpl folderServiceImpl, ProfExecutionRepository executionRepository,
+			ProfDmsHeaderRepository headerRepository, TransactionHelper transactionHelper) {
+		this.profUserInfoRepository = profUserInfoRepository;
+		this.activityRepository = activityRepository;
+		this.dmsMainRepository = dmsMainRepository;
+		this.folderServiceImpl = folderServiceImpl;
+		this.executionRepository = executionRepository;
+		this.headerRepository = headerRepository;
+		this.transactionHelper = transactionHelper;
+	}
 
 	public ProfActivityResponse saveActivity(ProfActivityRequest activityRequest) {
 		ProfActivityResponse activityResponse = new ProfActivityResponse();

@@ -31,23 +31,31 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 @Service
 public class MountPointServiceImpl {
 
-	@Autowired
 	MountPointHelper helper;
 
-	@Autowired
 	ProfMountPointRepository mountPointRepository;
 
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 
-	@Autowired
 	ProfMountFolderMappingRepository folderMappingRepository;
 
-	@Autowired
 	FolderRepository folderRepository;
 
-	@Autowired
 	ProfDocUploadRepository docUploadRepository;
+	
+	
+	@Autowired
+	public MountPointServiceImpl(MountPointHelper helper, ProfMountPointRepository mountPointRepository,
+			ProfUserPropertiesRepository profUserPropertiesRepository,
+			ProfMountFolderMappingRepository folderMappingRepository, FolderRepository folderRepository,
+			ProfDocUploadRepository docUploadRepository) {
+		this.helper = helper;
+		this.mountPointRepository = mountPointRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.folderMappingRepository = folderMappingRepository;
+		this.folderRepository = folderRepository;
+		this.docUploadRepository = docUploadRepository;
+	}
 
 	public ProfMountPointResponse saveMountPoint(ProfMountPointRequest pointRequest, String token) {
 		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();

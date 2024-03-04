@@ -3,7 +3,6 @@ package com.proflaut.dms.helper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,16 +29,20 @@ import com.proflaut.dms.repository.ProfMetaDataRepository;
 
 @Component
 public class GroupHelper {
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
-
-	@Autowired
 	ProfMetaDataRepository metaDataRepository;
+	
+	
+	@Autowired
+	public GroupHelper(ProfGroupInfoRepository groupInfoRepository, ProfMetaDataRepository metaDataRepository) {
+		this.groupInfoRepository = groupInfoRepository;
+		this.metaDataRepository = metaDataRepository;
+	}
 
-	private static int tableCount = 0;
 
 	public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
 			ProfUserPropertiesEntity entity2) {
@@ -107,43 +110,6 @@ public class GroupHelper {
 		return groupInfoEnt != null;
 	}
 
-	public String createTable(List<FieldDefnition> fieldDefinitions, CreateTableRequest createTableRequest) {
-		StringBuilder queryBuilder = new StringBuilder();
-
-		String tableName = createTableRequest.getTableName() + "_" + tableCount;
-
-		queryBuilder.append("CREATE TABLE ").append(tableName).append(" (");
-
-		for (Iterator<FieldDefnition> it = fieldDefinitions.iterator(); it.hasNext();) {
-			FieldDefnition field = it.next();
-			String fieldName = field.getFieldName();
-			String fieldType = field.getFieldType();
-			String mandatory = field.getMandatory();
-			int maxLength = Integer.parseInt(field.getMaxLength());
-
-			queryBuilder.append(fieldName).append(" ").append(getDatabaseType(fieldType, maxLength));
-			if ("Y".equalsIgnoreCase(mandatory)) {
-				queryBuilder.append(" NOT NULL");
-			}
-			if (it.hasNext()) {
-				queryBuilder.append(", ");
-			}
-		}
-		queryBuilder.append(")");
-		entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
-		tableCount++;
-		return tableName;
-	}
-
-	private String getDatabaseType(String fieldType, int maxLength) {
-		if ("String".equalsIgnoreCase(fieldType)) {
-			return "VARCHAR(" + maxLength + ")";
-		} else if ("Integer".equalsIgnoreCase(fieldType)) {
-			return "INT";
-		} else {
-			return fieldType;
-		}
-	}
 
 	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName) {
 		ProfMetaDataEntity metaDataEntity = new ProfMetaDataEntity();

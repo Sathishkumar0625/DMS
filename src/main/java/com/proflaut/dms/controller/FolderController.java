@@ -34,14 +34,19 @@ import com.proflaut.dms.service.impl.FolderServiceImpl;
 @CrossOrigin
 public class FolderController {
 
-	@Autowired
 	FolderServiceImpl folderServiceImpl;
 
-	@Autowired
 	FileManagementServiceImpl serviceIMPL;
 
-	@Autowired
 	FolderHelper folderHelper;
+	
+	@Autowired
+	public FolderController(FolderServiceImpl folderServiceImpl, FileManagementServiceImpl serviceIMPL,
+			FolderHelper folderHelper) {
+		this.folderServiceImpl = folderServiceImpl;
+		this.serviceIMPL = serviceIMPL;
+		this.folderHelper = folderHelper;
+	}
 
 	private static final Logger logger = LogManager.getLogger(FolderController.class);
 

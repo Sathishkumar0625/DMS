@@ -27,11 +27,16 @@ import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 @Component
 public class AccessRightsHelper {
 
-	@Autowired
 	ProfAccessGroupMappingRepository groupMappingRepository;
 
-	@Autowired
 	ProfAccessUserMappingRepository userMappingRepository;
+	
+	@Autowired
+	public AccessRightsHelper(ProfAccessGroupMappingRepository groupMappingRepository,
+			ProfAccessUserMappingRepository userMappingRepository) {
+		this.groupMappingRepository = groupMappingRepository;
+		this.userMappingRepository = userMappingRepository;
+	}
 
 	public static String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();

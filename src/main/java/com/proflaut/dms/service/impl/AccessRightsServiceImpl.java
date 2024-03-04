@@ -29,32 +29,34 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 
 @Service
 public class AccessRightsServiceImpl {
-	@Autowired
+	
 	ProfMetaDataRepository dataRepository;
-
-	@Autowired
 	AccessRightsHelper helper;
-
-	@Autowired
 	ProfAccessRightRepository accessRightRepository;
-
-	@Autowired
 	FileManagementServiceImpl serviceImpl;
-
-	@Autowired
 	ProfAccessUserMappingRepository accessUserMappingRepository;
-
-	@Autowired
 	ProfAccessGroupMappingRepository accessGroupMappingRepository;
-
-	@Autowired
 	ProfUserInfoRepository infoRepository;
-
-	@Autowired
 	GroupServiceImpl groupServiceImpl;
-
-	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
+	
+	
+	@Autowired
+	public AccessRightsServiceImpl(ProfMetaDataRepository dataRepository, AccessRightsHelper helper,
+			ProfAccessRightRepository accessRightRepository, FileManagementServiceImpl serviceImpl,
+			ProfAccessUserMappingRepository accessUserMappingRepository,
+			ProfAccessGroupMappingRepository accessGroupMappingRepository, ProfUserInfoRepository infoRepository,
+			GroupServiceImpl groupServiceImpl, ProfGroupInfoRepository groupInfoRepository) {
+		this.dataRepository = dataRepository;
+		this.helper = helper;
+		this.accessRightRepository = accessRightRepository;
+		this.serviceImpl = serviceImpl;
+		this.accessUserMappingRepository = accessUserMappingRepository;
+		this.accessGroupMappingRepository = accessGroupMappingRepository;
+		this.infoRepository = infoRepository;
+		this.groupServiceImpl = groupServiceImpl;
+		this.groupInfoRepository = groupInfoRepository;
+	}
 
 	public ProfAccessRightResponse create(ProfAccessRightRequest accessRightRequest) {
 		ProfAccessRightResponse accessRightResponse = new ProfAccessRightResponse();

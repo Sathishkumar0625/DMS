@@ -41,11 +41,16 @@ public class MetaHelper {
 	@PersistenceContext
 	EntityManager entityManager;
 
-	@Autowired
 	MetaServiceImpl metaServiceImpl;
 
-	@Autowired
 	ProfMetaDataPropRepository dataPropRepository;
+	
+	
+	@Autowired
+	public MetaHelper(MetaServiceImpl metaServiceImpl, ProfMetaDataPropRepository dataPropRepository) {
+		this.metaServiceImpl = metaServiceImpl;
+		this.dataPropRepository = dataPropRepository;
+	}
 
 	public String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();

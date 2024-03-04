@@ -24,9 +24,12 @@ import com.proflaut.dms.statiClass.PasswordEncDecrypt;
 @Component
 public class AccessHelper {
 
-	@Autowired
 	ProfUserInfoRepository userInfoRepository;
 	
+	@Autowired
+	public AccessHelper(ProfUserInfoRepository userInfoRepository) {
+		this.userInfoRepository = userInfoRepository;
+	}
 
 	private static final Logger logger = LogManager.getLogger(AccessHelper.class);
 

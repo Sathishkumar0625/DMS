@@ -58,34 +58,44 @@ public class MetaServiceImpl {
 	@Autowired
 	MetaHelper metaHelper;
 
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-	@Autowired
+	
 	ProfUserInfoRepository profUserInfoRepository;
 
-	@Autowired
 	ProfMetaDataRepository metaDataRepository;
 
 	@PersistenceContext
 	EntityManager entityManager;
 
-	@Autowired
 	FolderRepository folderRepository;
 
-	@Autowired
 	ProfAccessUserMappingRepository accessUserMappingRepository;
 
-	@Autowired
 	ProfAccessRightRepository accessRightRepository;
 
-	@Autowired
 	ProfMetaDataRepository profMetaDataRepository;
 
-	@Autowired
 	ProfMetaDataPropRepository dataPropRepository;
 
-	@Autowired
 	ProfDocumentRepository documentRepository;
+	
+	
+	@Autowired
+	public MetaServiceImpl(ProfUserPropertiesRepository profUserPropertiesRepository,
+			ProfUserInfoRepository profUserInfoRepository, ProfMetaDataRepository metaDataRepository,
+			FolderRepository folderRepository, ProfAccessUserMappingRepository accessUserMappingRepository,
+			ProfAccessRightRepository accessRightRepository, ProfMetaDataRepository profMetaDataRepository,
+			ProfMetaDataPropRepository dataPropRepository, ProfDocumentRepository documentRepository) {
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.profUserInfoRepository = profUserInfoRepository;
+		this.metaDataRepository = metaDataRepository;
+		this.folderRepository = folderRepository;
+		this.accessUserMappingRepository = accessUserMappingRepository;
+		this.accessRightRepository = accessRightRepository;
+		this.profMetaDataRepository = profMetaDataRepository;
+		this.dataPropRepository = dataPropRepository;
+		this.documentRepository = documentRepository;
+	}
 
 	private static final Logger logger = LogManager.getLogger(MetaServiceImpl.class);
 

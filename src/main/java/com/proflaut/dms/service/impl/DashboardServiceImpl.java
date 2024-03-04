@@ -44,35 +44,34 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 @Service
 public class DashboardServiceImpl {
 
-	@Autowired
 	ProfUserInfoRepository infoRepository;
-
-	@Autowired
 	ProfDocUploadRepository docUploadRepository;
-
-	@Autowired
 	FileHelper fileHelper;
-
-	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
-
-	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
-
-	@Autowired
 	ProfGroupUserMappingRepository userMappingRepository;
-
-	@Autowired
 	ProfUserPropertiesRepository userPropertiesRepository;
-
-	@Autowired
 	RestTemplate restTemplate;
-
-	@Autowired
 	ProfDownloadHistoryRepo downloadHistoryRepo;
-
-	@Autowired
 	FolderRepository folderRepository;
+	
+	@Autowired
+	public DashboardServiceImpl(ProfUserInfoRepository infoRepository, ProfDocUploadRepository docUploadRepository,
+			FileHelper fileHelper, ProfUserGroupMappingRepository groupMappingRepository,
+			ProfGroupInfoRepository groupInfoRepository, ProfGroupUserMappingRepository userMappingRepository,
+			ProfUserPropertiesRepository userPropertiesRepository, RestTemplate restTemplate,
+			ProfDownloadHistoryRepo downloadHistoryRepo, FolderRepository folderRepository) {
+		this.infoRepository = infoRepository;
+		this.docUploadRepository = docUploadRepository;
+		this.fileHelper = fileHelper;
+		this.groupMappingRepository = groupMappingRepository;
+		this.groupInfoRepository = groupInfoRepository;
+		this.userMappingRepository = userMappingRepository;
+		this.userPropertiesRepository = userPropertiesRepository;
+		this.restTemplate = restTemplate;
+		this.downloadHistoryRepo = downloadHistoryRepo;
+		this.folderRepository = folderRepository;
+	}
 
 	private List<Map<String, String>> userCounts = new ArrayList<>();
 

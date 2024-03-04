@@ -49,13 +49,15 @@ import com.proflaut.dms.util.AppConfiguration;
 public class TransactionController {
 
 	private final AppConfiguration appConfiguration;
-
-	public TransactionController( AppConfiguration appConfiguration) {
+	
+	TransactionServiceImpl transactionImpl;
+	
+	@Autowired
+	public TransactionController( AppConfiguration appConfiguration,TransactionServiceImpl transactionImpl) {
 		this.appConfiguration = appConfiguration;
+		this.transactionImpl=transactionImpl;
 	}
 
-	@Autowired
-	TransactionServiceImpl transactionImpl;
 
 	private static final Logger logger = LogManager.getLogger(TransactionController.class);
 
@@ -177,7 +179,7 @@ public class TransactionController {
 	}
 
 	@PutMapping("/update")
-	private ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(
+	public ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(
 			@RequestBody ProfUpdateDmsMainRequest dmsMainRequest, @RequestParam String prospectId) {
 		if (StringUtils.isEmpty(prospectId)) {
 			logger.info(DMSConstant.INVALID_INPUT);
@@ -202,7 +204,7 @@ public class TransactionController {
 	}
 
 	@PostMapping("/saveHeader")
-	private ResponseEntity<ProfUpdateDmsMainResponse> saveHeader() {
+	public ResponseEntity<ProfUpdateDmsMainResponse> saveHeader() {
 		ProfUpdateDmsMainResponse dmsMainResponsedmsMainResponse = null;
 
 		try {

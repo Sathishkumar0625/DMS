@@ -24,8 +24,12 @@ import com.proflaut.dms.service.impl.DashboardServiceImpl;
 @CrossOrigin
 public class DashboardController {
 
-	@Autowired
 	DashboardServiceImpl dashboardServiceImpl;
+		
+	@Autowired
+	public DashboardController(DashboardServiceImpl dashboardServiceImpl) {
+		this.dashboardServiceImpl = dashboardServiceImpl;
+	}
 
 	@GetMapping("/getUserUploadedDetails")
 	public ResponseEntity<ProfUserUploadDetailsResponse> getUploadedDetails(@RequestHeader("token") String token) {

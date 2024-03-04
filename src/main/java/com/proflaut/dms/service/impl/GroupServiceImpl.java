@@ -13,17 +13,14 @@ import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfGroupUserMappingEntity;
-import com.proflaut.dms.entity.ProfMetaDataEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.GroupHelper;
-import com.proflaut.dms.model.CreateTableRequest;
 import com.proflaut.dms.model.ProfAssignUserRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfGroupInfoResponse;
-import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.ProfSignupUserRequest;
@@ -41,23 +38,31 @@ public class GroupServiceImpl {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Autowired
 	ProfGroupInfoRepository groupInfoRepository;
 
-	@Autowired
 	GroupHelper groupHelper;
 
-	@Autowired
 	ProfUserGroupMappingRepository mappingRepository;
 
-	@Autowired
 	ProfUserInfoRepository userInfoRepository;
 
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 
-	@Autowired
 	ProfGroupUserMappingRepository groupUserMappingRepository;
+	
+	
+	@Autowired
+	public GroupServiceImpl(ProfGroupInfoRepository groupInfoRepository, GroupHelper groupHelper,
+			ProfUserGroupMappingRepository mappingRepository, ProfUserInfoRepository userInfoRepository,
+			ProfUserPropertiesRepository profUserPropertiesRepository,
+			ProfGroupUserMappingRepository groupUserMappingRepository) {
+		this.groupInfoRepository = groupInfoRepository;
+		this.groupHelper = groupHelper;
+		this.mappingRepository = mappingRepository;
+		this.userInfoRepository = userInfoRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.groupUserMappingRepository = groupUserMappingRepository;
+	}
 
 	public ProfGroupInfoResponse updateGroup(int id, ProfGroupInfoRequest groupInfoRequest) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
@@ -150,19 +155,6 @@ public class GroupServiceImpl {
 		return infoResponses;
 	}
 
-	public ProfMetaDataResponse createTableFromFieldDefinitions(CreateTableRequest createTableRequest) {
-		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
-		try {
-			String tableName = groupHelper.createTable(createTableRequest.getFields(), createTableRequest);
-			ProfMetaDataEntity dataEntity = groupHelper.convertTableReqToMetaEntity(createTableRequest, tableName);
-			entityManager.persist(dataEntity);
-			metaDataResponse.setStatus(DMSConstant.SUCCESS);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return metaDataResponse;
-	}
 
 	public ProfGroupInfoResponse updateSignupUser(ProfSignupUserRequest userRequest, int userId) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();

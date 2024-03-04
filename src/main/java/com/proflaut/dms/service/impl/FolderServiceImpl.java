@@ -37,35 +37,45 @@ public class FolderServiceImpl {
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
-	@Autowired
 	FolderRepository folderRepo;
 
-	@Autowired
 	FolderHelper helper;
 
-	@Autowired
 	ProfDocUploadRepository docUploadRepository;
 
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 
-	@Autowired
 	ProfMetaDataRepository dataRepository;
 
-	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
 
-	@Autowired
 	ProfAccessGroupMappingRepository accessGroupMappingRepository;
 
-	@Autowired
 	ProfAccessUserMappingRepository accessUserMappingRepository;
 
-	@Autowired
 	ProfAccessRightRepository accessRightRepository;
 
-	@Autowired
 	MountPointServiceImpl pointServiceImpl;
+	
+	
+	@Autowired
+	public FolderServiceImpl(FolderRepository folderRepo, FolderHelper helper,
+			ProfDocUploadRepository docUploadRepository, ProfUserPropertiesRepository profUserPropertiesRepository,
+			ProfMetaDataRepository dataRepository, ProfUserGroupMappingRepository groupMappingRepository,
+			ProfAccessGroupMappingRepository accessGroupMappingRepository,
+			ProfAccessUserMappingRepository accessUserMappingRepository,
+			ProfAccessRightRepository accessRightRepository, MountPointServiceImpl pointServiceImpl) {
+		this.folderRepo = folderRepo;
+		this.helper = helper;
+		this.docUploadRepository = docUploadRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.dataRepository = dataRepository;
+		this.groupMappingRepository = groupMappingRepository;
+		this.accessGroupMappingRepository = accessGroupMappingRepository;
+		this.accessUserMappingRepository = accessUserMappingRepository;
+		this.accessRightRepository = accessRightRepository;
+		this.pointServiceImpl = pointServiceImpl;
+	}
 
 	public FileResponse saveFolder(FolderFO folderFO, String token) throws CustomException {
 		FileResponse fileResponse = new FileResponse();
@@ -82,7 +92,7 @@ public class FolderServiceImpl {
 					return fileResponse;
 				}
 
-				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, propertiesEntity, token);
+				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, propertiesEntity);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
 				List<Integer> digits = convertToArrayList(folderEnt.getId());
 				ProfMountFolderMappingRequest folderMappingRequest = new ProfMountFolderMappingRequest();

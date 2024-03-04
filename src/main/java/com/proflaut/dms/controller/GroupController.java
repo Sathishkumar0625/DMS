@@ -36,9 +36,13 @@ import com.proflaut.dms.service.impl.GroupServiceImpl;
 @CrossOrigin
 public class GroupController {
 
-	@Autowired
 	GroupServiceImpl groupServiceImpl;
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
+	
+	@Autowired
+	public GroupController(GroupServiceImpl groupServiceImpl) {
+		this.groupServiceImpl = groupServiceImpl;
+	}
 
 	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,

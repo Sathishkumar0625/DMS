@@ -56,18 +56,25 @@ public class FileController {
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
-	@Autowired
+	
 	FileManagementServiceImpl fileManagementServiceImpl;
 	private static final Logger logger = LogManager.getLogger(FileController.class);
 
-	@Autowired
 	ProfDocUploadRepository uploadRepository;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@Autowired
 	MetaServiceImpl metaServiceImpl;
+	
+	
+	@Autowired
+	public FileController(FileManagementServiceImpl fileManagementServiceImpl, ProfDocUploadRepository uploadRepository,
+			MetaServiceImpl metaServiceImpl) {
+		this.fileManagementServiceImpl = fileManagementServiceImpl;
+		this.uploadRepository = uploadRepository;
+		this.metaServiceImpl = metaServiceImpl;
+	}
 
 	@PostMapping("/upload")
 	@Transactional

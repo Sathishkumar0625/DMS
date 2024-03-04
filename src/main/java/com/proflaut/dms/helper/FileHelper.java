@@ -70,19 +70,14 @@ import com.proflaut.dms.util.Compression;
 @Transactional
 public class FileHelper {
 
-	@Autowired
 	ProfUserInfoRepository infoRepository;
 
-	@Autowired
 	FolderRepository folderRepository;
 
-	@Autowired
 	ProfDocUploadRepository docUploadRepository;
 
-	@Autowired
 	ProfOldImageRepository imageRepository;
 
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 
 	@Value("${upload.filelocation}")
@@ -94,11 +89,24 @@ public class FileHelper {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Autowired
 	ProfMountPointRepository mountPointRepository;
 
-	@Autowired
 	ProfUserGroupMappingRepository groupMappingRepository;
+	
+	
+	@Autowired
+	public FileHelper(ProfUserInfoRepository infoRepository, FolderRepository folderRepository,
+			ProfDocUploadRepository docUploadRepository, ProfOldImageRepository imageRepository,
+			ProfUserPropertiesRepository profUserPropertiesRepository, ProfMountPointRepository mountPointRepository,
+			ProfUserGroupMappingRepository groupMappingRepository) {
+		this.infoRepository = infoRepository;
+		this.folderRepository = folderRepository;
+		this.docUploadRepository = docUploadRepository;
+		this.imageRepository = imageRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.mountPointRepository = mountPointRepository;
+		this.groupMappingRepository = groupMappingRepository;
+	}
 
 	private static final Logger logger = LogManager.getLogger(FileHelper.class);
 

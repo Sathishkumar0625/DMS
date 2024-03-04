@@ -35,17 +35,19 @@ import com.proflaut.dms.util.TokenGenerator;
 @Service
 public class AccessServiceImpl {
 
-	@Autowired
 	ProfUserInfoRepository profUserInfoRepository;
-
-	@Autowired
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-
-	@Autowired
 	AccessHelper accessHelper;
-
-	@Autowired
 	TokenGenerator tokenGenerator;
+	@Autowired
+	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
+			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
+			TokenGenerator tokenGenerator) {
+		this.profUserInfoRepository = profUserInfoRepository;
+		this.profUserPropertiesRepository = profUserPropertiesRepository;
+		this.accessHelper = accessHelper;
+		this.tokenGenerator = tokenGenerator;
+	}
 
 	private static final Logger logger = LogManager.getLogger(AccessServiceImpl.class);
 

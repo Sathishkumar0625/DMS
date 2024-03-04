@@ -37,8 +37,17 @@ public class MetaController {
 
 	private static final Logger logger = LogManager.getLogger(MetaController.class);
 
-	@Autowired
 	MetaServiceImpl metaServiceImpl;
+	
+	
+	@Autowired
+	public MetaServiceImpl getMetaServiceImpl() {
+		return metaServiceImpl;
+	}
+
+	public void setMetaServiceImpl(MetaServiceImpl metaServiceImpl) {
+		this.metaServiceImpl = metaServiceImpl;
+	}
 
 	@PostMapping("/createTable")
 	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,
