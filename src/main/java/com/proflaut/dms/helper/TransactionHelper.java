@@ -8,11 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.controller.DashboardController;
 import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
@@ -36,16 +39,17 @@ import com.proflaut.dms.util.AppConfiguration;
 @Component
 public class TransactionHelper {
 
+	private static final Logger logger = LogManager.getLogger(TransactionHelper.class);
 	private final Random random = new Random();
 
 	FolderServiceImpl folderServiceImpl;
 
 	private final AppConfiguration appConfiguration;
-	
+
 	@Autowired
-	public TransactionHelper(AppConfiguration appConfiguration,FolderServiceImpl folderServiceImpl) {
+	public TransactionHelper(AppConfiguration appConfiguration, FolderServiceImpl folderServiceImpl) {
 		this.appConfiguration = appConfiguration;
-		this.folderServiceImpl=folderServiceImpl;
+		this.folderServiceImpl = folderServiceImpl;
 	}
 
 	private String generateUniqueId() {
@@ -119,7 +123,7 @@ public class TransactionHelper {
 			jsonData = jsonData.replace("\r", "").replace("\n", "");
 			return jsonData;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return "Something Went Wrong";
 		}
 	}
@@ -152,9 +156,8 @@ public class TransactionHelper {
 	}
 
 	public InvoiceResponse invoicegenerator(InvoiceRequest invoiceRequest) throws IOException {
-		String inputFilename =appConfiguration.getInvoiceInputFileName() ;
-		String outputfilename =appConfiguration.getInvoiceOutputFileName() ;
-
+		String inputFilename = appConfiguration.getInvoiceInputFileName();
+		String outputfilename = appConfiguration.getInvoiceOutputFileName();
 
 		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)))) {
 
@@ -211,7 +214,7 @@ public class TransactionHelper {
 			List<BankingCreditFacilities> creditFacilities = invoiceRequest.getBankingCreditFacilities();
 			if (creditFacilities != null && !creditFacilities.isEmpty()) {
 				for (int i = 0; i < creditFacilities.size(); i++) {
-					int rowOffset = 17+i;
+					int rowOffset = 17 + i;
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
 							.setText(creditFacilities.get(i).getLimit());
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
@@ -233,7 +236,7 @@ public class TransactionHelper {
 				invoiceResponse.setFilePath(outputfilename);
 				return invoiceResponse;
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 				InvoiceResponse invoiceResponse = new InvoiceResponse();
 				invoiceResponse.setStatus(DMSConstant.FAILURE);
 				invoiceResponse.setErrorMessage("Failed to update invoice");

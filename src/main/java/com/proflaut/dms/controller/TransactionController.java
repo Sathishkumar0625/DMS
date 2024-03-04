@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +44,6 @@ import com.proflaut.dms.util.AppConfiguration;
 
 @RestController
 @RequestMapping("/transaction")
-@CrossOrigin
 public class TransactionController {
 
 	private final AppConfiguration appConfiguration;
@@ -153,7 +151,6 @@ public class TransactionController {
 	}
 
 	@GetMapping("/findBy")
-	@CrossOrigin
 	public ResponseEntity<Map<String, Object>> retrieveByKey(@RequestParam String key, @RequestParam int userid) {
 		if (StringUtils.isEmpty(key) || StringUtils.isEmpty(userid)) {
 			logger.info(DMSConstant.INVALID_INPUT);

@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +49,6 @@ import com.proflaut.dms.service.impl.MetaServiceImpl;
 
 @RestController
 @RequestMapping("/file")
-@CrossOrigin
 public class FileController {
 
 	@Value("${create.folderlocation}")
@@ -184,7 +182,7 @@ public class FileController {
 				return new ResponseEntity<>(fileRetreiveByResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

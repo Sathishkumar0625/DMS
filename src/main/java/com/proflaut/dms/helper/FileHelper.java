@@ -292,7 +292,7 @@ public class FileHelper {
 						fileRetreiveResponse.setDocument(document);
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 					DocumentDetails documentDetails = new DocumentDetails();
 					documentDetails.setProspectId(profDocEntity.get(i).getProspectId());
 					documentDetails.setDocName(profDocEntity.get(i).getDocName());
@@ -328,9 +328,9 @@ public class FileHelper {
 			decompressedBytes = Compression.decompressB64(decrypted);
 		} catch (AccessDeniedException e) {
 			logger.info("Access denied -> {} ", e.getMessage());
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return decompressedBytes;
 	}

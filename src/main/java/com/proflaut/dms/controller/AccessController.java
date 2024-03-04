@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,6 @@ import com.proflaut.dms.service.impl.AccessServiceImpl;
 
 @RestController
 @RequestMapping("/access")
-@CrossOrigin
 public class AccessController {
 
 	private static final Logger logger = LogManager.getLogger(AccessController.class);

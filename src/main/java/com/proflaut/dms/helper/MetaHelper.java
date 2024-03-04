@@ -160,7 +160,7 @@ public class MetaHelper {
 				definitionResponses.add(fieldDefinitionResponse);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return definitionResponses;
 	}
@@ -179,7 +179,7 @@ public class MetaHelper {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return values;
 	}
@@ -289,7 +289,7 @@ public class MetaHelper {
 		if (path != null) {
 			metaServiceImpl.delete(path);
 		}
-		e.printStackTrace();
+		logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 	}
 
 	private String getFormattedValue(FieldDefnition fieldValue) {
@@ -324,7 +324,7 @@ public class MetaHelper {
 				columnNames.add(escapedColumnName);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return columnNames;
 	}
@@ -380,7 +380,7 @@ public class MetaHelper {
 				definitionResponses.add(fieldDefinitionResponse);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return definitionResponses;
 	}
