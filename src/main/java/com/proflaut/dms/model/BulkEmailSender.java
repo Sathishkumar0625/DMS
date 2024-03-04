@@ -78,7 +78,7 @@ public class BulkEmailSender {
 				try {
 					mimeMessage.setSubject(mailInfoRequest.getSubject());
 				} catch (Exception e) {
-					e.printStackTrace();
+					throw new RuntimeException("Could not set subject " + mailInfoRequest.getSubject());
 				}
 			}
 			return mimeMessage;
@@ -91,7 +91,7 @@ public class BulkEmailSender {
 				try {
 					mimeMessage.setFrom(new InternetAddress(mailInfoRequest.getFrom().trim()));
 				} catch (Exception e) {
-					e.printStackTrace();
+					throw new RuntimeException("Could not resolve from address " + mailInfoRequest.getFrom());
 				}
 			}
 			return mimeMessage;
@@ -106,12 +106,12 @@ public class BulkEmailSender {
 						try {
 							return new InternetAddress(to);
 						} catch (AddressException e) {
-							e.printStackTrace();
 							throw new RuntimeException("Could not resolve to address");
 						}
 					}).toArray(InternetAddress[]::new));
 				} catch (MessagingException e) {
-					e.printStackTrace();
+					throw new RuntimeException(
+							"Could not set to address in message " + mailInfoRequest.getToList().toString());
 				}
 			}
 			return mimeMessage;
