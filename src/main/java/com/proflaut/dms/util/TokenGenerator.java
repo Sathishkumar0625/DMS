@@ -4,18 +4,14 @@ import java.security.InvalidKeyException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
-
-import com.proflaut.dms.statiClass.EncryptionDecryptionAES;
 
 @Component
 public class TokenGenerator {

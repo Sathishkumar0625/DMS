@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.proflaut.dms.controller.AccessController;
 import com.proflaut.dms.service.impl.AccessServiceImpl;
 
 @Component

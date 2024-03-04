@@ -54,7 +54,7 @@ public class DashboardServiceImpl {
 	RestTemplate restTemplate;
 	ProfDownloadHistoryRepo downloadHistoryRepo;
 	FolderRepository folderRepository;
-	
+
 	@Autowired
 	public DashboardServiceImpl(ProfUserInfoRepository infoRepository, ProfDocUploadRepository docUploadRepository,
 			FileHelper fileHelper, ProfUserGroupMappingRepository groupMappingRepository,
@@ -205,7 +205,7 @@ public class DashboardServiceImpl {
 					HttpMethod.POST, requestEntity, ImageResponse.class);
 
 			ImageResponse responseBody = responseEntity.getBody();
-			if (responseBody.getSharpenImage() != null) {
+			if (responseBody != null && responseBody.getSharpenImage() != null) {
 				String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
 				for (String response : text) {
 					if (!response.trim().isEmpty()) {
