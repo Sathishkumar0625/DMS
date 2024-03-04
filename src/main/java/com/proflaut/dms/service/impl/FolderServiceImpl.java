@@ -82,7 +82,7 @@ public class FolderServiceImpl {
 					return fileResponse;
 				}
 
-				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, fileResponse, propertiesEntity, token);
+				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, propertiesEntity, token);
 				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
 				List<Integer> digits = convertToArrayList(folderEnt.getId());
 				ProfMountFolderMappingRequest folderMappingRequest = new ProfMountFolderMappingRequest();
@@ -112,13 +112,13 @@ public class FolderServiceImpl {
 		return digits;
 	}
 
-	public FileResponse retriveFile(Integer id) {
+	public FileResponse retriveFile(int id) {
 		FileResponse fileResponse = new FileResponse();
 		try {
-			FolderEntity folderEntity = folderRepo.findById(id).get();
+			FolderEntity folderEntity = folderRepo.findById(id);
 			if (folderEntity != null) {
 				fileResponse.setStatus(DMSConstant.SUCCESS);
-				fileResponse.setProspectId(id.toString());
+				fileResponse.setProspectId(String.valueOf(id));
 				fileResponse.setFolderPath(folderEntity.getFolderPath());
 			} else {
 				fileResponse.setStatus(DMSConstant.FAILURE);

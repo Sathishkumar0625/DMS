@@ -76,11 +76,10 @@ public class FolderHelper {
 		return currentDateTime.format(formatter);
 	}
 
-	public FolderEntity convertFOtoBO(FolderFO folderFO, FileResponse fileResponse,
+	public FolderEntity convertFOtoBO(FolderFO folderFO, 
 			ProfUserPropertiesEntity propertiesEntity, String token) {
 
 		FolderEntity ent = new FolderEntity();
-//		folderPath = storeFolder(fileResponse, folderFO);
 		ent.setFolderName(folderFO.getFolderName());
 		ent.setIsParent(folderLocation);
 		ent.setMetaId(folderFO.getMetaDataId());
@@ -88,11 +87,6 @@ public class FolderHelper {
 		ent.setCreatedBy(propertiesEntity.getUserName());
 		ent.setParentFolderID(Integer.parseInt(folderFO.getParentFolderID()));
 		return ent;
-	}
-
-	public FolderEntity callFolderEntity(Integer id) {
-		return folderRepository.findById(id).get();
-
 	}
 
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity) {

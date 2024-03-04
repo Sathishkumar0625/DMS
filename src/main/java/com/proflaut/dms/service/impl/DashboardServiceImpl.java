@@ -204,21 +204,22 @@ public class DashboardServiceImpl {
 			// Send POST request to Python server
 			ResponseEntity<ImageResponse> responseEntity = restTemplate.exchange("http://127.0.0.1:5000/ocrImage",
 					HttpMethod.POST, requestEntity, ImageResponse.class);
-			if ( responseEntity.getBody() != null) {
-				ImageResponse responseBody = responseEntity.getBody();
-			    String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
-			    for (String response : text) {
-			    	if (!response.trim().isEmpty()) { 
-			            ImageResponse imageResponse = new ImageResponse(); 
-			            imageResponse.setSharpenImage(response.trim()); 
-			            imageResponses.add(imageResponse); 
-			        }
-			    }
-			}
 
+			ImageResponse responseBody = responseEntity.getBody();
+			if (responseBody.getSharpenImage() != null) {
+				String[] text = responseBody.getSharpenImage().split("\r\n|\r|\n");
+				for (String response : text) {
+					if (!response.trim().isEmpty()) {
+						ImageResponse imageResponse = new ImageResponse();
+						imageResponse.setSharpenImage(response.trim());
+						imageResponses.add(imageResponse);
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return imageResponses;
 	}
 
@@ -232,7 +233,7 @@ public class DashboardServiceImpl {
 				detailsResponse.setUserUploadedCount(String.valueOf(count));
 				List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(entity.getUserName());
 				long userDocSize = fileHelper.getTotalFileSize(docEntities);
-				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize)+"kb");
+				detailsResponse.setUserFileOccupiedSize(String.valueOf(userDocSize) + "kb");
 				List<ProfDownloadHistoryEntity> historyEntities = downloadHistoryRepo.findByUserId(userId);
 				detailsResponse.setUserDownloadCount(String.valueOf(historyEntities.size()));
 				List<FolderEntity> folderEntities = folderRepository.findByCreatedBy(entity.getUserName());
@@ -241,7 +242,7 @@ public class DashboardServiceImpl {
 				detailsResponse.setAverageFileUploade(average);
 				String averageExecutionTime = calculateAverageExecutionTime(docEntities);
 				detailsResponse.setAverageUploadSpeed(averageExecutionTime);
-				String averageDownloadSpeed=calculateAverageDownloadSpeed(historyEntities.size(),historyEntities);
+				String averageDownloadSpeed = calculateAverageDownloadSpeed(historyEntities.size(), historyEntities);
 				detailsResponse.setAverageDownloadSpeed(averageDownloadSpeed);
 			}
 		} catch (Exception e) {
