@@ -41,11 +41,7 @@ public class MetaController {
 	
 	
 	@Autowired
-	public MetaServiceImpl getMetaServiceImpl() {
-		return metaServiceImpl;
-	}
-
-	public void setMetaServiceImpl(MetaServiceImpl metaServiceImpl) {
+	public MetaController(MetaServiceImpl metaServiceImpl) {
 		this.metaServiceImpl = metaServiceImpl;
 	}
 

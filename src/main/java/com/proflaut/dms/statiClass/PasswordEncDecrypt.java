@@ -12,8 +12,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PasswordEncDecrypt {
+	private static final Logger logger = LogManager.getLogger(PasswordEncDecrypt.class);
 	public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
 	private KeySpec ks;
 	private SecretKeyFactory skf;
@@ -68,9 +71,9 @@ public class PasswordEncDecrypt {
 		String encrypted = td.encrypt(target);
 		String decrypted = td.decrypt(encrypted);
 
-		System.out.println("String To Encrypt: " + target);
-		System.out.println("Encrypted String:" + encrypted);
-		System.out.println("Decrypted String:" + decrypted);
+		logger.info("String To Encrypt -->  {}", target);
+		logger.info("Encrypted String  -->  {}", encrypted);
+		logger.info("Decrypted String  -->  {}", decrypted);
 
 	}
 }

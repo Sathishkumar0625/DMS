@@ -5,30 +5,40 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.proflaut.dms.controller.AccessController;
 import com.proflaut.dms.service.impl.AccessServiceImpl;
 
 @Component
 public class LogInterceptor implements HandlerInterceptor {
-	 	@Autowired
+	
+		private static final Logger logger = LogManager.getLogger(LogInterceptor.class);
+		
 	 	AccessServiceImpl accessServiceImpl;
+	 	
+	 	@Autowired
+	    public LogInterceptor(AccessServiceImpl accessServiceImpl) {
+			this.accessServiceImpl = accessServiceImpl;
+		}
 
-	    @Override
+		@Override
 	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 	            throws Exception {
 	        String path = request.getRequestURI().substring(request.getContextPath().length());
-	        System.out.println(path);
+	        logger.info("PATH --> {}",path);
 //	        path.equals("/dmsCheck/signup") ||
 	        if (path.equals("/access/signup") || path.equals("/access/login")) {
 	            return true;
 	        } else {
 
 	            String token = request.getHeader("token");
-	            System.out.println("hEadER token -- " + token);
+	            logger.info("hEadER token --> {} ",token);
 	            Map<String, String> userData = accessServiceImpl.validateToken(token);
 	            if (userData.get("status").equals("success")) {
 	                return true;

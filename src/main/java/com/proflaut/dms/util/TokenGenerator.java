@@ -11,11 +11,15 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+
+import com.proflaut.dms.statiClass.EncryptionDecryptionAES;
 
 @Component
 public class TokenGenerator {
-
+	private static final Logger logger = LogManager.getLogger(TokenGenerator.class);
 	static Cipher cipher;
 
 	public Map<String, String> generateToken(String userName) {
@@ -30,7 +34,7 @@ public class TokenGenerator {
 			cipher = Cipher.getInstance("AES");
 
 			encryptedText = encrypt(userName, secretKey);
-			System.out.println("Encrypted Text After Encryption: " + encryptedText);
+			logger.info("Encrypted Text After Encryption --> {}",encryptedText);
 			resp.put("token", encryptedText);
 			resp.put("seckey", encodedKey);
 		} catch (Exception ex) {

@@ -10,7 +10,8 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 public class CompressionUtil {
-	
+	private CompressionUtil() {
+	}
 	 public static String compressAndReturnB64(String base64Content) throws IOException {
 	        byte[] decodedBytes = Base64.getDecoder().decode(base64Content);
 	        byte[] compressedBytes = compress(decodedBytes);
