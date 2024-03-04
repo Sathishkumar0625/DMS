@@ -65,8 +65,8 @@ public class AccessServiceImpl {
 
 				resp.put("status", "failure");
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return resp;
 
@@ -110,8 +110,8 @@ public class AccessServiceImpl {
 				loginResponse.setUserId(0);
 			}
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return loginResponse;
 	}

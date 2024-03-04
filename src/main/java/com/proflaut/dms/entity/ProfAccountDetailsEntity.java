@@ -9,7 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-	
 @Entity
 @Table(name = "PROF_CUSTOMERACCOUNTINFO")
 public class ProfAccountDetailsEntity {
@@ -24,6 +23,30 @@ public class ProfAccountDetailsEntity {
 
 	public String getCustomerId() {
 		return customerId;
+	}
+
+	public int getOdLimit() {
+		return odLimit;
+	}
+
+	public String getIfscCode() {
+		return ifscCode;
+	}
+
+	public String getMicrCode() {
+		return micrCode;
+	}
+
+	public void setOdLimit(int odLimit) {
+		this.odLimit = odLimit;
+	}
+
+	public void setIfscCode(String ifscCode) {
+		this.ifscCode = ifscCode;
+	}
+
+	public void setMicrCode(String micrCode) {
+		this.micrCode = micrCode;
 	}
 
 	public void setCustomerId(String customerId) {
@@ -70,36 +93,12 @@ public class ProfAccountDetailsEntity {
 		this.state = state;
 	}
 
-	public int getODlimit() {
-		return ODlimit;
-	}
-
-	public void setODlimit(int oDlimit) {
-		ODlimit = oDlimit;
-	}
-
 	public int getBranchCode() {
 		return branchCode;
 	}
 
 	public void setBranchCode(int branchCode) {
 		this.branchCode = branchCode;
-	}
-
-	public String getIFSCcode() {
-		return IFSCcode;
-	}
-
-	public void setIFSCcode(String iFSCcode) {
-		IFSCcode = iFSCcode;
-	}
-
-	public String getMICRcode() {
-		return MICRcode;
-	}
-
-	public void setMICRcode(String mICRcode) {
-		MICRcode = mICRcode;
 	}
 
 	@Id
@@ -110,9 +109,6 @@ public class ProfAccountDetailsEntity {
 	@Column(name = "CUSTOMER_ID")
 	private String customerId;
 
-//	@Column(name = "JOIN_ID")
-//	@ManyToOne
-//	@JoinColumn(name = "JOIN_ID")
 	private Integer joinID;
 
 	public Integer getJoinID() {
@@ -147,16 +143,16 @@ public class ProfAccountDetailsEntity {
 	private String state;
 
 	@Column(name = "OD_LIMIT")
-	private int ODlimit;
+	private int odLimit;
 
 	@Column(name = "BRANCH_CODE")
 	private int branchCode;
 
 	@Column(name = "IFSC_CODE")
-	private String IFSCcode;
+	private String ifscCode;
 
 	@Column(name = "MICR_CODE")
-	private String MICRcode;
+	private String micrCode;
 
 	@ManyToOne
 	@JoinColumn(name = "profAccountRequestEntity_id")

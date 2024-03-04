@@ -14,13 +14,17 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.exception.CustomException;
 
-
 public class BulkEmailSender {
+
+	private static final Logger logger = LogManager.getLogger(BulkEmailSender.class);
 	private MailInfoRequest mailInfoRequest;
 	private Properties emailConfig;
-	
 
 	public BulkEmailSender(MailInfoRequest mailInfoRequest, Properties emailConfig) {
 		this.mailInfoRequest = mailInfoRequest;
@@ -35,12 +39,12 @@ public class BulkEmailSender {
 		try {
 			Transport.send(mimeMessage);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 	}
 
 	public MimeMessage getMimeMessage() throws CustomException {
-  MimeMessage mimeMessage;
+		MimeMessage mimeMessage;
 		mimeMessage = buildMimeMessage();
 		return mimeMessage;
 	}
@@ -66,7 +70,7 @@ public class BulkEmailSender {
 
 			mimeMessage.setSentDate(new Date());
 		} catch (Exception e) {
-			 throw new CustomException("Error in setting from, to, cc address and subject of the email");
+			throw new CustomException("Error in setting from, to, cc address and subject of the email");
 		}
 
 		return mimeMessage;
