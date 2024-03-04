@@ -3,7 +3,6 @@ package com.proflaut.dms.model;
 public class DocumentDetails {
 	private String prospectId;
 
-	//private String image;
 	private int id;
 	
 	private String docName;
@@ -63,13 +62,4 @@ public class DocumentDetails {
 		this.prospectId = prospectId;
 	}
 
-	
-
-//	public String getImage() {
-//		return image;
-//	}
-//
-//	public void setImage(String image) {
-//		this.image = image;
-//	}
 }

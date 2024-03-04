@@ -221,9 +221,6 @@ public class TransactionServiceImpl {
 			ProfDmsMainEntity mainEntity = transactionHelper.convertRequestToProfMain(userId, activityName,
 					executionEntity);
 			entityManager.persist(mainEntity);
-//			FolderFO folderFO = new FolderFO();
-//			folderFO.setProspectId(executionEntity.getProspectId());
-//			folderServiceImpl.saveFolder(folderFO, activityName);
 			profExecutionResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			profExecutionResponse.setStatus(DMSConstant.FAILURE);

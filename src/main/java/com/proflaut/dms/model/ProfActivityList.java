@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ProfActivityList {
 
-	public List<ProfActivityReterive> activityList;
+	private List<ProfActivityReterive> activityList;
 
 	public List<ProfActivityReterive> getActivityList() {
 		return activityList;

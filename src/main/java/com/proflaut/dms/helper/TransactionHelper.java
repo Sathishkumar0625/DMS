@@ -226,23 +226,6 @@ public class TransactionHelper {
 							.setText(creditFacilities.get(i).getRepaymentTerms());
 				}
 			}
-//			List<CreditFacilities> facilities = invoiceRequest.getCreditFacilities();
-//			if (facilities != null && !facilities.isEmpty()) {
-//				for (int i = 0; i < facilities.size(); i++) {
-//					int rowOffset = 7+i;
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2)
-//							.setText(facilities.get(i).getType());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3)
-//							.setText(facilities.get(i).getAmount());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
-//							.setText(facilities.get(i).getPurpose());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(4)
-//							.setText(facilities.get(i).getPrimarySecurity());
-//					doc.getTables().get(getIndex).getRow(rowOffset).getCell(5)
-//							.setText(facilities.get(i).getCollateralSecurityOffered());
-//					
-//				}
-//			}
 			try (FileOutputStream out = new FileOutputStream(outputfilename)) {
 				doc.write(out);
 				InvoiceResponse invoiceResponse = new InvoiceResponse();

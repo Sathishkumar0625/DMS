@@ -17,7 +17,6 @@ import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.CreateTableRequest;
-import com.proflaut.dms.model.FieldDefnition;
 import com.proflaut.dms.model.ProfAssignUserRequest;
 import com.proflaut.dms.model.ProfGroupInfoRequest;
 import com.proflaut.dms.model.ProfOveralUserInfoResponse;

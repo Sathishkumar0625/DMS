@@ -33,7 +33,7 @@ public class EncryptionDecryptionAES {
 		cipher = Cipher.getInstance("AES"); 
 
 		String plainText = "system123#";
-		System.out.println("Plain Text Before Encryption: " + plainText);
+		logger.info("Plain Text Before Encryption --> {} ",plainText);
 	
 	}
 

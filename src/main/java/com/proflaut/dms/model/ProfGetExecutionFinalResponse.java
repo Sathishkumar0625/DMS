@@ -14,6 +14,7 @@ public class ProfGetExecutionFinalResponse {
 	public ProfGetExecutionFinalResponse() {
 	}
 
+	
 	public ProfGetExecutionFinalResponse(String accountNumber, String branchName, String branchCode, String customerId,
 			String ifsc, String key, String name, String prospectId) {
 		this.accountNumber = accountNumber;

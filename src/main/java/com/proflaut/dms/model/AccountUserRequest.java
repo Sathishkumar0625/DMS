@@ -3,7 +3,6 @@ package com.proflaut.dms.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
 @JsonPropertyOrder({ "accountNumber", "accountBranch", "address", "city", "state", "ODlimit", "branchCode", "IFSCcode",
 		"MICRcode" })
 public class AccountUserRequest {
@@ -59,12 +58,28 @@ public class AccountUserRequest {
 		this.state = state;
 	}
 
-	public int getODlimit() {
-		return ODlimit;
+	public int getOdLimit() {
+		return odLimit;
 	}
 
-	public void setODlimit(int oDlimit) {
-		ODlimit = oDlimit;
+	public String getIfscCode() {
+		return ifscCode;
+	}
+
+	public String getMicrCode() {
+		return micrCode;
+	}
+
+	public void setOdLimit(int odLimit) {
+		this.odLimit = odLimit;
+	}
+
+	public void setIfscCode(String ifscCode) {
+		this.ifscCode = ifscCode;
+	}
+
+	public void setMicrCode(String micrCode) {
+		this.micrCode = micrCode;
 	}
 
 	public int getBranchCode() {
@@ -75,35 +90,19 @@ public class AccountUserRequest {
 		this.branchCode = branchCode;
 	}
 
-	public String getIFSCcode() {
-		return IFSCcode;
-	}
-
-	public void setIFSCcode(String iFSCcode) {
-		IFSCcode = iFSCcode;
-	}
-
-	public String getMICRcode() {
-		return MICRcode;
-	}
-
-	public void setMICRcode(String mICRcode) {
-		MICRcode = mICRcode;
-	}
-
 	@JsonProperty("state")
 	private String state;
 
 	@JsonProperty("ODlimit")
-	private int ODlimit;
+	private int odLimit;
 
 	@JsonProperty("branchCode")
 	private int branchCode;
 
 	@JsonProperty("IFSCcode")
-	private String IFSCcode;
+	private String ifscCode;
 
 	@JsonProperty("MICRcode")
-	private String MICRcode;
+	private String micrCode;
 
 }
