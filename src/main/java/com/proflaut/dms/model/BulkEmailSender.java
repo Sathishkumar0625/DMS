@@ -14,11 +14,13 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.proflaut.dms.exception.CustomException;
+
 
 public class BulkEmailSender {
 	private MailInfoRequest mailInfoRequest;
 	private Properties emailConfig;
-	private MimeMessage mimeMessage;
+	
 
 	public BulkEmailSender(MailInfoRequest mailInfoRequest, Properties emailConfig) {
 		this.mailInfoRequest = mailInfoRequest;
@@ -37,23 +39,24 @@ public class BulkEmailSender {
 		}
 	}
 
-	public MimeMessage getMimeMessage() {
+	public MimeMessage getMimeMessage() throws CustomException {
+  MimeMessage mimeMessage;
 		mimeMessage = buildMimeMessage();
 		return mimeMessage;
 	}
 
-	private MimeMessage buildMimeMessage() {
+	private MimeMessage buildMimeMessage() throws CustomException {
 //		final String username = "pdineshofficial@gmail.com";// change accordingly
 //		final String password = "ykkekdkvlautwqex";// change accordingly
 //		final String username = "sathishsjroman@gmail.com";// change accordingly
 //		final String password = "heqrgvtwhjghjgmc";// change accordingly
 		final String username = "sathishkumar@proflaut.com";// change accordingly
-		final String password = "igwmiafnylucedbq";
+		final String pass = "igwmiafnylucedbq";
 		// Get the Session object.
 		Session session = Session.getInstance(emailConfig, new javax.mail.Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password);
+				return new PasswordAuthentication(username, pass);
 			}
 		});
 		MimeMessage mimeMessage = new MimeMessage(session);
@@ -63,8 +66,7 @@ public class BulkEmailSender {
 
 			mimeMessage.setSentDate(new Date());
 		} catch (Exception e) {
-			mimeMessage = null;
-			throw new RuntimeException("Error in setting from, to, cc address and subject of the email");
+			 throw new CustomException("Error in setting from, to, cc address and subject of the email");
 		}
 
 		return mimeMessage;
@@ -76,7 +78,7 @@ public class BulkEmailSender {
 				try {
 					mimeMessage.setSubject(mailInfoRequest.getSubject());
 				} catch (Exception e) {
-					throw new RuntimeException("Could not set subject " + mailInfoRequest.getSubject());
+					e.printStackTrace();
 				}
 			}
 			return mimeMessage;
@@ -89,7 +91,7 @@ public class BulkEmailSender {
 				try {
 					mimeMessage.setFrom(new InternetAddress(mailInfoRequest.getFrom().trim()));
 				} catch (Exception e) {
-					throw new RuntimeException("Could not resolve from address " + mailInfoRequest.getFrom());
+					e.printStackTrace();
 				}
 			}
 			return mimeMessage;
@@ -104,12 +106,12 @@ public class BulkEmailSender {
 						try {
 							return new InternetAddress(to);
 						} catch (AddressException e) {
+							e.printStackTrace();
 							throw new RuntimeException("Could not resolve to address");
 						}
 					}).toArray(InternetAddress[]::new));
 				} catch (MessagingException e) {
-					throw new RuntimeException(
-							"Could not set to address in message " + mailInfoRequest.getToList().toString());
+					e.printStackTrace();
 				}
 			}
 			return mimeMessage;

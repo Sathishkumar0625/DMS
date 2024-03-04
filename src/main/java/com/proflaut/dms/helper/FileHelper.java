@@ -348,14 +348,14 @@ public class FileHelper {
 	}
 
 	public boolean sendMail(MailInfoRequest mailInfoRequest, byte[] fileBytes, String extension,
-			ProfDocEntity docEntity) throws MessagingException {
+			ProfDocEntity docEntity) throws MessagingException, CustomException {
 		boolean isMail = false;
 		String host = "smtp.gmail.com";
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.host", host);	
 		props.put("mail.smtp.port", "587");
 
 		BulkEmailSender bulkEmailSender = new BulkEmailSender(mailInfoRequest, props);
