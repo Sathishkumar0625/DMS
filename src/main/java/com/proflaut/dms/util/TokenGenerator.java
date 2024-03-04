@@ -22,7 +22,7 @@ public class TokenGenerator {
 	private static final Logger logger = LogManager.getLogger(TokenGenerator.class);
 	static Cipher cipher;
 
-	public static Map<String, String> generateToken(String userName) {
+	public  Map<String, String> generateToken(String userName) {
 		String encryptedText = "";
 		Map<String, String> resp = new HashMap<>();
 		try {
@@ -38,7 +38,7 @@ public class TokenGenerator {
 			resp.put("token", encryptedText);
 			resp.put("seckey", encodedKey);
 		} catch (Exception e) {
-			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);;
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return resp;
 	}

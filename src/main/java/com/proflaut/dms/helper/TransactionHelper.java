@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.controller.DashboardController;
 import com.proflaut.dms.entity.ProfActivitiesEntity;
 import com.proflaut.dms.entity.ProfDmsHeader;
 import com.proflaut.dms.entity.ProfDmsMainEntity;
@@ -50,7 +49,7 @@ public class TransactionHelper {
 	public TransactionHelper(AppConfiguration appConfiguration, FolderServiceImpl folderServiceImpl) {
 		this.appConfiguration = appConfiguration;
 		this.folderServiceImpl = folderServiceImpl;
-	}
+	}	
 
 	private String generateUniqueId() {
 		return String.format("%04d", this.random.nextInt(999));
