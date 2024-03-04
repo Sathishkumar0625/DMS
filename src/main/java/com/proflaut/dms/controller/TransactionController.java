@@ -247,8 +247,6 @@ public class TransactionController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		try {
-			logger.info("Entering into getExecution -> {}", key);
-
 			Map<String, Object> result = transactionImpl.getExecutionResults(key, userId);
 
 			if (result != null && !result.isEmpty()) {

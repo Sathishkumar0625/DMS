@@ -16,7 +16,6 @@
 	<description>DMS Spring boot project</description>
 	<properties>
 		<java.version>1.8</java.version>
-		<sonar.token>sqp_72e65730dcf0cf3cebc3aa9baffd0e86230ba931</sonar.token>
 	</properties>
 	<dependencies>
 
@@ -54,25 +53,14 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<!-- <dependencies>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.12.5</version> Use the latest version available
-		</dependency>
-
-		</dependencies> -->
+		
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency> -->
+		
 
 		<dependency>
 			<groupId>org.springframework</groupId>
