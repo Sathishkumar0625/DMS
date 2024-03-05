@@ -7,14 +7,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @SuppressWarnings("deprecation")
 @Component
-public class Serviceinterceptor extends WebMvcConfigurerAdapter{
-	
-	 @Autowired
-     LogInterceptor logInterceptor;
+public class Serviceinterceptor extends WebMvcConfigurerAdapter {
 
-     @Override
-     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(logInterceptor);
-     }
+	LogInterceptor logInterceptor;
+
+	@Autowired
+	public Serviceinterceptor(LogInterceptor logInterceptor) {
+		this.logInterceptor = logInterceptor;
+	}
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(logInterceptor);
+	}
 
 }

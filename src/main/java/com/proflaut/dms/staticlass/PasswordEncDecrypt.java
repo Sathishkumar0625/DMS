@@ -1,4 +1,4 @@
-package com.proflaut.dms.statiClass;
+package com.proflaut.dms.staticlass;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;

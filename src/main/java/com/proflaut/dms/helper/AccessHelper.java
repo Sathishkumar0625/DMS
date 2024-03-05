@@ -19,7 +19,7 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
-import com.proflaut.dms.statiClass.PasswordEncDecrypt;
+import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 
 @Component
 public class AccessHelper {

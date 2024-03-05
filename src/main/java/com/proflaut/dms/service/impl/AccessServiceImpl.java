@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.proflaut.dms.constant.DMSConstant;
-import com.proflaut.dms.customException.CustomExcep;
+import com.proflaut.dms.customexception.CustomExcep;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;

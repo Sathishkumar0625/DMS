@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.entity.ProfLicenseEntity;
 import com.proflaut.dms.model.ProfLicenceResponse;
-import com.proflaut.dms.statiClass.PasswordEncDecrypt;
+import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 
 @Component
 public class LicenceHelper {

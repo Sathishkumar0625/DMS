@@ -1,4 +1,4 @@
-package com.proflaut.dms.customException;
+package com.proflaut.dms.customexception;
 
 @SuppressWarnings("serial")
 public class CustomExcep extends Exception{

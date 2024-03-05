@@ -48,7 +48,7 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 @Service
 public class TransactionServiceImpl {
 	private static final Logger logger = LogManager.getLogger(TransactionServiceImpl.class);
-	@Autowired
+
 	private JdbcTemplate jdbcTemplate;
 
 	ProfUserInfoRepository profUserInfoRepository;
@@ -66,13 +66,12 @@ public class TransactionServiceImpl {
 	ProfDmsHeaderRepository headerRepository;
 
 	TransactionHelper transactionHelper;
-	
-	
+
 	@Autowired
 	public TransactionServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfActivityRepository activityRepository, ProfDmsMainRepository dmsMainRepository,
 			FolderServiceImpl folderServiceImpl, ProfExecutionRepository executionRepository,
-			ProfDmsHeaderRepository headerRepository, TransactionHelper transactionHelper) {
+			ProfDmsHeaderRepository headerRepository, TransactionHelper transactionHelper, JdbcTemplate jdbcTemplate) {
 		this.profUserInfoRepository = profUserInfoRepository;
 		this.activityRepository = activityRepository;
 		this.dmsMainRepository = dmsMainRepository;
@@ -80,6 +79,7 @@ public class TransactionServiceImpl {
 		this.executionRepository = executionRepository;
 		this.headerRepository = headerRepository;
 		this.transactionHelper = transactionHelper;
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	public ProfActivityResponse saveActivity(ProfActivityRequest activityRequest) {

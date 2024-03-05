@@ -61,7 +61,7 @@ import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
-import com.proflaut.dms.statiClass.PasswordEncDecrypt;
+import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 import com.proflaut.dms.util.Compression;
 
 @Service

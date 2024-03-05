@@ -13,7 +13,7 @@ import com.proflaut.dms.entity.ProfLicenseEntity;
 import com.proflaut.dms.helper.LicenceHelper;
 import com.proflaut.dms.model.ProfLicenceResponse;
 import com.proflaut.dms.repository.ProfLicenseRepository;
-import com.proflaut.dms.statiClass.PasswordEncDecrypt;
+import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 
 @Service
 public class LicenceServiceImpl {
