@@ -8,6 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.crypto.NoSuchPaddingException;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -92,8 +96,7 @@ public class FileHelper {
 	ProfMountPointRepository mountPointRepository;
 
 	ProfUserGroupMappingRepository groupMappingRepository;
-	
-	
+
 	@Autowired
 	public FileHelper(ProfUserInfoRepository infoRepository, FolderRepository folderRepository,
 			ProfDocUploadRepository docUploadRepository, ProfOldImageRepository imageRepository,
@@ -116,7 +119,6 @@ public class FileHelper {
 		return currentDateTime.format(formatter);
 	}
 
-	@Transactional
 	public boolean storeDocument(FileRequest fileRequest, int uId, String uName, String token,
 			ProfMountPointFolderMappingEntity folderMappingEntity) throws CustomException {
 		boolean isFileCreated = false;
@@ -135,16 +137,7 @@ public class FileHelper {
 						fileRequest.getDockName(), Integer.parseInt(fileRequest.getFolderId()));
 
 				if (existingDocEntity != null) {
-					File newFile = new File(path + File.separator + fileName);
-					try (FileWriter fileWriter = new FileWriter(newFile)) {
-						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
-						PasswordEncDecrypt td = new PasswordEncDecrypt();
-						String encrypted = td.encrypt(compressedBytes);
-						fileWriter.write(encrypted);
-						isFileCreated = true;
-					} catch (IOException e) {
-						handleIOException(e);
-					}
+					isFileCreated = createFileAndSaveData(path, fileName, fileRequest.getImage());
 					String fileSize = getBase64ImageSizeInKB(fileRequest.getImage());
 					ProfOldImageEntity imageEntity = convertFileReqToOldImage(existingDocEntity, uId, uName, fileSize);
 					imageRepository.save(imageEntity);
@@ -153,16 +146,7 @@ public class FileHelper {
 					existingDocEntity.setFileSize(fileSize);
 					docUploadRepository.save(existingDocEntity);
 				} else {
-					File file = new File(path + File.separator + fileName);
-					try (FileWriter fileWriter = new FileWriter(file)) {
-						String compressedBytes = Compression.compressAndReturnB64(fileRequest.getImage());
-						PasswordEncDecrypt td = new PasswordEncDecrypt();
-						String encrypted = td.encrypt(compressedBytes);
-						fileWriter.write(encrypted);
-						isFileCreated = true;
-					} catch (IOException e) {
-						handleIOException(e);
-					}
+					isFileCreated = createFileAndSaveData(path, fileName, fileRequest.getImage());
 					String fileSize = getBase64ImageSizeInKB(fileRequest.getImage());
 					ProfDocEntity profDocEnt = convertFileRequesttoProfDoc(fileRequest, token, entity, fileName,
 							fileSize);
@@ -178,6 +162,20 @@ public class FileHelper {
 			}
 		}
 		return isFileCreated;
+	}
+
+	private boolean createFileAndSaveData(String path, String fileName,
+			String imageData) throws IOException, CustomException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
+		try (FileWriter fileWriter = new FileWriter(new File(path + File.separator + fileName))) {
+			String compressedBytes = Compression.compressAndReturnB64(imageData);
+			PasswordEncDecrypt td = new PasswordEncDecrypt();
+			String encrypted = td.encrypt(compressedBytes);
+			fileWriter.write(encrypted);
+			return true;
+		} catch (IOException e) {
+			handleIOException(e);
+			return false;
+		}
 	}
 
 	public static String getBase64ImageSizeInKB(String base64Image) {
@@ -355,7 +353,7 @@ public class FileHelper {
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);	
+		props.put("mail.smtp.host", host);
 		props.put("mail.smtp.port", "587");
 
 		BulkEmailSender bulkEmailSender = new BulkEmailSender(mailInfoRequest, props);
@@ -452,7 +450,7 @@ public class FileHelper {
 
 	public ProfDownloadHistoryEntity convertRequestToDownloadHistory(int docId,
 			ProfUserPropertiesEntity profUserPropertiesEntity) {
-		ProfDownloadHistoryEntity downloadHistoryEntity=new ProfDownloadHistoryEntity();
+		ProfDownloadHistoryEntity downloadHistoryEntity = new ProfDownloadHistoryEntity();
 		downloadHistoryEntity.setDocId(docId);
 		downloadHistoryEntity.setDownloadedDate(formatCurrentDateTime());
 		downloadHistoryEntity.setUserId(profUserPropertiesEntity.getUserId());

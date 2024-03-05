@@ -1,6 +1,7 @@
 package com.proflaut.dms.service.impl;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,7 +89,8 @@ public class FolderServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
 			if (dataEntity != null && propertiesEntity != null) {
 				String folderPath = folderLocation + folderFO.getFolderName();
-				File folder = new File(folderPath);
+				String path=Paths.get(folderPath).toString();
+				File folder = new File(path);
 
 				if (folder.exists()) {
 					fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);

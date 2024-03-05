@@ -54,7 +54,6 @@ public class FileController {
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
-	
 	FileManagementServiceImpl fileManagementServiceImpl;
 	private static final Logger logger = LogManager.getLogger(FileController.class);
 
@@ -63,15 +62,14 @@ public class FileController {
 	private PlatformTransactionManager transactionManager;
 
 	MetaServiceImpl metaServiceImpl;
-	
-	
+
 	@Autowired
 	public FileController(FileManagementServiceImpl fileManagementServiceImpl, ProfDocUploadRepository uploadRepository,
-			MetaServiceImpl metaServiceImpl,PlatformTransactionManager transactionManager) {
+			MetaServiceImpl metaServiceImpl, PlatformTransactionManager transactionManager) {
 		this.fileManagementServiceImpl = fileManagementServiceImpl;
 		this.uploadRepository = uploadRepository;
 		this.metaServiceImpl = metaServiceImpl;
-		this.transactionManager=transactionManager;
+		this.transactionManager = transactionManager;
 	}
 
 	@PostMapping("/upload")
@@ -103,12 +101,12 @@ public class FileController {
 						fileRequest.getCreateTableRequests().get(0), docEntity.getId(), fileRequest, paths, docEntity);
 				fileResponse.setId(docEntity.getId());
 				if (metaDataResponse != null && metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.SUCCESS)) {
-					logger.error("INSERT META DATA SUCCESS");
+					logger.info("INSERT META DATA SUCCESS");
 					long endTime = System.nanoTime();
 					long executionTime = (endTime - startTime) / 1000000;
-					docEntity.setUploadExecutionTime((int)executionTime);
+					docEntity.setUploadExecutionTime((int) executionTime);
 					uploadRepository.save(docEntity);
-					logger.info("Counting to 10000000 takes --> {} " , executionTime);
+					logger.info("Counting to 10000000 takes --> {} ", executionTime);
 					return new ResponseEntity<>(fileResponse, HttpStatus.OK);
 				} else {
 					logger.error("Failed to create meta table");
@@ -138,7 +136,7 @@ public class FileController {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 		logger.info("Getting into Download");
 		FileRetreiveResponse fileRetreiveResponse = new FileRetreiveResponse();
 		try {
@@ -249,9 +247,10 @@ public class FileController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/downloadHistory/{docId}")
-	public ResponseEntity<ProfEmailShareResponse> downloadHistory(@RequestHeader("token") String token,@PathVariable int docId) {
+	public ResponseEntity<ProfEmailShareResponse> downloadHistory(@RequestHeader("token") String token,
+			@PathVariable int docId) {
 		long startTime = System.nanoTime();
 		if (StringUtils.isEmpty(docId) || StringUtils.isEmpty(token)) {
 			logger.warn(DMSConstant.INVALID_INPUT);
@@ -260,7 +259,7 @@ public class FileController {
 		ProfEmailShareResponse emailShareResponse = null;
 
 		try {
-			emailShareResponse = fileManagementServiceImpl.downloadHist(docId,token,startTime);
+			emailShareResponse = fileManagementServiceImpl.downloadHist(docId, token, startTime);
 			if (!emailShareResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(emailShareResponse, HttpStatus.OK);
 			} else {
@@ -273,6 +272,5 @@ public class FileController {
 		}
 
 	}
-
 
 }
