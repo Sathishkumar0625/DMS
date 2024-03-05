@@ -18,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
@@ -46,8 +45,8 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
-public class DashboardServiceImpl {
-	
+public class DashboardServiceImpl implements DashboardService 	 {
+
 	private static final Logger logger = LogManager.getLogger(DashboardServiceImpl.class);
 	ProfUserInfoRepository infoRepository;
 	ProfDocUploadRepository docUploadRepository;
@@ -86,9 +85,10 @@ public class DashboardServiceImpl {
 		return currentDateTime.format(formatter);
 	}
 
-	public List<Map<String, String>> getUserCounts() {
-		return userCounts;
-	}
+	@Override
+    public List<Map<String, String>> getUserCounts() {
+        return userCounts;
+    }
 
 	public ProfUserUploadDetailsResponse getUploadedDetails(String token) {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
@@ -179,19 +179,26 @@ public class DashboardServiceImpl {
 		}
 		return String.valueOf(count);
 	}
-
-	@Scheduled(fixedRate = 2 * 24 * 60 * 60 * 1000)
-//	@Scheduled(fixedRate = 10 * 1000)
-	public void updateUserCount() {
-		String count = usersCount();
-		String date = formatCurrentDate();
-		Map<String, String> countMap = new HashMap<>();
-		countMap.put("date", date);
-		countMap.put("count", count);
-		userCounts.add(countMap);
-		if (userCounts.size() > 10) {
-			userCounts.remove(0);
+	
+	public List<Map<String, String>> averageFileUpload(String token) {
+		try {
+			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
+			List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(propertiesEntity.getUserName());
+			long userDocSize = fileHelper.getTotalFileSize(docEntities);
+			long count = docEntities.size();
+			String average = calculateAverage(count, userDocSize);
+			String date = formatCurrentDate();
+			Map<String, String> countMap = new HashMap<>();
+			countMap.put("date", date);
+			countMap.put("AvgFileUpload", average);
+			userCounts.add(countMap);
+			if (userCounts.size() > 10) {
+				userCounts.remove(0);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
+		return userCounts;
 	}
 
 	public List<ImageResponse> getOcrImage(ImageRequest imageRequest) {
@@ -255,12 +262,12 @@ public class DashboardServiceImpl {
 		return detailsResponse;
 	}
 
-	private String calculateAverageDownloadSpeed(int size, List<ProfDownloadHistoryEntity> historyEntities) {
+	public String calculateAverageDownloadSpeed(int size, List<ProfDownloadHistoryEntity> historyEntities) {
 		long sum = historyEntities.stream().mapToLong(ProfDownloadHistoryEntity::getDownloadExecutionSpeed).sum();
 		return sum / size + "ms";
 	}
 
-	private String calculateAverageExecutionTime(List<ProfDocEntity> docEntities) {
+	public String calculateAverageExecutionTime(List<ProfDocEntity> docEntities) {
 		if (docEntities.isEmpty()) {
 			return null;
 		}
@@ -268,7 +275,7 @@ public class DashboardServiceImpl {
 		return sum / docEntities.size() + "ms";
 	}
 
-	private String calculateAverage(long count, long userDocSize) {
+	public String calculateAverage(long count, long userDocSize) {
 		long average = (userDocSize / count);
 		return average + "kb";
 	}

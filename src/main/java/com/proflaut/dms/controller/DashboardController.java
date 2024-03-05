@@ -21,6 +21,7 @@ import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.model.ImageRequest;
 import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.ProfUserGroupDetailsResponse;
+import com.proflaut.dms.service.impl.DashboardService;
 import com.proflaut.dms.service.impl.DashboardServiceImpl;
 
 @RestController
@@ -28,10 +29,14 @@ import com.proflaut.dms.service.impl.DashboardServiceImpl;
 public class DashboardController {
 
 	DashboardServiceImpl dashboardServiceImpl;
+	
+	DashboardService dashboardService;
+	
 	private static final Logger logger = LogManager.getLogger(DashboardController.class);	
 	@Autowired
-	public DashboardController(DashboardServiceImpl dashboardServiceImpl) {
+	public DashboardController(DashboardServiceImpl dashboardServiceImpl,DashboardService dashboardService) {
 		this.dashboardServiceImpl = dashboardServiceImpl;
+		this.dashboardService=dashboardService;
 	}
 
 	@GetMapping("/getUserUploadedDetails")
@@ -70,8 +75,9 @@ public class DashboardController {
 	@GetMapping("/usersGraph")
 	public ResponseEntity<List<Map<String, String>>> getUsersGraph(@RequestHeader("token") String token) {
 		try {
-			List<Map<String, String>> counts = dashboardServiceImpl.getUserCounts();
-			return new ResponseEntity<>(counts, HttpStatus.OK);
+			dashboardServiceImpl.averageFileUpload(token);
+			List<Map<String, String>> totalcounts=dashboardService.getUserCounts();
+			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
