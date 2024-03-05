@@ -29,9 +29,6 @@ public class EncryptionDecryptionAES {
 		@SuppressWarnings("unused")
 		SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 		
-	
-		cipher = Cipher.getInstance("AES"); 
-
 		String plainText = "system123#";
 		logger.info("Plain Text Before Encryption --> {} ",plainText);
 	

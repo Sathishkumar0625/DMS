@@ -122,7 +122,7 @@ public class AccessServiceImpl {
 		String token = "";
 		boolean isValidate = accessHelper.validatePassword(profUserInfoEntity, userInfo);
 		if (isValidate) {
-			Map<String, String> tokenResp = tokenGenerator.generateToken(userInfo.getUserName());
+			Map<String, String> tokenResp = TokenGenerator.generateToken(userInfo.getUserName());
 			token = tokenResp.get("token");
 			ProfUserPropertiesEntity ent = accessHelper.convertUserInfotoProfUserProp(profUserInfoEntity, tokenResp);
 			userValidation(userInfo, profUserInfoEntity, loginResponse, token, ent);

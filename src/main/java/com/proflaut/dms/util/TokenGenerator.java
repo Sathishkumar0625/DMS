@@ -22,7 +22,7 @@ public class TokenGenerator {
 	private static final Logger logger = LogManager.getLogger(TokenGenerator.class);
 	static Cipher cipher;
 
-	public  Map<String, String> generateToken(String userName) {
+	public static Map<String, String> generateToken(String userName) {
 		String encryptedText = "";
 		Map<String, String> resp = new HashMap<>();
 		try {
