@@ -22,11 +22,15 @@ public class DashboardDataEntity {
 	@Column(name = "AVG_UPLOADSPEED")
 	private String avgUploadSpeed;
 	@Column(name = "AVG_DOWNLOADSPEED")
-	private int avgDownloadSpeed;
+	private String avgDownloadSpeed;
 	@Column(name = "TOTAL_UPLOADS")
 	private String totalUploads;
 	@Column(name = "TOTAL_DOWNLOADS")
 	private String totalDownloads;
+	@Column(name = "USER_NAME")
+	private String userName;
+	@Column(name = "USER_ID")
+	private String userId;
 
 	public int getId() {
 		return id;
@@ -34,6 +38,22 @@ public class DashboardDataEntity {
 
 	public String getDate() {
 		return date;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getAvgFileSize() {
@@ -64,7 +84,7 @@ public class DashboardDataEntity {
 		return avgUploadSpeed;
 	}
 
-	public int getAvgDownloadSpeed() {
+	public String getAvgDownloadSpeed() {
 		return avgDownloadSpeed;
 	}
 
@@ -72,7 +92,7 @@ public class DashboardDataEntity {
 		this.avgUploadSpeed = avgUploadSpeed;
 	}
 
-	public void setAvgDownloadSpeed(int avgDownloadSpeed) {
+	public void setAvgDownloadSpeed(String avgDownloadSpeed) {
 		this.avgDownloadSpeed = avgDownloadSpeed;
 	}
 

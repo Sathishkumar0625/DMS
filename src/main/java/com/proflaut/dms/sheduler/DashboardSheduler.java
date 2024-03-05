@@ -41,35 +41,44 @@ public class DashboardSheduler {
 		this.downloadHistoryRepo = downloadHistoryRepo;
 	}
 
-//	@Scheduled(cron = "0 0 0 * * ?")
-//	@Scheduled(fixedDelay = 10 * 1000)
+	@Scheduled(cron = "0 0 0 * * ?")
+//  @Scheduled(fixedDelay = 10 * 1000)
 	public void storeData() {
-		DashboardDataEntity dashboardDataEntity = null;
-		List<ProfUserInfoEntity> entities = infoRepository.findAll();
-		List<String> userNames = entities.stream().map(ProfUserInfoEntity::getUserName).collect(Collectors.toList());
-		List<Integer> userIds = entities.stream().map(ProfUserInfoEntity::getUserId).collect(Collectors.toList());
 		List<DashboardDataEntity> dashboardDataEntities = new ArrayList<>();
-		for (String userName : userNames) {
+
+		// Process upload data
+		List<ProfUserInfoEntity> entities = infoRepository.findAll();
+		for (ProfUserInfoEntity entity : entities) {
+			String userName = entity.getUserName();
 			List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedByIgnoreCase(userName);
-			dashboardDataEntity = new DashboardDataEntity();
-			dashboardDataEntity.setTotalUploads(String.valueOf(docEntities.size()));
-			long userDocSize = fileHelper.getTotalFileSize(docEntities);
-			String avgUploadSize = dashboardServiceImpl.calculateAverage(docEntities.size(), userDocSize);
-			dashboardDataEntity.setAvgFileSize(avgUploadSize);
-			String uploadSpeed = dashboardServiceImpl.calculateAverageExecutionTime(docEntities);
-			dashboardDataEntity.setAvgUploadSpeed(uploadSpeed);
-			dashboardDataEntities.add(dashboardDataEntity);
+			if (!docEntities.isEmpty()) {
+				DashboardDataEntity dashboardDataEntity = new DashboardDataEntity();
+				dashboardDataEntity.setTotalUploads(String.valueOf(docEntities.size()));
+				long userDocSize = fileHelper.getTotalFileSize(docEntities);
+				String avgUploadSize = dashboardServiceImpl.calculateAverage(docEntities.size(), userDocSize);
+				dashboardDataEntity.setAvgFileSize(avgUploadSize);
+				String uploadSpeed = dashboardServiceImpl.calculateAverageExecutionTime(docEntities);
+				dashboardDataEntity.setAvgUploadSpeed(uploadSpeed);
+				dashboardDataEntity.setUserName(userName);
+				dashboardDataEntities.add(dashboardDataEntity);
+			}
 		}
-		boardRepository.saveAll(dashboardDataEntities);
-		for (Integer userid : userIds) {
-			dashboardDataEntity = new DashboardDataEntity();
-			List<ProfDownloadHistoryEntity> downloadHistoryEntities = downloadHistoryRepo.findByUserId(userid);
-			String averageDownloadSpeed = dashboardServiceImpl
-					.calculateAverageDownloadSpeed(downloadHistoryEntities.size(), downloadHistoryEntities);
-			dashboardDataEntity.setAvgDownloadSpeed(Integer.parseInt(averageDownloadSpeed));
-			dashboardDataEntity.setTotalDownloads(String.valueOf(downloadHistoryEntities.size()));
-			dashboardDataEntities.add(dashboardDataEntity);
+
+		// Process download data
+		for (ProfUserInfoEntity entity : entities) {
+			Integer userId = entity.getUserId();
+			List<ProfDownloadHistoryEntity> downloadHistoryEntities = downloadHistoryRepo.findByUserId(userId);
+			if (!downloadHistoryEntities.isEmpty()) {
+				DashboardDataEntity dashboardDataEntity = new DashboardDataEntity();
+				String averageDownloadSpeed = dashboardServiceImpl
+						.calculateAverageDownloadSpeed(downloadHistoryEntities.size(), downloadHistoryEntities);
+				dashboardDataEntity.setAvgDownloadSpeed(averageDownloadSpeed);
+				dashboardDataEntity.setTotalDownloads(String.valueOf(downloadHistoryEntities.size()));
+				dashboardDataEntity.setUserId(String.valueOf(userId));
+				dashboardDataEntities.add(dashboardDataEntity);
+			}
 		}
+
 		boardRepository.saveAll(dashboardDataEntities);
 	}
 
