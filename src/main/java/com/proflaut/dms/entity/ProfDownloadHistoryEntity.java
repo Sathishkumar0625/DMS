@@ -28,6 +28,9 @@ public class ProfDownloadHistoryEntity {
 	@Column(name = "DOWNLOAD_EXECUTIONSPEED")
 	private int downloadExecutionSpeed;
 
+	@Column(name = "USER_NAME")
+	private String userName;
+
 	public int getDownloadExecutionSpeed() {
 		return downloadExecutionSpeed;
 	}
@@ -66,6 +69,14 @@ public class ProfDownloadHistoryEntity {
 
 	public void setDownloadedDate(String downloadedDate) {
 		this.downloadedDate = downloadedDate;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

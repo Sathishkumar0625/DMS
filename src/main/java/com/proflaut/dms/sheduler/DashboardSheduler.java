@@ -51,7 +51,8 @@ public class DashboardSheduler {
 		for (ProfUserInfoEntity entity : entities) {
 			String userName = entity.getUserName();
 			List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedByIgnoreCase(userName);
-			if (!docEntities.isEmpty()) {
+			List<ProfDownloadHistoryEntity> downloadHistoryEntities = downloadHistoryRepo.findByUserName(userName);
+			if (!docEntities.isEmpty() || !downloadHistoryEntities.isEmpty()) {
 				DashboardDataEntity dashboardDataEntity = new DashboardDataEntity();
 				dashboardDataEntity.setTotalUploads(String.valueOf(docEntities.size()));
 				long userDocSize = fileHelper.getTotalFileSize(docEntities);
@@ -60,24 +61,29 @@ public class DashboardSheduler {
 				String uploadSpeed = dashboardServiceImpl.calculateAverageExecutionTime(docEntities);
 				dashboardDataEntity.setAvgUploadSpeed(uploadSpeed);
 				dashboardDataEntity.setUserName(userName);
-				dashboardDataEntities.add(dashboardDataEntity);
-			}
-		}
-
-		// Process download data
-		for (ProfUserInfoEntity entity : entities) {
-			Integer userId = entity.getUserId();
-			List<ProfDownloadHistoryEntity> downloadHistoryEntities = downloadHistoryRepo.findByUserId(userId);
-			if (!downloadHistoryEntities.isEmpty()) {
-				DashboardDataEntity dashboardDataEntity = new DashboardDataEntity();
 				String averageDownloadSpeed = dashboardServiceImpl
 						.calculateAverageDownloadSpeed(downloadHistoryEntities.size(), downloadHistoryEntities);
 				dashboardDataEntity.setAvgDownloadSpeed(averageDownloadSpeed);
 				dashboardDataEntity.setTotalDownloads(String.valueOf(downloadHistoryEntities.size()));
-				dashboardDataEntity.setUserId(String.valueOf(userId));
+				dashboardDataEntity.setUserId(String.valueOf(entity.getUserId()));
 				dashboardDataEntities.add(dashboardDataEntity);
 			}
 		}
+
+//		// Process download data
+//		for (ProfUserInfoEntity entity : entities) {
+//			Integer userId = entity.getUserId();
+//			List<ProfDownloadHistoryEntity> downloadHistoryEntities = downloadHistoryRepo.findByUserId(userId);
+//			if (!downloadHistoryEntities.isEmpty()) {
+//				DashboardDataEntity dashboardDataEntity = new DashboardDataEntity();
+//				String averageDownloadSpeed = dashboardServiceImpl
+//						.calculateAverageDownloadSpeed(downloadHistoryEntities.size(), downloadHistoryEntities);
+//				dashboardDataEntity.setAvgDownloadSpeed(averageDownloadSpeed);
+//				dashboardDataEntity.setTotalDownloads(String.valueOf(downloadHistoryEntities.size()));
+//				dashboardDataEntity.setUserId(String.valueOf(userId));
+//				dashboardDataEntities.add(dashboardDataEntity);
+//			}
+//		}
 
 		boardRepository.saveAll(dashboardDataEntities);
 	}

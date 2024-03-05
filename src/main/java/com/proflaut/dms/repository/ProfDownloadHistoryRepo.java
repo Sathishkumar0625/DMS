@@ -10,4 +10,6 @@ public interface ProfDownloadHistoryRepo extends JpaRepository<ProfDownloadHisto
 
 	List<ProfDownloadHistoryEntity> findByUserId(int userId);
 
+	List<ProfDownloadHistoryEntity> findByUserName(String userName);
+
 }

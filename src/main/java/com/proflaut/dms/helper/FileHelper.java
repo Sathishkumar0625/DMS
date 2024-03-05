@@ -454,6 +454,7 @@ public class FileHelper {
 		downloadHistoryEntity.setDocId(docId);
 		downloadHistoryEntity.setDownloadedDate(formatCurrentDateTime());
 		downloadHistoryEntity.setUserId(profUserPropertiesEntity.getUserId());
+		downloadHistoryEntity.setUserName(profUserPropertiesEntity.getUserName());
 		return downloadHistoryEntity;
 	}
 
