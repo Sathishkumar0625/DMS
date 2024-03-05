@@ -293,8 +293,6 @@ public class DashboardServiceImpl implements DashboardService {
 			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
 			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(entity.getUserName());
 
-			int count = 0;
-
 			for (DashboardDataEntity dataEntity : dataEntities) {
 				Map<String, String> entry = new LinkedHashMap<>();
 				String date = dataEntity.getDate();
@@ -307,9 +305,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 				linearGraphList.add(entry);
 
-				count++;
-
-				if (count >= 10) {
+				if (linearGraphList.size() > 10) {
 					linearGraphList.remove(0);
 				}
 			}
