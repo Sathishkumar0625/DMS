@@ -29,14 +29,15 @@ import com.proflaut.dms.service.impl.DashboardServiceImpl;
 public class DashboardController {
 
 	DashboardServiceImpl dashboardServiceImpl;
-	
+
 	DashboardService dashboardService;
-	
-	private static final Logger logger = LogManager.getLogger(DashboardController.class);	
+
+	private static final Logger logger = LogManager.getLogger(DashboardController.class);
+
 	@Autowired
-	public DashboardController(DashboardServiceImpl dashboardServiceImpl,DashboardService dashboardService) {
+	public DashboardController(DashboardServiceImpl dashboardServiceImpl, DashboardService dashboardService) {
 		this.dashboardServiceImpl = dashboardServiceImpl;
-		this.dashboardService=dashboardService;
+		this.dashboardService = dashboardService;
 	}
 
 	@GetMapping("/getUserUploadedDetails")
@@ -76,19 +77,20 @@ public class DashboardController {
 	public ResponseEntity<List<Map<String, String>>> getUsersGraph(@RequestHeader("token") String token) {
 		try {
 			dashboardServiceImpl.averageFileUpload(token);
-			List<Map<String, String>> totalcounts=dashboardService.getUserCounts();
+			List<Map<String, String>> totalcounts = dashboardService.getUserCounts();
 			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@PostMapping("/ocrImage")
 	public ResponseEntity<List<ImageResponse>> getOcrImage(@RequestBody ImageRequest imageRequest) {
 		if (StringUtils.isEmpty(imageRequest.getImage())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		List<ImageResponse> imageResponse=null;
+		List<ImageResponse> imageResponse = null;
 		try {
 			imageResponse = dashboardServiceImpl.getOcrImage(imageRequest);
 			if (imageResponse != null) {
@@ -102,7 +104,7 @@ public class DashboardController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getUserFullDetails")
 	public ResponseEntity<ProfUserUploadDetailsResponse> getUserDetails(@RequestHeader("token") String token) {
 		ProfUserUploadDetailsResponse detailsResponse = null;
@@ -113,6 +115,18 @@ public class DashboardController {
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/linearGraph")
+	public ResponseEntity<Map<String, String>> getLinearGraph(@RequestHeader("token") String token) {
+		try {
+			dashboardServiceImpl.averageFileUpload(token);
+			Map<String, String> totalcounts = dashboardService.linearGraph(token);
+			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

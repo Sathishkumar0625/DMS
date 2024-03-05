@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.entity.DashboardDataEntity;
 import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
@@ -35,6 +37,7 @@ import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.model.ImageRequest;
 import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.ProfUserGroupDetailsResponse;
+import com.proflaut.dms.repository.DashBoardRepository;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfDownloadHistoryRepo;
@@ -45,7 +48,7 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
-public class DashboardServiceImpl implements DashboardService 	 {
+public class DashboardServiceImpl implements DashboardService {
 
 	private static final Logger logger = LogManager.getLogger(DashboardServiceImpl.class);
 	ProfUserInfoRepository infoRepository;
@@ -58,13 +61,15 @@ public class DashboardServiceImpl implements DashboardService 	 {
 	RestTemplate restTemplate;
 	ProfDownloadHistoryRepo downloadHistoryRepo;
 	FolderRepository folderRepository;
+	DashBoardRepository boardRepository;
 
 	@Autowired
 	public DashboardServiceImpl(ProfUserInfoRepository infoRepository, ProfDocUploadRepository docUploadRepository,
 			FileHelper fileHelper, ProfUserGroupMappingRepository groupMappingRepository,
 			ProfGroupInfoRepository groupInfoRepository, ProfGroupUserMappingRepository userMappingRepository,
 			ProfUserPropertiesRepository userPropertiesRepository, RestTemplate restTemplate,
-			ProfDownloadHistoryRepo downloadHistoryRepo, FolderRepository folderRepository) {
+			ProfDownloadHistoryRepo downloadHistoryRepo, FolderRepository folderRepository,
+			DashBoardRepository boardRepository) {
 		this.infoRepository = infoRepository;
 		this.docUploadRepository = docUploadRepository;
 		this.fileHelper = fileHelper;
@@ -75,6 +80,7 @@ public class DashboardServiceImpl implements DashboardService 	 {
 		this.restTemplate = restTemplate;
 		this.downloadHistoryRepo = downloadHistoryRepo;
 		this.folderRepository = folderRepository;
+		this.boardRepository = boardRepository;
 	}
 
 	private List<Map<String, String>> userCounts = new ArrayList<>();
@@ -86,9 +92,9 @@ public class DashboardServiceImpl implements DashboardService 	 {
 	}
 
 	@Override
-    public List<Map<String, String>> getUserCounts() {
-        return userCounts;
-    }
+	public List<Map<String, String>> getUserCounts() {
+		return userCounts;
+	}
 
 	public ProfUserUploadDetailsResponse getUploadedDetails(String token) {
 		ProfUserUploadDetailsResponse detailsResponse = new ProfUserUploadDetailsResponse();
@@ -179,7 +185,7 @@ public class DashboardServiceImpl implements DashboardService 	 {
 		}
 		return String.valueOf(count);
 	}
-	
+
 	public List<Map<String, String>> averageFileUpload(String token) {
 		try {
 			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
@@ -278,6 +284,32 @@ public class DashboardServiceImpl implements DashboardService 	 {
 	public String calculateAverage(long count, long userDocSize) {
 		long average = (userDocSize / count);
 		return average + "kb";
+	}
+
+	@Override
+	public Map<String, String> linearGraph(String token) {
+		Map<String, String> linearGraphMap = new LinkedHashMap<>();
+		try {
+			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(entity.getUserName());
+
+			// Remove the oldest entry if map size exceeds 10
+			while (linearGraphMap.size() >= 10) {
+				linearGraphMap.remove(linearGraphMap.keySet().iterator().next());
+			}
+
+			for (DashboardDataEntity dataEntity : dataEntities) {
+				String date = dataEntity.getDate();
+				String avgUploadSpeed = dataEntity.getAvgUploadSpeed();
+				String avgDownloadSpeed = dataEntity.getAvgDownloadSpeed();
+
+				// Add the entry to the map
+				linearGraphMap.put(date, avgUploadSpeed + "," + avgDownloadSpeed);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return linearGraphMap;
 	}
 
 }
