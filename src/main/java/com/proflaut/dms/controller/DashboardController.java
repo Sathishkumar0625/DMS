@@ -122,10 +122,10 @@ public class DashboardController {
 	}
 
 	@GetMapping("/linearGraph")
-	public ResponseEntity<Map<String, String>> getLinearGraph(@RequestHeader("token") String token) {
+	public ResponseEntity<List<Map<String, String>>> getLinearGraph(@RequestHeader("token") String token) {
 		try {
 			dashboardServiceImpl.averageFileUpload(token);
-			Map<String, String> totalcounts = dashboardService.linearGraph(token);
+			List<Map<String, String>> totalcounts = dashboardService.linearGraph(token);
 			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);

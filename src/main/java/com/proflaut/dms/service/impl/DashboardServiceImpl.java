@@ -287,29 +287,36 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public Map<String, String> linearGraph(String token) {
-		Map<String, String> linearGraphMap = new LinkedHashMap<>();
+	public List<Map<String, String>> linearGraph(String token) {
+		List<Map<String, String>> linearGraphList = new ArrayList<>();
 		try {
 			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
 			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(entity.getUserName());
 
-			// Remove the oldest entry if map size exceeds 10
-			while (linearGraphMap.size() >= 10) {
-				linearGraphMap.remove(linearGraphMap.keySet().iterator().next());
-			}
+			int count = 0;
 
 			for (DashboardDataEntity dataEntity : dataEntities) {
+				Map<String, String> entry = new LinkedHashMap<>();
 				String date = dataEntity.getDate();
 				String avgUploadSpeed = dataEntity.getAvgUploadSpeed();
 				String avgDownloadSpeed = dataEntity.getAvgDownloadSpeed();
 
-				// Add the entry to the map
-				linearGraphMap.put(date, avgUploadSpeed + "," + avgDownloadSpeed);
+				entry.put("date", date);
+				entry.put("avgUploadSpeed", avgUploadSpeed);
+				entry.put("avgDownloadSpeed", avgDownloadSpeed);
+
+				linearGraphList.add(entry);
+
+				count++;
+
+				if (count >= 10) {
+					linearGraphList.remove(0);
+				}
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
-		return linearGraphMap;
+		return linearGraphList;
 	}
 
 }
