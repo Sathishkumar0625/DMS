@@ -197,7 +197,7 @@ public class DashboardServiceImpl implements DashboardService {
 				String avgFileUpload = dataEntity.getAvgFileSize();
 
 				entry.put("date", date);
-				entry.put("avgFileUpload", avgFileUpload);
+				entry.put("avgFileUpload", avgFileUpload.replace("kb", ""));
 
 				barGraphList.add(entry);
 
