@@ -76,8 +76,7 @@ public class DashboardController {
 	@GetMapping("/usersGraph")
 	public ResponseEntity<List<Map<String, String>>> getUsersGraph(@RequestHeader("token") String token) {
 		try {
-			dashboardServiceImpl.averageFileUpload(token);
-			List<Map<String, String>> totalcounts = dashboardService.getUserCounts();
+			List<Map<String, String>> totalcounts = dashboardServiceImpl.averageFileUpload(token);
 			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
@@ -126,6 +125,18 @@ public class DashboardController {
 		try {
 			dashboardServiceImpl.averageFileUpload(token);
 			List<Map<String, String>> totalcounts = dashboardService.linearGraph(token);
+			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/totalUploDown")
+	public ResponseEntity<List<Map<String, String>>> getUploadDownlopadGraph(@RequestHeader("token") String token) {
+		try {
+			dashboardServiceImpl.averageFileUpload(token);
+			List<Map<String, String>> totalcounts = dashboardService.totalUploadDownloadGraph(token);
 			return new ResponseEntity<>(totalcounts, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);

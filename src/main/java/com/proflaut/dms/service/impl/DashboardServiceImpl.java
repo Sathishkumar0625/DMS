@@ -187,24 +187,28 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	public List<Map<String, String>> averageFileUpload(String token) {
+		List<Map<String, String>> barGraphList = new ArrayList<>();
 		try {
 			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
-			List<ProfDocEntity> docEntities = docUploadRepository.findByCreatedBy(propertiesEntity.getUserName());
-			long userDocSize = fileHelper.getTotalFileSize(docEntities);
-			long count = docEntities.size();
-			String average = calculateAverage(count, userDocSize);
-			String date = formatCurrentDate();
-			Map<String, String> countMap = new HashMap<>();
-			countMap.put("date", date);
-			countMap.put("AvgFileUpload", average);
-			userCounts.add(countMap);
-			if (userCounts.size() > 10) {
-				userCounts.remove(0);
+			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(propertiesEntity.getUserName());
+			for (DashboardDataEntity dataEntity : dataEntities) {
+				Map<String, String> entry = new LinkedHashMap<>();
+				String date = dataEntity.getDate();
+				String avgFileUpload = dataEntity.getAvgFileSize();
+
+				entry.put("date", date);
+				entry.put("avgFileUpload", avgFileUpload);
+
+				barGraphList.add(entry);
+
+				if (barGraphList.size() > 10) {
+					barGraphList.remove(0);
+				}
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
-		return userCounts;
+		return barGraphList;
 	}
 
 	public List<ImageResponse> getOcrImage(ImageRequest imageRequest) {
@@ -313,6 +317,35 @@ public class DashboardServiceImpl implements DashboardService {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return linearGraphList;
+	}
+
+	@Override
+	public List<Map<String, String>> totalUploadDownloadGraph(String token) {
+		List<Map<String, String>> uploadDownl = new ArrayList<>();
+		try {
+			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(entity.getUserName());
+
+			for (DashboardDataEntity dataEntity : dataEntities) {
+				Map<String, String> entry = new LinkedHashMap<>();
+				String date = dataEntity.getDate();
+				String totalDownl = dataEntity.getTotalDownloads();
+				String totalUplo = dataEntity.getTotalUploads();
+
+				entry.put("date", date);
+				entry.put("Total Download", totalDownl);
+				entry.put("Total Upload", totalUplo);
+
+				uploadDownl.add(entry);
+
+				if (uploadDownl.size() > 10) {
+					uploadDownl.remove(0);
+				}
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return uploadDownl;
 	}
 
 }

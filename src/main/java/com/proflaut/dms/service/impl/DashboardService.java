@@ -8,4 +8,6 @@ public interface DashboardService {
 
 	List<Map<String, String>> linearGraph(String token);
 
+	List<Map<String, String>> totalUploadDownloadGraph(String token);
+
 }
