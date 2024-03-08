@@ -305,7 +305,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 				entry.put("date", date);
 				entry.put("avgUploadSpeed", avgUploadSpeed.replace("ms", ""));
-				entry.put("avgDownloadSpeed", avgDownloadSpeed.replace("ms", ""));
+				entry.put("avgDownloadSpeed", avgDownloadSpeed.replace("ms", "")); 
 
 				linearGraphList.add(entry);
 

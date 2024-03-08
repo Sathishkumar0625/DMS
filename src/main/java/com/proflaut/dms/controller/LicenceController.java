@@ -10,9 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.ProfLanguageConverterRequest;
+import com.proflaut.dms.model.ProfLanguageConverterResponse;
 import com.proflaut.dms.model.ProfLicenceResponse;
 import com.proflaut.dms.service.impl.LicenceServiceImpl;
 
@@ -59,6 +63,19 @@ public class LicenceController {
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@PostMapping("/langConverter")
+	public ResponseEntity<ProfLanguageConverterResponse> languageConverter(
+			@RequestBody ProfLanguageConverterRequest converterRequest) {
+		System.out.println("getting in");
+		ProfLanguageConverterResponse converterResponse = null;
+		try {
+			converterResponse = licenceServiceImpl.converter(converterRequest);
+			return new ResponseEntity<>(converterResponse, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
 	}
 

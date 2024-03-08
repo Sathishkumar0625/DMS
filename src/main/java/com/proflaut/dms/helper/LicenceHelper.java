@@ -2,18 +2,17 @@ package com.proflaut.dms.helper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
-
 import org.springframework.stereotype.Component;
 
+import com.proflaut.dms.entity.ProfLanguageConverterEntity;
 import com.proflaut.dms.entity.ProfLicenseEntity;
+import com.proflaut.dms.model.ProfLanguageConverterRequest;
 import com.proflaut.dms.model.ProfLicenceResponse;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 
 @Component
 public class LicenceHelper {
 
-	private UUID uuid = UUID.randomUUID();
 
 	public String formatCurrentDate() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -28,19 +27,27 @@ public class LicenceHelper {
 	}
 
 	public ProfLicenseEntity convertToLicenceEntity(PasswordEncDecrypt decrypt) {
-		String uuidString = uuid.toString().replace("-", "").substring(0, 8);
 		ProfLicenseEntity entity = new ProfLicenseEntity();
 		entity.setExpiryDate(decrypt.encrypt(formatCurrentDateTime()));
-		entity.setLicenseKey("PROF" + formatCurrentDate() + uuidString);
+		entity.setLicenseKey(decrypt.encrypt("PROF" + formatCurrentDate() + "U2000C200T"));
 		return entity;
 	}
 
 	public ProfLicenceResponse convertOverallResponse(ProfLicenseEntity profLicenseEntity, PasswordEncDecrypt decrypt) {
-		ProfLicenceResponse licenceResponse=new ProfLicenceResponse();
+		ProfLicenceResponse licenceResponse = new ProfLicenceResponse();
 		licenceResponse.setId(String.valueOf(profLicenseEntity.getId()));
-		licenceResponse.setExpiryData(decrypt.decrypt(profLicenseEntity.getExpiryDate()));
+		licenceResponse.setExpiryData((profLicenseEntity.getExpiryDate()));
 		licenceResponse.setLicenceKey(profLicenseEntity.getLicenseKey());
 		return licenceResponse;
+	}
+	
+	public ProfLanguageConverterEntity convertRequestToEntity(ProfLanguageConverterRequest converterRequest,
+			String newLang) {
+		ProfLanguageConverterEntity converterEntity = new ProfLanguageConverterEntity();
+		converterEntity.setTextId(converterEntity.getTextId());
+		converterEntity.setConvertedText(newLang);
+		converterEntity.setOriginalText(converterEntity.getOriginalText());
+		return converterEntity;
 	}
 
 }
