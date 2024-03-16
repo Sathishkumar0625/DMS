@@ -36,9 +36,9 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
 @Service
 public class FolderServiceImpl {
-	
+
 	private static final Logger logger = LogManager.getLogger(FolderServiceImpl.class);
-	
+
 	@Value("${create.folderlocation}")
 	private String folderLocation;
 
@@ -61,8 +61,7 @@ public class FolderServiceImpl {
 	ProfAccessRightRepository accessRightRepository;
 
 	MountPointServiceImpl pointServiceImpl;
-	
-	
+
 	@Autowired
 	public FolderServiceImpl(FolderRepository folderRepo, FolderHelper helper,
 			ProfDocUploadRepository docUploadRepository, ProfUserPropertiesRepository profUserPropertiesRepository,
@@ -89,7 +88,7 @@ public class FolderServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
 			if (dataEntity != null && propertiesEntity != null) {
 				String folderPath = folderLocation + folderFO.getFolderName();
-				String path=Paths.get(folderPath).toString();
+				String path = Paths.get(folderPath).toString();
 				File folder = new File(path);
 
 				if (folder.exists()) {
@@ -121,10 +120,7 @@ public class FolderServiceImpl {
 
 	private List<Integer> convertToArrayList(Integer id) {
 		List<Integer> digits = new ArrayList<>();
-		while (id > 0) {
-			digits.add(0, id % 10);
-			id /= 10;
-		}
+		digits.add(id); 
 		return digits;
 	}
 

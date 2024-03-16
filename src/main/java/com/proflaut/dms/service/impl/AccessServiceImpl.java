@@ -33,6 +33,8 @@ import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.util.TokenGenerator;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
 import com.twilio.type.PhoneNumber;
 
 @Service
@@ -250,14 +252,16 @@ public class AccessServiceImpl {
 	public ProfForgotpassResponse forgotPasswordMobile(String mobileNumber) {
 		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
 		try {
-
-			PhoneNumber to = new PhoneNumber(mobileNumber);
-			PhoneNumber from = new PhoneNumber(twilioConfig.getTrialNumber());
-
+			String otp = accessHelper.generateOTP();
+			String otpMessage = "Your OTP for password reset is: " + otp;
+			Message.creator(new PhoneNumber(mobileNumber), // to
+					new PhoneNumber(twilioConfig.getTrialNumber()), 
+					otpMessage).create();
+			forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
-		return null;
+		return forgotpassResponse;
 	}
 
 }

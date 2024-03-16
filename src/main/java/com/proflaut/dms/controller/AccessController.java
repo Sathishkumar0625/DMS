@@ -144,7 +144,7 @@ public class AccessController {
 	public ResponseEntity<ProfForgotpassResponse> forgotPasswordByMobile(@RequestParam String mobileNumber) {
 		ProfForgotpassResponse forgotpassResponse = null;
 		try {
-			forgotpassResponse = accessServiceImpl.forgotPassword(mobileNumber);
+			forgotpassResponse = accessServiceImpl.forgotPasswordMobile(mobileNumber);
 			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
 			} else {
