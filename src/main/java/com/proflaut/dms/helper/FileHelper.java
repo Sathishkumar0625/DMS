@@ -164,8 +164,9 @@ public class FileHelper {
 		return isFileCreated;
 	}
 
-	private boolean createFileAndSaveData(String path, String fileName,
-			String imageData) throws IOException, CustomException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException {
+	private boolean createFileAndSaveData(String path, String fileName, String imageData)
+			throws IOException, CustomException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidKeySpecException {
 		try (FileWriter fileWriter = new FileWriter(new File(path + File.separator + fileName))) {
 			String compressedBytes = Compression.compressAndReturnB64(imageData);
 			PasswordEncDecrypt td = new PasswordEncDecrypt();
@@ -306,10 +307,10 @@ public class FileHelper {
 		return decrypted;
 	}
 
-	public String retrieveDocument(ProfDocEntity docEntity) {
+	public String retrieveDocument(ProfDocEntity docEntity, ProfMountPointEntity mountPointEntity) {
 		String decompressedBytes = "";
 		String decrypted = "";
-		String path = folderLocation + File.separator + docEntity.getDocPath();
+		String path = mountPointEntity.getPath() + File.separator + docEntity.getDocPath();
 
 		try {
 			logger.info("File path -> {} ", path);

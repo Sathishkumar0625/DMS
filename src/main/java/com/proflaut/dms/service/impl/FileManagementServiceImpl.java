@@ -32,6 +32,7 @@ import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfDownloadHistoryEntity;
 import com.proflaut.dms.entity.ProfGroupInfoEntity;
 import com.proflaut.dms.entity.ProfMailConfigEntity;
+import com.proflaut.dms.entity.ProfMountPointEntity;
 import com.proflaut.dms.entity.ProfMountPointFolderMappingEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
@@ -57,6 +58,7 @@ import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMailConfigRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfMountFolderMappingRepository;
+import com.proflaut.dms.repository.ProfMountPointRepository;
 import com.proflaut.dms.repository.ProfOldImageRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
@@ -67,9 +69,9 @@ import com.proflaut.dms.util.Compression;
 @Service
 @Transactional
 public class FileManagementServiceImpl {
-	
+
 	private static final Logger logger = LogManager.getLogger(FileManagementServiceImpl.class);
-	
+
 	ProfDocUploadRepository profDocUploadRepository;
 
 	ProfUserInfoRepository profUserInfoRepository;
@@ -93,7 +95,9 @@ public class FileManagementServiceImpl {
 	MetaServiceImpl metaServiceImpl;
 
 	ProfMountFolderMappingRepository folderMappingRepository;
-	
+
+	ProfMountPointRepository mountPointRepository;
+
 	ProfGroupInfoRepository groupInfoRepository;
 
 	ProfUserGroupMappingRepository groupMappingRepository;
@@ -101,19 +105,18 @@ public class FileManagementServiceImpl {
 	RestTemplate restTemplatel;
 
 	ProfDownloadHistoryRepo downloadHistoryRepo;
-	
+
 	ProfUserPropertiesRepository profUserPropertiesRepository;
-	
-	
+
 	@Autowired
 	public FileManagementServiceImpl(ProfDocUploadRepository profDocUploadRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, ProfUserInfoRepository profUserInfoRepository,
 			FileHelper fileHelper, FolderRepository folderRepository, ProfOldImageRepository imageRepository,
 			EntityManager entityManager, ProfMailConfigRepository configRepository,
-			ProfMetaDataRepository metaDataRepository,
-			MetaServiceImpl metaServiceImpl, ProfMountFolderMappingRepository folderMappingRepository,
-			ProfGroupInfoRepository groupInfoRepository, ProfUserGroupMappingRepository groupMappingRepository,
-			RestTemplate restTemplatel, ProfDownloadHistoryRepo downloadHistoryRepo) {
+			ProfMetaDataRepository metaDataRepository, MetaServiceImpl metaServiceImpl,
+			ProfMountFolderMappingRepository folderMappingRepository, ProfGroupInfoRepository groupInfoRepository,
+			ProfUserGroupMappingRepository groupMappingRepository, RestTemplate restTemplatel,
+			ProfDownloadHistoryRepo downloadHistoryRepo, ProfMountPointRepository mountPointRepository) {
 		this.profDocUploadRepository = profDocUploadRepository;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
 		this.profUserInfoRepository = profUserInfoRepository;
@@ -129,6 +132,7 @@ public class FileManagementServiceImpl {
 		this.groupMappingRepository = groupMappingRepository;
 		this.restTemplatel = restTemplatel;
 		this.downloadHistoryRepo = downloadHistoryRepo;
+		this.mountPointRepository = mountPointRepository;
 	}
 
 	@Value("${create.folderlocation}")
@@ -193,6 +197,10 @@ public class FileManagementServiceImpl {
 			if (entity == null) {
 				throw new CustomException("FolderEntity not found for ID: " + docEntity.getFolderId());
 			}
+			ProfMountPointFolderMappingEntity folderMappingEntity = folderMappingRepository
+					.findByFolderId(docEntity.getFolderId());
+			ProfMountPointEntity mountPointEntity = mountPointRepository
+					.findById(folderMappingEntity.getMountPointId());
 			String decrypted = fileHelper.retrieveDocument(docEntity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
@@ -334,8 +342,8 @@ public class FileManagementServiceImpl {
 			emailShareResponse.setStatus(DMSConstant.SUCCESS);
 			long endTime = System.nanoTime();
 			long executionTime = (endTime - startTime) / 1000000;
-			historyEntity.setDownloadExecutionSpeed((int)executionTime);
-		    downloadHistoryRepo.save(historyEntity);
+			historyEntity.setDownloadExecutionSpeed((int) executionTime);
+			downloadHistoryRepo.save(historyEntity);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}

@@ -1,5 +1,6 @@
 package com.proflaut.dms.service.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +37,8 @@ import com.proflaut.dms.util.TokenGenerator;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.rest.api.v2010.account.MessageCreator;
 import com.twilio.type.PhoneNumber;
+
+import okhttp3.*;
 
 @Service
 public class AccessServiceImpl {
@@ -252,14 +255,40 @@ public class AccessServiceImpl {
 	public ProfForgotpassResponse forgotPasswordMobile(String mobileNumber) {
 		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
 		try {
+			OkHttpClient client = new OkHttpClient();
+
+			// Generate OTP
 			String otp = accessHelper.generateOTP();
-			String otpMessage = "Your OTP for password reset is: " + otp;
-			Message.creator(new PhoneNumber(mobileNumber), // to
-					new PhoneNumber(twilioConfig.getTrialNumber()), 
-					otpMessage).create();
-			forgotpassResponse.setStatus(DMSConstant.SUCCESS);
+			String message = "Your OTP for password reset is: " + otp;
+
+			// Create request body
+			MediaType mediaType = MediaType.parse("application/json");
+			String jsonBody = "{\"messages\":[{\"destinations\":[{\"to\":\"" + mobileNumber
+					+ "\"}],\"from\":\"ServiceSMS\",\"text\":\"" + message + "\"}]}";
+			RequestBody body = RequestBody.create(mediaType, jsonBody);
+
+			// Create and execute request
+			Request request = new Request.Builder().url("https://43nvn1.api.infobip.com/sms/2/text/advanced")
+					.method("POST", body)
+					.addHeader("Authorization",
+							"App 40ac4574d0a0f103153f9bf92a7c4493-cefda4b4-2ab5-43f4-b3c0-65117983d6de")
+					.addHeader("Content-Type", "application/json").addHeader("Accept", "application/json").build();
+
+			try (Response response = client.newCall(request).execute()) {
+				if (!response.isSuccessful()) {
+					forgotpassResponse.setStatus(DMSConstant.FAILURE);
+				} else {
+					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
+				}
+			} catch (IOException e) {
+				// Log or handle the exception
+				e.printStackTrace();
+				forgotpassResponse.setStatus(DMSConstant.FAILURE);
+			}
 		} catch (Exception e) {
-			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			// Log or handle the exception
+			e.printStackTrace();
+			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return forgotpassResponse;
 	}
