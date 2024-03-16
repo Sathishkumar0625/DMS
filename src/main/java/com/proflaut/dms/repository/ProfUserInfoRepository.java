@@ -34,4 +34,8 @@ public interface ProfUserInfoRepository extends JpaRepository<ProfUserInfoEntity
 	@Query("SELECT userName FROM ProfUserInfoEntity f WHERE f.userId IN :userIds")
 	List<String> findUserNamesByUserIds(List<Integer> userIds);
 
+	ProfUserInfoEntity findByMobileNo(String mobileNumber);
+
+	ProfUserInfoEntity findByEmail(String mailId);
+
 }

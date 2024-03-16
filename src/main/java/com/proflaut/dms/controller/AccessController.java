@@ -1,6 +1,7 @@
 package com.proflaut.dms.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import org.apache.logging.log4j.LogManager;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.LoginResponse;
+import com.proflaut.dms.model.ProfForgotpassResponse;
 import com.proflaut.dms.model.ProfUserLogoutResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
@@ -97,6 +100,55 @@ public class AccessController {
 				return new ResponseEntity<>(logoutResponse, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(logoutResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/forgotPassword")
+	public ResponseEntity<ProfForgotpassResponse> forgot(@RequestParam String mailId) {
+		ProfForgotpassResponse forgotpassResponse = null;
+		try {
+			forgotpassResponse = accessServiceImpl.forgotPassword(mailId);
+			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/verifyOtp")
+	public ResponseEntity<ProfForgotpassResponse> verifyOTP(@RequestBody Map<String, String> data) {
+		ProfForgotpassResponse forgotpassResponse = null;
+		try {
+			forgotpassResponse = accessServiceImpl.verifyOtp(data);
+			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+	
+	@PostMapping("/forgotPasswordMobile")
+	public ResponseEntity<ProfForgotpassResponse> forgotPasswordByMobile(@RequestParam String mobileNumber) {
+		ProfForgotpassResponse forgotpassResponse = null;
+		try {
+			forgotpassResponse = accessServiceImpl.forgotPassword(mobileNumber);
+			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);

@@ -7,12 +7,16 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.NoSuchPaddingException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.entity.ProfUserInfoEntity;
@@ -25,10 +29,13 @@ import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 public class AccessHelper {
 
 	ProfUserInfoRepository userInfoRepository;
-	
+
+	private JavaMailSender mailSender;
+
 	@Autowired
-	public AccessHelper(ProfUserInfoRepository userInfoRepository) {
+	public AccessHelper(ProfUserInfoRepository userInfoRepository, JavaMailSender mailSender) {
 		this.userInfoRepository = userInfoRepository;
+		this.mailSender = mailSender;
 	}
 
 	private static final Logger logger = LogManager.getLogger(AccessHelper.class);
@@ -87,6 +94,43 @@ public class AccessHelper {
 		ent.setLastLogin(localdateandtime);
 		ent.setUserName(profUserInfoEntity.getUserName());
 		return ent;
+	}
+
+	public String generateOTP() {
+		Random random = new Random();
+		int otp = 100000 + random.nextInt(900000);
+		return String.valueOf(otp);
+	}
+
+	public void sendOTP(String email, String otp, long validityDurationMinutes) {
+		long validityDurationSeconds = TimeUnit.MINUTES.toSeconds(validityDurationMinutes);
+		String validityDurationText = formatValidityDuration(validityDurationSeconds);
+
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(email);
+		message.setSubject("Password Reset OTP");
+		message.setText(
+				"Your OTP for password reset is: " + otp + ". This OTP is valid for " + validityDurationText + ".");
+
+		mailSender.send(message);
+	}
+
+	private String formatValidityDuration(long validityDurationSeconds) {
+		long minutes = TimeUnit.SECONDS.toMinutes(validityDurationSeconds);
+		long remainingSeconds = validityDurationSeconds - TimeUnit.MINUTES.toSeconds(minutes);
+
+		StringBuilder builder = new StringBuilder();
+		if (minutes > 0) {
+			builder.append(minutes).append(" minute").append(minutes > 1 ? "s" : "");
+			if (remainingSeconds > 0) {
+				builder.append(" and ");
+			}
+		}
+		if (remainingSeconds > 0) {
+			builder.append(remainingSeconds).append(" second").append(remainingSeconds > 1 ? "s" : "");
+		}
+
+		return builder.toString();
 	}
 
 }

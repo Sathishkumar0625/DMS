@@ -33,7 +33,7 @@ public class LicenceHelper {
 		return entity;
 	}
 
-	public ProfLicenceResponse convertOverallResponse(ProfLicenseEntity profLicenseEntity, PasswordEncDecrypt decrypt) {
+	public ProfLicenceResponse convertOverallResponse(ProfLicenseEntity profLicenseEntity) {
 		ProfLicenceResponse licenceResponse = new ProfLicenceResponse();
 		licenceResponse.setId(String.valueOf(profLicenseEntity.getId()));
 		licenceResponse.setExpiryData((profLicenseEntity.getExpiryDate()));
@@ -44,9 +44,9 @@ public class LicenceHelper {
 	public ProfLanguageConverterEntity convertRequestToEntity(ProfLanguageConverterRequest converterRequest,
 			String newLang) {
 		ProfLanguageConverterEntity converterEntity = new ProfLanguageConverterEntity();
-		converterEntity.setTextId(converterEntity.getTextId());
+		converterEntity.setTextId(converterRequest.getTextId());
 		converterEntity.setConvertedText(newLang);
-		converterEntity.setOriginalText(converterEntity.getOriginalText());
+		converterEntity.setOriginalText(converterRequest.getTextValue());
 		return converterEntity;
 	}
 

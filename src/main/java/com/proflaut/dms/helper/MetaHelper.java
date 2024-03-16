@@ -44,8 +44,7 @@ public class MetaHelper {
 	MetaServiceImpl metaServiceImpl;
 
 	ProfMetaDataPropRepository dataPropRepository;
-	
-	
+
 	@Autowired
 	public MetaHelper(MetaServiceImpl metaServiceImpl, ProfMetaDataPropRepository dataPropRepository) {
 		this.metaServiceImpl = metaServiceImpl;
@@ -110,6 +109,8 @@ public class MetaHelper {
 			return "VARCHAR(255)";
 		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
 			return "BIGINT";
+		} else if ("DATE".equalsIgnoreCase(fieldType)) {
+			return "DATE";
 		} else {
 			return fieldType;
 		}
@@ -183,7 +184,6 @@ public class MetaHelper {
 		}
 		return values;
 	}
-	
 
 	public ProfOverallMetaDataResponse convertToResponse(ProfMetaDataEntity metaDataEntity) {
 		ProfOverallMetaDataResponse metaDataResponse = new ProfOverallMetaDataResponse();
@@ -357,13 +357,13 @@ public class MetaHelper {
 		allTableResponse.setTableName(dataEntity.getName());
 		String tableName = dataEntity.getTableName();
 		if (tableName != null) {
-			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose( dataEntity);
+			List<FieldDefinitionResponse> definitionResponses = getColumnDetailsForRespose(dataEntity);
 			allTableResponse.setFieldNames(definitionResponses);
 		}
 		return allTableResponse;
 	}
 
-	private List<FieldDefinitionResponse> getColumnDetailsForRespose( ProfMetaDataEntity dataEntity) {
+	private List<FieldDefinitionResponse> getColumnDetailsForRespose(ProfMetaDataEntity dataEntity) {
 
 		List<FieldDefinitionResponse> definitionResponses = new ArrayList<>();
 		try {

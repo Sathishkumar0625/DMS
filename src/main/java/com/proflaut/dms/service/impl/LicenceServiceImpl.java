@@ -57,11 +57,10 @@ public class LicenceServiceImpl {
 	public List<ProfLicenceResponse> getLicenceKey() {
 		List<ProfLicenceResponse> licenceResponses = new ArrayList<>();
 		try {
-			PasswordEncDecrypt decrypt = new PasswordEncDecrypt();
 			List<ProfLicenseEntity> entity = licenseRepository.findAll();
 			if (!entity.isEmpty()) {
 				for (ProfLicenseEntity profLicenseEntity : entity) {
-					ProfLicenceResponse licenceResponse = helper.convertOverallResponse(profLicenseEntity,decrypt);
+					ProfLicenceResponse licenceResponse = helper.convertOverallResponse(profLicenseEntity);
 					licenceResponses.add(licenceResponse);
 				}
 			}

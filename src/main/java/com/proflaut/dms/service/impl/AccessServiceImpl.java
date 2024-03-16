@@ -9,15 +9,16 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.concurrent.TimeUnit;
 import javax.crypto.NoSuchPaddingException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.proflaut.dms.configuration.TwilioConfig;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.customexception.CustomExcep;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
@@ -25,12 +26,14 @@ import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
 import com.proflaut.dms.helper.AccessHelper;
 import com.proflaut.dms.model.LoginResponse;
+import com.proflaut.dms.model.ProfForgotpassResponse;
 import com.proflaut.dms.model.ProfUserLogoutResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.util.TokenGenerator;
+import com.twilio.type.PhoneNumber;
 
 @Service
 public class AccessServiceImpl {
@@ -39,15 +42,19 @@ public class AccessServiceImpl {
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 	AccessHelper accessHelper;
 	TokenGenerator tokenGenerator;
-	
+	TwilioConfig twilioConfig;
+	private RedisTemplate<String, String> redisTemplate;
+
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
-			TokenGenerator tokenGenerator) {
+			TokenGenerator tokenGenerator, RedisTemplate<String, String> redisTemplate, TwilioConfig twilioConfig) {
 		this.profUserInfoRepository = profUserInfoRepository;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
 		this.accessHelper = accessHelper;
 		this.tokenGenerator = tokenGenerator;
+		this.redisTemplate = redisTemplate;
+		this.twilioConfig = twilioConfig;
 	}
 
 	private static final Logger logger = LogManager.getLogger(AccessServiceImpl.class);
@@ -191,4 +198,66 @@ public class AccessServiceImpl {
 		}
 		return logoutResponse;
 	}
+
+	public ProfForgotpassResponse forgotPassword(String mailId) {
+		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
+		try {
+			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByEmail(mailId);
+			if (infoEntity != null) {
+				String otp = accessHelper.generateOTP();
+				long validityDurationMinutes = 1;
+				accessHelper.sendOTP(mailId, otp, validityDurationMinutes);
+				redisTemplate.opsForValue().set(mailId, otp, validityDurationMinutes, TimeUnit.MINUTES);
+				forgotpassResponse.setStatus(DMSConstant.SUCCESS);
+			} else {
+				forgotpassResponse.setStatus(DMSConstant.FAILURE);
+				forgotpassResponse.setErroraMessage(mailId);
+			}
+		} catch (Exception e) {
+			forgotpassResponse.setStatus(DMSConstant.FAILURE);
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return forgotpassResponse;
+	}
+
+	public ProfForgotpassResponse verifyOtp(Map<String, String> data) {
+		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
+		try {
+			String email = data.get("email");
+			String otp = data.get("otp");
+			if (Boolean.TRUE.equals(redisTemplate.hasKey(email))) {
+				String storedOTP = redisTemplate.opsForValue().get(email);
+				if (otp.equals(storedOTP)) {
+					// Clear OTP from storage after verification
+					redisTemplate.delete(email);
+					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
+					forgotpassResponse.setStatus(DMSConstant.FAILURE);
+					forgotpassResponse.setErroraMessage(DMSConstant.INVALID_OTP);
+				}
+			} else {
+				forgotpassResponse.setStatus(DMSConstant.FAILURE);
+				forgotpassResponse.setErroraMessage(DMSConstant.INVALID_OTP + " or expired");
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			forgotpassResponse.setStatus(DMSConstant.FAILURE);
+			forgotpassResponse.setErroraMessage("Error verifying OTP");
+		}
+		return forgotpassResponse;
+	}
+
+	public ProfForgotpassResponse forgotPasswordMobile(String mobileNumber) {
+		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
+		try {
+
+			PhoneNumber to = new PhoneNumber(mobileNumber);
+			PhoneNumber from = new PhoneNumber(twilioConfig.getTrialNumber());
+
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return null;
+	}
+
 }
