@@ -48,7 +48,7 @@ public class DashboardSheduler {
 		this.downloadHistoryRepo = downloadHistoryRepo;
 	}
 
-	@Scheduled(cron = "0 0 0 * * ?")
+//	@Scheduled(cron = "0 0 0 * * ?")
 //  @Scheduled(fixedDelay = 10 * 1000)
 	public void storeData() {
 		List<DashboardDataEntity> dashboardDataEntities = new ArrayList<>();

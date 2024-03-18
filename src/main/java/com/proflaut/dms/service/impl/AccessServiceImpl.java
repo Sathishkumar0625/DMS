@@ -1,6 +1,5 @@
 package com.proflaut.dms.service.impl;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,10 +33,6 @@ import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.util.TokenGenerator;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.rest.api.v2010.account.MessageCreator;
-import com.twilio.type.PhoneNumber;
-
 import okhttp3.*;
 
 @Service
@@ -49,7 +44,6 @@ public class AccessServiceImpl {
 	TokenGenerator tokenGenerator;
 	TwilioConfig twilioConfig;
 	private RedisTemplate<String, String> redisTemplate;
-
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
@@ -210,7 +204,7 @@ public class AccessServiceImpl {
 			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByEmail(mailId);
 			if (infoEntity != null) {
 				String otp = accessHelper.generateOTP();
-				long validityDurationMinutes = 1;
+				long validityDurationMinutes = 5;
 				accessHelper.sendOTP(mailId, otp, validityDurationMinutes);
 				redisTemplate.opsForValue().set(mailId, otp, validityDurationMinutes, TimeUnit.MINUTES);
 				forgotpassResponse.setStatus(DMSConstant.SUCCESS);
@@ -280,10 +274,6 @@ public class AccessServiceImpl {
 				} else {
 					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 				}
-			} catch (IOException e) {
-				// Log or handle the exception
-				e.printStackTrace();
-				forgotpassResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
 			// Log or handle the exception

@@ -201,7 +201,7 @@ public class FileManagementServiceImpl {
 					.findByFolderId(docEntity.getFolderId());
 			ProfMountPointEntity mountPointEntity = mountPointRepository
 					.findById(folderMappingEntity.getMountPointId());
-			String decrypted = fileHelper.retrieveDocument(docEntity);
+			String decrypted = fileHelper.retrieveDocument(docEntity,mountPointEntity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
