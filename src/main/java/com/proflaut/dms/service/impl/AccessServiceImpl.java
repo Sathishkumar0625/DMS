@@ -276,8 +276,7 @@ public class AccessServiceImpl {
 				}
 			}
 		} catch (Exception e) {
-			// Log or handle the exception
-			e.printStackTrace();
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return forgotpassResponse;
