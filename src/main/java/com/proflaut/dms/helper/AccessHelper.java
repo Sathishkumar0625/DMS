@@ -3,11 +3,11 @@ package com.proflaut.dms.helper;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import javax.crypto.NoSuchPaddingException;
@@ -31,7 +31,6 @@ public class AccessHelper {
 	ProfUserInfoRepository userInfoRepository;
 
 	private JavaMailSender mailSender;
-	private static final Random random = new Random();
 
 	@Autowired
 	public AccessHelper(ProfUserInfoRepository userInfoRepository, JavaMailSender mailSender) {
@@ -98,8 +97,9 @@ public class AccessHelper {
 	}
 
 	public String generateOTP() {
-		int otp = 100000 + random.nextInt(900000);
-		return String.valueOf(otp);
+	    SecureRandom secureRandom = new SecureRandom();
+	    int otp = 100000 + secureRandom.nextInt(900000);
+	    return String.valueOf(otp);
 	}
 
 	public void sendOTP(String email, String otp, long validityDurationMinutes) {
