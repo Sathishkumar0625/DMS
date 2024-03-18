@@ -31,6 +31,7 @@ public class AccessHelper {
 	ProfUserInfoRepository userInfoRepository;
 
 	private JavaMailSender mailSender;
+	private static final Random random = new Random();
 
 	@Autowired
 	public AccessHelper(ProfUserInfoRepository userInfoRepository, JavaMailSender mailSender) {
@@ -97,7 +98,6 @@ public class AccessHelper {
 	}
 
 	public String generateOTP() {
-		Random random = new Random();
 		int otp = 100000 + random.nextInt(900000);
 		return String.valueOf(otp);
 	}
