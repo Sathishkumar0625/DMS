@@ -15,14 +15,16 @@ import org.springframework.web.client.RestTemplate;
 import com.proflaut.dms.configuration.TwilioConfig;
 import com.twilio.Twilio;
 
+import lombok.AllArgsConstructor;
+
 @SpringBootApplication
 @ComponentScan({ "com.proflaut.*" })
 @EntityScan("com.proflaut.*")
 @EnableJpaRepositories("com.proflaut.*")
 @EnableScheduling
+@AllArgsConstructor
 public class DmsApplication {
 
-	@Autowired
 	private TwilioConfig twilioConfig;
 	
 	

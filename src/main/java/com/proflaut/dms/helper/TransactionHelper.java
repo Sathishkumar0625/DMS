@@ -159,7 +159,6 @@ public class TransactionHelper {
 		String outputfilename = appConfiguration.getInvoiceOutputFileName();
 
 		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)))) {
-
 			doc.getTables().get(0).getRow(0).getCell(2).setText(" " + invoiceRequest.getApplicantName());
 			doc.getTables().get(0).getRow(1).getCell(2).setText(invoiceRequest.getOfficeAddress());
 			doc.getTables().get(0).getRow(2).getCell(2).setText(invoiceRequest.getAddressOfFactory());
@@ -175,7 +174,6 @@ public class TransactionHelper {
 			List<ProprietorParDirRequest> persons = invoiceRequest.getProprietorParDirRequests();
 			if (persons != null && !persons.isEmpty()) {
 				for (int i = 0; i < persons.size(); i++) {
-
 					int rowOffset = 2 + i;
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(2).setText(persons.get(i).getName());
 					doc.getTables().get(getIndex).getRow(rowOffset).getCell(3).setText(persons.get(i).getDateOfBirth());
@@ -192,7 +190,6 @@ public class TransactionHelper {
 
 				}
 			}
-
 			List<AssociateConcerns> associateConcerns = invoiceRequest.getAssociateConcerns();
 			if (associateConcerns != null && !associateConcerns.isEmpty()) {
 				for (int i = 0; i < associateConcerns.size(); i++) {

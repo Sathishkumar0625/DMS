@@ -2,6 +2,7 @@ package com.proflaut.dms.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,24 +16,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.ProfJobPackRequest;
 import com.proflaut.dms.model.ProfLanguageConverterRequest;
 import com.proflaut.dms.model.ProfLanguageConverterResponse;
 import com.proflaut.dms.model.ProfLicenceResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.LicenceServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/licence")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class LicenceController {
 
 	private static final Logger logger = LogManager.getLogger(LicenceController.class);
-	
+
 	LicenceServiceImpl licenceServiceImpl;
-	
-	
-	@Autowired
-	public LicenceController(LicenceServiceImpl licenceServiceImpl) {
-		this.licenceServiceImpl = licenceServiceImpl;
-	}
 
 	@PostMapping("/createLicence")
 	public ResponseEntity<ProfLicenceResponse> create() {
@@ -49,7 +49,7 @@ public class LicenceController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getLicenceKey")
 	public ResponseEntity<List<ProfLicenceResponse>> getLicence() {
 		List<ProfLicenceResponse> licenceResponse = new ArrayList<>();
@@ -65,6 +65,7 @@ public class LicenceController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@PostMapping("/langConverter")
 	public ResponseEntity<ProfLanguageConverterResponse> languageConverter(
 			@RequestBody ProfLanguageConverterRequest converterRequest) {
@@ -79,5 +80,20 @@ public class LicenceController {
 		}
 	}
 
+	@PostMapping("/getDocFields")
+	public ResponseEntity<String> getDocFields(@RequestBody ProfJobPackRequest jobPackRequest)  {
+		String licenceResponse = null;
+		try {
+			licenceResponse = licenceServiceImpl.getFields(jobPackRequest);
+			if (!licenceResponse.isEmpty()) {
+				return new ResponseEntity<>(licenceResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(licenceResponse, HttpStatus.NOT_ACCEPTABLE);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

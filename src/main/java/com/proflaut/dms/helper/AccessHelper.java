@@ -23,20 +23,18 @@ import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 
+import lombok.AllArgsConstructor;
+
 @Component
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessHelper {
 
 	ProfUserInfoRepository userInfoRepository;
 
 	private JavaMailSender mailSender;
-
-	@Autowired
-	public AccessHelper(ProfUserInfoRepository userInfoRepository, JavaMailSender mailSender) {
-		this.userInfoRepository = userInfoRepository;
-		this.mailSender = mailSender;
-	}
 
 	private static final Logger logger = LogManager.getLogger(AccessHelper.class);
 

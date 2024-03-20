@@ -27,21 +27,20 @@ import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.model.ProfUploadAccessResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.MetaServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/meta")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class MetaController {
 
 	private static final Logger logger = LogManager.getLogger(MetaController.class);
 
 	MetaServiceImpl metaServiceImpl;
 	
-	
-	@Autowired
-	public MetaController(MetaServiceImpl metaServiceImpl) {
-		this.metaServiceImpl = metaServiceImpl;
-	}
 
 	@PostMapping("/createTable")
 	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,

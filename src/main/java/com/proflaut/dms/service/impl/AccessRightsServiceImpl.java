@@ -8,6 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
@@ -32,7 +34,7 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 @Service
 public class AccessRightsServiceImpl {
 	private static final Logger logger = LogManager.getLogger(AccessRightsServiceImpl.class);
-	
+
 	ProfMetaDataRepository dataRepository;
 	AccessRightsHelper helper;
 	ProfAccessRightRepository accessRightRepository;
@@ -42,8 +44,7 @@ public class AccessRightsServiceImpl {
 	ProfUserInfoRepository infoRepository;
 	GroupServiceImpl groupServiceImpl;
 	ProfGroupInfoRepository groupInfoRepository;
-	
-	
+
 	@Autowired
 	public AccessRightsServiceImpl(ProfMetaDataRepository dataRepository, AccessRightsHelper helper,
 			ProfAccessRightRepository accessRightRepository, FileManagementServiceImpl serviceImpl,
@@ -80,12 +81,14 @@ public class AccessRightsServiceImpl {
 		try {
 			List<ProfAccessRightsEntity> accessRightsEntity = accessRightRepository.findAll();
 			for (ProfAccessRightsEntity profAccessRightsEntity : accessRightsEntity) {
-				ProfMetaDataEntity dataEntity = dataRepository
-						.findById(Integer.parseInt(profAccessRightsEntity.getMetaId()));
-				if (dataEntity != null) {
-					ProfOverallAccessRightsResponse response = helper.convertToOverallResponse(profAccessRightsEntity,
-							dataEntity);
-					accessRightsResponses.add(response);
+				if (!profAccessRightsEntity.getStatus().equalsIgnoreCase("I")) {
+					ProfMetaDataEntity dataEntity = dataRepository
+							.findById(Integer.parseInt(profAccessRightsEntity.getMetaId()));
+					if (dataEntity != null) {
+						ProfOverallAccessRightsResponse response = helper
+								.convertToOverallResponse(profAccessRightsEntity, dataEntity);
+						accessRightsResponses.add(response);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -189,7 +192,8 @@ public class AccessRightsServiceImpl {
 		List<ProfOveralUserInfoResponse> overalUserInfoResponses = new ArrayList<>();
 		try {
 			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(accessId);
-			List<ProfAccessUserMappingEntity> accessUserMappingEntities = accessUserMappingRepository.findByAccessRightsEntityId(accessRightsEntity.getId());
+			List<ProfAccessUserMappingEntity> accessUserMappingEntities = accessUserMappingRepository
+					.findByAccessRightsEntityId(accessRightsEntity.getId());
 
 			if (!accessUserMappingEntities.isEmpty()) {
 				List<String> userIds = accessUserMappingEntities.stream().map(ProfAccessUserMappingEntity::getUserId)
@@ -217,7 +221,8 @@ public class AccessRightsServiceImpl {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
 		try {
 			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(accessId);
-			List<ProfAccessGroupMappingEntity> accessGroupMappingEntities = accessGroupMappingRepository.findByAccessRightsEntityId(accessRightsEntity.getId());
+			List<ProfAccessGroupMappingEntity> accessGroupMappingEntities = accessGroupMappingRepository
+					.findByAccessRightsEntityId(accessRightsEntity.getId());
 
 			if (!accessGroupMappingEntities.isEmpty()) {
 				List<String> groupIds = accessGroupMappingEntities.stream()
@@ -239,5 +244,20 @@ public class AccessRightsServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return groupInfoResponses;
+	}
+
+	public ProfAccessRightResponse modifyStatus(int id) {
+		ProfAccessRightResponse accessRightResponse = new ProfAccessRightResponse();
+		try {
+			ProfAccessRightsEntity accessRightsEntity = accessRightRepository.findById(id);
+			if (!StringUtils.isEmpty(accessRightsEntity.getId())) {
+				accessRightsEntity.setStatus("I");
+				accessRightRepository.save(accessRightsEntity);
+				accessRightResponse.setStatus(DMSConstant.SUCCESS);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return accessRightResponse;
 	}
 }

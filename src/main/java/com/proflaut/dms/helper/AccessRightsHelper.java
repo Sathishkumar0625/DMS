@@ -23,21 +23,18 @@ import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @Component
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessRightsHelper {
 
 	ProfAccessGroupMappingRepository groupMappingRepository;
 
 	ProfAccessUserMappingRepository userMappingRepository;
 	
-	@Autowired
-	public AccessRightsHelper(ProfAccessGroupMappingRepository groupMappingRepository,
-			ProfAccessUserMappingRepository userMappingRepository) {
-		this.groupMappingRepository = groupMappingRepository;
-		this.userMappingRepository = userMappingRepository;
-	}
-
 	public static String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");

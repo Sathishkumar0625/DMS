@@ -32,6 +32,7 @@ import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
+import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 import com.proflaut.dms.util.TokenGenerator;
 import okhttp3.*;
 
@@ -44,6 +45,7 @@ public class AccessServiceImpl {
 	TokenGenerator tokenGenerator;
 	TwilioConfig twilioConfig;
 	private RedisTemplate<String, String> redisTemplate;
+
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
@@ -239,47 +241,42 @@ public class AccessServiceImpl {
 				forgotpassResponse.setErroraMessage(DMSConstant.INVALID_OTP + " or expired");
 			}
 		} catch (Exception e) {
-			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 			forgotpassResponse.setErroraMessage("Error verifying OTP");
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return forgotpassResponse;
 	}
 
-	public ProfForgotpassResponse forgotPasswordMobile(String mobileNumber) {
+	public ProfForgotpassResponse savePass(Map<String, String> data) {
 		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
 		try {
-			OkHttpClient client = new OkHttpClient();
+			PasswordEncDecrypt encDecrypt = new PasswordEncDecrypt();
+			String email = data.get("email");
+			String newPassword = data.get("password");
+			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByEmail(email);
+			infoEntity.setPassword(encDecrypt.encrypt(newPassword));
+			profUserInfoRepository.save(infoEntity);
+			forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 
-			// Generate OTP
-			String otp = accessHelper.generateOTP();
-			String message = "Your OTP for password reset is: " + otp;
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return forgotpassResponse;
+	}
 
-			// Create request body
-			MediaType mediaType = MediaType.parse("application/json");
-			String jsonBody = "{\"messages\":[{\"destinations\":[{\"to\":\"" + mobileNumber
-					+ "\"}],\"from\":\"ServiceSMS\",\"text\":\"" + message + "\"}]}";
-			RequestBody body = RequestBody.create(mediaType, jsonBody);
-
-			// Create and execute request
-			Request request = new Request.Builder().url("https://43nvn1.api.infobip.com/sms/2/text/advanced")
-					.method("POST", body)
-					.addHeader("Authorization",
-							"App 40ac4574d0a0f103153f9bf92a7c4493-cefda4b4-2ab5-43f4-b3c0-65117983d6de")
-					.addHeader("Content-Type", "application/json").addHeader("Accept", "application/json").build();
-
-			try (Response response = client.newCall(request).execute()) {
-				if (!response.isSuccessful()) {
-					forgotpassResponse.setStatus(DMSConstant.FAILURE);
-				} else {
-					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
-				}
+	public ProfForgotpassResponse modifyStatus(int userId) {
+		ProfForgotpassResponse forgotpassResponse = new ProfForgotpassResponse();
+		try {
+			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByUserId(userId);
+			if (!infoEntity.getUserName().isEmpty()) {
+				infoEntity.setStatus("I");
+				profUserInfoRepository.save(infoEntity);
+				forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
-			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 		}
 		return forgotpassResponse;
 	}
-
 }

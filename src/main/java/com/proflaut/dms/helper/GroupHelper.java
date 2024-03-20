@@ -122,7 +122,7 @@ public class GroupHelper {
 
 	public ProfGroupInfoEntity updateGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
 			ProfGroupInfoEntity groupInfo) {
-		groupInfo.setStatus(groupInfoRequest.getGroupName());
+		groupInfo.setStatus("I");
 		return groupInfo;
 	}
 

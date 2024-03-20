@@ -10,6 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import java.nio.file.Files;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
@@ -44,8 +46,7 @@ public class MountPointServiceImpl {
 	FolderRepository folderRepository;
 
 	ProfDocUploadRepository docUploadRepository;
-	
-	
+
 	@Autowired
 	public MountPointServiceImpl(MountPointHelper helper, ProfMountPointRepository mountPointRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository,
@@ -147,8 +148,8 @@ public class MountPointServiceImpl {
 					folderPathResponses.add(pathResponse);
 				}
 			} else {
-				List<Integer> folderIds = folderMappingEntity.stream().map(ProfMountPointFolderMappingEntity::getFolderId)
-						.collect(Collectors.toList());
+				List<Integer> folderIds = folderMappingEntity.stream()
+						.map(ProfMountPointFolderMappingEntity::getFolderId).collect(Collectors.toList());
 				List<FolderEntity> entities = folderRepository.findAllByIdNotIn(folderIds);
 				for (FolderEntity folderEntity : entities) {
 					FolderPathResponse pathResponse = helper.convertRequestToFolderResponse(folderEntity);
@@ -198,6 +199,21 @@ public class MountPointServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return folderPathResponses;
+	}
+
+	public ProfMountPointResponse modifyMountStatus(int id) {
+		ProfMountPointResponse mountPointResponse = new ProfMountPointResponse();
+		try {
+			ProfMountPointEntity mountPointEntity = mountPointRepository.findById(id);
+			if (!StringUtils.isEmpty(mountPointEntity.getId())) {
+				mountPointEntity.setStatus("I");
+				mountPointRepository.save(mountPointEntity);
+				mountPointResponse.setStatus(DMSConstant.SUCCESS);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return null;
 	}
 
 }

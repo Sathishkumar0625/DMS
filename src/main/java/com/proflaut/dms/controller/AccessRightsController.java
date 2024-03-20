@@ -27,22 +27,19 @@ import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.service.impl.AccessRightsServiceImpl;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/access")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessRightsController {
 
 	FileManagementServiceImpl fileManagementServiceImpl;
 
 	AccessRightsServiceImpl accessRightsServiceImpl;
-
-	@Autowired
-	public AccessRightsController(FileManagementServiceImpl fileManagementServiceImpl,
-			AccessRightsServiceImpl accessRightsServiceImpl) {
-		this.fileManagementServiceImpl = fileManagementServiceImpl;
-		this.accessRightsServiceImpl = accessRightsServiceImpl;
-	}
 
 	private static final Logger logger = LogManager.getLogger(AccessRightsController.class);
 
@@ -57,6 +54,27 @@ public class AccessRightsController {
 		ProfAccessRightResponse accessRightResponse = null;
 		try {
 			accessRightResponse = accessRightsServiceImpl.create(accessRightRequest);
+			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(accessRightResponse, HttpStatus.NOT_ACCEPTABLE);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@PutMapping("/updateAccessStatus/{id}")
+	public ResponseEntity<ProfAccessRightResponse> upadeteStatus(@PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ProfAccessRightResponse accessRightResponse = null;
+		try {
+			accessRightResponse = accessRightsServiceImpl.modifyStatus(id);
 			if (!accessRightResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(accessRightResponse, HttpStatus.OK);
 			} else {

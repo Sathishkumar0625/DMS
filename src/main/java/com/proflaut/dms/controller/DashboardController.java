@@ -21,11 +21,15 @@ import com.proflaut.dms.helper.ProfUserUploadDetailsResponse;
 import com.proflaut.dms.model.ImageRequest;
 import com.proflaut.dms.model.ImageResponse;
 import com.proflaut.dms.model.ProfUserGroupDetailsResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.DashboardService;
 import com.proflaut.dms.service.impl.DashboardServiceImpl;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/dashboard")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class DashboardController {
 
 	DashboardServiceImpl dashboardServiceImpl;
@@ -33,12 +37,6 @@ public class DashboardController {
 	DashboardService dashboardService;
 
 	private static final Logger logger = LogManager.getLogger(DashboardController.class);
-
-	@Autowired
-	public DashboardController(DashboardServiceImpl dashboardServiceImpl, DashboardService dashboardService) {
-		this.dashboardServiceImpl = dashboardServiceImpl;
-		this.dashboardService = dashboardService;
-	}
 
 	@GetMapping("/getUserUploadedDetails")
 	public ResponseEntity<ProfUserUploadDetailsResponse> getUploadedDetails(@RequestHeader("token") String token) {

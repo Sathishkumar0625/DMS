@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,21 +23,19 @@ import com.proflaut.dms.model.ProfMountFolderMappingRequest;
 import com.proflaut.dms.model.ProfMountPointOverallResponse;
 import com.proflaut.dms.model.ProfMountPointRequest;
 import com.proflaut.dms.model.ProfMountPointResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.MountPointServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/mount")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class MountPointController {
 
 	private static final Logger logger = LogManager.getLogger(MountPointController.class);
 
 	MountPointServiceImpl mountPointServiceImpl;
-	
-	
-	@Autowired
-	public MountPointController(MountPointServiceImpl mountPointServiceImpl) {
-		this.mountPointServiceImpl = mountPointServiceImpl;
-	}
 
 	@PostMapping("/saveMountPoint")
 	public ResponseEntity<ProfMountPointResponse> saveMount(@RequestHeader("token") String token,
@@ -54,6 +53,29 @@ public class MountPointController {
 				return new ResponseEntity<>(mountPointResponse, HttpStatus.OK);
 			} else {
 				logger.info("SAVE MOUNT POINT FAILURE");
+				mountPointResponse.setStatus(DMSConstant.FAILURE);
+				return new ResponseEntity<>(mountPointResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PutMapping("/updateMountStatus/{id}")
+	public ResponseEntity<ProfMountPointResponse> updateMountStatus(@RequestHeader("token") String token,
+			@PathVariable int id) {
+		if (StringUtils.isEmpty(id)) {
+			logger.info(DMSConstant.INVALID_INPUT);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		ProfMountPointResponse mountPointResponse = null;
+		try {
+			mountPointResponse = mountPointServiceImpl.modifyMountStatus(id);
+			if (!mountPointResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(mountPointResponse, HttpStatus.OK);
+			} else {
 				mountPointResponse.setStatus(DMSConstant.FAILURE);
 				return new ResponseEntity<>(mountPointResponse, HttpStatus.NOT_FOUND);
 			}

@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,18 +28,16 @@ import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
 import com.proflaut.dms.service.impl.AccessServiceImpl;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/access")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessController {
 
 	private static final Logger logger = LogManager.getLogger(AccessController.class);
 
 	AccessServiceImpl accessServiceImpl;
-
-	@Autowired
-	public AccessController(AccessServiceImpl accessServiceImpl) {
-		this.accessServiceImpl = accessServiceImpl;
-	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<UserRegResponse> createUser(@Valid @RequestBody UserInfo userInfo,
@@ -139,12 +138,12 @@ public class AccessController {
 		}
 
 	}
-	
-	@PostMapping("/forgotPasswordMobile")
-	public ResponseEntity<ProfForgotpassResponse> forgotPasswordByMobile(@RequestParam String mobileNumber) {
+
+	@PostMapping("/savePassword")
+	public ResponseEntity<ProfForgotpassResponse> savePassword(@RequestBody Map<String, String> data) {
 		ProfForgotpassResponse forgotpassResponse = null;
 		try {
-			forgotpassResponse = accessServiceImpl.forgotPasswordMobile(mobileNumber);
+			forgotpassResponse = accessServiceImpl.savePass(data);
 			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
 			} else {
@@ -154,5 +153,23 @@ public class AccessController {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
+	}
+
+	@PutMapping("/updateUserStatus/{userId}")
+	public ResponseEntity<ProfForgotpassResponse> upadteStatus(@PathVariable int userId) {
+		ProfForgotpassResponse forgotpassResponse = null;
+		try {
+			forgotpassResponse = accessServiceImpl.modifyStatus(userId);
+			if (!forgotpassResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(forgotpassResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 }

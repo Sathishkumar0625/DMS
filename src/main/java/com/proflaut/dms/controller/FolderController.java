@@ -25,11 +25,15 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/folder")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class FolderController {
 
 	FolderServiceImpl folderServiceImpl;
@@ -38,13 +42,6 @@ public class FolderController {
 
 	FolderHelper folderHelper;
 	
-	@Autowired
-	public FolderController(FolderServiceImpl folderServiceImpl, FileManagementServiceImpl serviceIMPL,
-			FolderHelper folderHelper) {
-		this.folderServiceImpl = folderServiceImpl;
-		this.serviceIMPL = serviceIMPL;
-		this.folderHelper = folderHelper;
-	}
 
 	private static final Logger logger = LogManager.getLogger(FolderController.class);
 

@@ -62,14 +62,14 @@ public class FileController {
 	private PlatformTransactionManager transactionManager;
 
 	MetaServiceImpl metaServiceImpl;
-
+	
+	
 	@Autowired
 	public FileController(FileManagementServiceImpl fileManagementServiceImpl, ProfDocUploadRepository uploadRepository,
-			MetaServiceImpl metaServiceImpl, PlatformTransactionManager transactionManager) {
+			MetaServiceImpl metaServiceImpl) {
 		this.fileManagementServiceImpl = fileManagementServiceImpl;
 		this.uploadRepository = uploadRepository;
 		this.metaServiceImpl = metaServiceImpl;
-		this.transactionManager = transactionManager;
 	}
 
 	@PostMapping("/upload")

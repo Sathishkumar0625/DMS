@@ -28,19 +28,19 @@ import com.proflaut.dms.model.ProfOveralUserInfoResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.ProfSignupUserRequest;
 import com.proflaut.dms.model.ProfUserGroupMappingRequest;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.GroupServiceImpl;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/group")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class GroupController {
 
 	GroupServiceImpl groupServiceImpl;
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
 	
-	@Autowired
-	public GroupController(GroupServiceImpl groupServiceImpl) {
-		this.groupServiceImpl = groupServiceImpl;
-	}
 
 	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,
@@ -58,7 +58,7 @@ public class GroupController {
 		}
 	}
 
-	@PutMapping("/update/{id}")
+	@PutMapping("/updateGroupStatus/{id}")
 	public ResponseEntity<ProfGroupInfoResponse> hideGroup(@PathVariable String id,
 			@RequestBody ProfGroupInfoRequest groupInfoRequest) {
 		if (StringUtils.isEmpty(id)) {

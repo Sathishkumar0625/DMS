@@ -39,23 +39,20 @@ import com.proflaut.dms.model.ProfDmsMainReterive;
 import com.proflaut.dms.model.ProfExecutionResponse;
 import com.proflaut.dms.model.ProfUpdateDmsMainRequest;
 import com.proflaut.dms.model.ProfUpdateDmsMainResponse;
+import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.TransactionServiceImpl;
 import com.proflaut.dms.util.AppConfiguration;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/transaction")
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class TransactionController {
 
 	private final AppConfiguration appConfiguration;
-	
-	TransactionServiceImpl transactionImpl;
-	
-	@Autowired
-	public TransactionController( AppConfiguration appConfiguration,TransactionServiceImpl transactionImpl) {
-		this.appConfiguration = appConfiguration;
-		this.transactionImpl=transactionImpl;
-	}
 
+	TransactionServiceImpl transactionImpl;
 
 	private static final Logger logger = LogManager.getLogger(TransactionController.class);
 
@@ -176,8 +173,8 @@ public class TransactionController {
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(
-			@RequestBody ProfUpdateDmsMainRequest dmsMainRequest, @RequestParam String prospectId) {
+	public ResponseEntity<ProfUpdateDmsMainResponse> updateDmsMain(@RequestBody ProfUpdateDmsMainRequest dmsMainRequest,
+			@RequestParam String prospectId) {
 		if (StringUtils.isEmpty(prospectId)) {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

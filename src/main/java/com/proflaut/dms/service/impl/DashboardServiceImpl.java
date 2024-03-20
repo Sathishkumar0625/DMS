@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -304,7 +305,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 				entry.put("date", date);
 				entry.put("avgUploadSpeed", avgUploadSpeed.replace("ms", ""));
-				entry.put("avgDownloadSpeed", avgDownloadSpeed.replace("ms", "")); 
+				entry.put("avgDownloadSpeed", avgDownloadSpeed.replace("ms", ""));
 
 				linearGraphList.add(entry);
 
@@ -323,6 +324,7 @@ public class DashboardServiceImpl implements DashboardService {
 		List<Map<String, String>> uploadDownl = new ArrayList<>();
 		try {
 			ProfUserPropertiesEntity entity = userPropertiesRepository.findByToken(token);
+
 			List<DashboardDataEntity> dataEntities = boardRepository.findByUserName(entity.getUserName());
 
 			for (DashboardDataEntity dataEntity : dataEntities) {

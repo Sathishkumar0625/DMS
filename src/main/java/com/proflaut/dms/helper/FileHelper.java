@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -96,6 +97,7 @@ public class FileHelper {
 	ProfMountPointRepository mountPointRepository;
 
 	ProfUserGroupMappingRepository groupMappingRepository;
+	SecureRandom secureRandom = new SecureRandom();
 
 	@Autowired
 	public FileHelper(ProfUserInfoRepository infoRepository, FolderRepository folderRepository,
