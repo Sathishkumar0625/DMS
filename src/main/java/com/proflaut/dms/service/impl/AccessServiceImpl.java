@@ -110,11 +110,11 @@ public class AccessServiceImpl {
 		try {
 
 			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserName(userInfo.getUserName());
-			if (profUserInfoEntity != null) {
+			if (!profUserInfoEntity.getStatus().equalsIgnoreCase("I")) {
 				validation(userInfo, profUserInfoEntity, loginResponse);
 			} else {
 				loginResponse.setStatus(DMSConstant.FAILURE);
-				loginResponse.setErrorMessage("Username is not valid");
+				loginResponse.setErrorMessage("Username is not valid Or User is Inactive");
 				loginResponse.setUserId(0);
 			}
 
