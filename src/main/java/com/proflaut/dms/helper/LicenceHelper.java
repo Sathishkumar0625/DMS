@@ -62,28 +62,22 @@ public class LicenceHelper {
 	public String convertToList(String inputFilename, String outputFilename, ProfJobPackRequest jobPackRequest) {
 		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)));
 				FileOutputStream out = new FileOutputStream(outputFilename)) {
+
 			boolean foundAgreement = false;
 			for (XWPFParagraph paragraph : doc.getParagraphs()) {
 				String paragraphText = paragraph.getText();
-				if (paragraphText.startsWith("LOAN AGREEMENT BETWEEN")) {
+
+				if (!foundAgreement && paragraphText.startsWith("LOAN AGREEMENT BETWEEN")) {
 					foundAgreement = true;
-					continue;
-				}
-				if (foundAgreement) {
-					// Insert borrower's name after "LOAN AGREEMENT BETWEEN"
 					insertAfterLine(paragraph, jobPackRequest.getBorrowerName());
-					foundAgreement = false;
-					continue; // Skip processing this paragraph
-				}
-				if (paragraphText.startsWith("AND")) {
-					// Insert lender's name after "AND"
+				} else if (foundAgreement && paragraphText.startsWith("AND")) {
 					insertAfterWord(paragraph, jobPackRequest.getLenderName(), "AND");
-					continue; // Skip processing this paragraph
+					foundAgreement = false;
+				} else {
+					insertLocationIfMatch(paragraph, jobPackRequest.getLocation());
 				}
-				
-				insertLocationIfMatch(paragraph, jobPackRequest.getLocation());
 			}
-			doc.write(out); // Write changes back to the output file
+			doc.write(out); 
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "Error";

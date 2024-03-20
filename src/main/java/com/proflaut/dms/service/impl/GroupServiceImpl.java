@@ -189,12 +189,7 @@ public class GroupServiceImpl {
 							ProfOverallGroupInfoResponse groupInfoResponse = groupHelper
 									.convertActiveGroupInfo(profGroupInfoEntity);
 							groupInfoResponses.add(groupInfoResponse);
-						} else {
-							ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
-							groupInfoResponse.setStatus(DMSConstant.FAILURE);
-							groupInfoResponse.setErrorMessage("This Group Is INACTIVE");
-							groupInfoResponses.add(groupInfoResponse);
-						}
+						} 
 					}
 				} else {
 					ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
