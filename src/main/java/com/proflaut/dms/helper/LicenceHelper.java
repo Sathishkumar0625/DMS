@@ -77,7 +77,8 @@ public class LicenceHelper {
 					insertLocationIfMatch(paragraph, jobPackRequest.getLocation());
 				}
 			}
-			doc.write(out); 
+			// Write changes back to the output file
+			doc.write(out);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "Error";

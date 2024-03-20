@@ -165,7 +165,6 @@ public class FolderHelper {
 				accessIds.add(accessRightsEntity.getId());
 			}
 		}
-
 		// Retrieve access rights based on access IDs
 		List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByIdIn(accessIds);
 

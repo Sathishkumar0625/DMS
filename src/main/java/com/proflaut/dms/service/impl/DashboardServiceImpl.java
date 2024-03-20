@@ -334,8 +334,8 @@ public class DashboardServiceImpl implements DashboardService {
 				String totalUplo = dataEntity.getTotalUploads();
 
 				entry.put("date", date);
-				entry.put("Total Download", totalDownl);
-				entry.put("Total Upload", totalUplo);
+				entry.put("TotalDownload", totalDownl);
+				entry.put("TotalUpload", totalUplo);
 
 				uploadDownl.add(entry);
 
