@@ -110,7 +110,7 @@ public class MetaHelper {
 		} else if (DMSConstant.INTEGER.equalsIgnoreCase(fieldType)) {
 			return "BIGINT";
 		} else if ("DATE".equalsIgnoreCase(fieldType)) {
-			return "DATE";
+			return "TIMESTAMP";
 		} else {
 			return fieldType;
 		}
@@ -155,8 +155,26 @@ public class MetaHelper {
 				fieldDefinitionResponse.setFieldType(property.getFieldType());
 				fieldDefinitionResponse.setMandatory(property.getMandatory());
 				fieldDefinitionResponse.setMaxLength(String.valueOf(property.getLength()));
+
+				// Fetch data from the table
 				List<String> values = fetchDataFromTable(property.getFieldNames(), tableName, docId);
-				fieldDefinitionResponse.setValue(String.join(",", values));
+
+				// If the field type is "DATE", format the values and remove the seconds part
+				if ("DATE".equalsIgnoreCase(property.getFieldType())) {
+					List<String> formattedValues = new ArrayList<>();
+					for (String value : values) {
+						// Split the value into date and time parts
+						String[] parts = value.split(" ");
+						// Remove the seconds part from the time
+						String timePartWithoutSeconds = parts[1].substring(0, parts[1].lastIndexOf(':'));
+						// Join the date and modified time parts
+						String formattedValue = parts[0] + "T" + timePartWithoutSeconds;
+						formattedValues.add(formattedValue);
+					}
+					fieldDefinitionResponse.setValue(String.join(",", formattedValues));
+				} else {
+					fieldDefinitionResponse.setValue(String.join(",", values));
+				}
 
 				definitionResponses.add(fieldDefinitionResponse);
 			}

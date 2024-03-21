@@ -109,7 +109,7 @@ public class AccessServiceImpl {
 		LoginResponse loginResponse = new LoginResponse();
 		try {
 
-			  ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserName(userInfo.getUserName());
+			ProfUserInfoEntity profUserInfoEntity = profUserInfoRepository.findByUserName(userInfo.getUserName());
 			if (!profUserInfoEntity.getStatus().equalsIgnoreCase("I")) {
 				validation(userInfo, profUserInfoEntity, loginResponse);
 			} else {
