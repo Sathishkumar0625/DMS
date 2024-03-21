@@ -31,7 +31,8 @@ public class LogInterceptor implements HandlerInterceptor {
 			throws Exception {
 		String path = request.getRequestURI().substring(request.getContextPath().length());
 		logger.info("PATH --> {}", path);
-		if (path.equals("/access/signup") || path.equals("/access/login")) {
+		if (path.equals("/access/signup") || path.equals("/access/login") || path.equals("/access/forgotPassword")
+				|| path.equals("/access/verifyOtp") || path.equals("/access/savePassword")) {
 			return true;
 		} else {
 

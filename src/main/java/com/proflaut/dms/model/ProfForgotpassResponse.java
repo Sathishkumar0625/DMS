@@ -12,6 +12,6 @@ import lombok.Setter;
 public class ProfForgotpassResponse {
 	
 	private String status;
-	private String erroraMessage;
+	private String message;
 
 }

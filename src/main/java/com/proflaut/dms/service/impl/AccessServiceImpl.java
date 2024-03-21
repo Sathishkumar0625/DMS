@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import javax.crypto.NoSuchPaddingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,10 +33,16 @@ import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 import com.proflaut.dms.util.TokenGenerator;
-import okhttp3.*;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 @Service
 public class AccessServiceImpl {
+
+	private CacheManager cacheManager;
+
+	private Cache otpCache;
 
 	ProfUserInfoRepository profUserInfoRepository;
 	ProfUserPropertiesRepository profUserPropertiesRepository;
@@ -49,13 +54,16 @@ public class AccessServiceImpl {
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
-			TokenGenerator tokenGenerator, RedisTemplate<String, String> redisTemplate, TwilioConfig twilioConfig) {
+			TokenGenerator tokenGenerator, RedisTemplate<String, String> redisTemplate, TwilioConfig twilioConfig,
+			CacheManager cacheManager) {
 		this.profUserInfoRepository = profUserInfoRepository;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
 		this.accessHelper = accessHelper;
 		this.tokenGenerator = tokenGenerator;
 		this.redisTemplate = redisTemplate;
 		this.twilioConfig = twilioConfig;
+		this.cacheManager = cacheManager;
+		otpCache = cacheManager.getCache("otpCache");
 	}
 
 	private static final Logger logger = LogManager.getLogger(AccessServiceImpl.class);
@@ -206,15 +214,18 @@ public class AccessServiceImpl {
 			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByEmail(mailId);
 			if (infoEntity != null) {
 				String otp = accessHelper.generateOTP();
-				long validityDurationMinutes = 5;
+				long validityDurationMinutes = 4;
 				accessHelper.sendOTP(mailId, otp, validityDurationMinutes);
-				redisTemplate.opsForValue().set(mailId, otp, validityDurationMinutes, TimeUnit.MINUTES);
+
+				// Storing OTP in cache
+				otpCache.put(new Element(mailId, otp));
+
+				// Set response status and message
 				forgotpassResponse.setStatus(DMSConstant.SUCCESS);
-			} else {
-				forgotpassResponse.setStatus(DMSConstant.FAILURE);
-				forgotpassResponse.setErroraMessage(mailId);
+				forgotpassResponse.setMessage("OTP SENT SUCCESSFULLY");
 			}
 		} catch (Exception e) {
+			// Handle exception
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
@@ -226,23 +237,26 @@ public class AccessServiceImpl {
 		try {
 			String email = data.get("email");
 			String otp = data.get("otp");
-			if (Boolean.TRUE.equals(redisTemplate.hasKey(email))) {
-				String storedOTP = redisTemplate.opsForValue().get(email);
+
+			// Retrieving OTP from cache
+			Element element = otpCache.get(email);
+			if (element != null) {
+				String storedOTP = (String) element.getObjectValue();
 				if (otp.equals(storedOTP)) {
 					// Clear OTP from storage after verification
-					redisTemplate.delete(email);
+					otpCache.remove(email);
 					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
 					forgotpassResponse.setStatus(DMSConstant.FAILURE);
-					forgotpassResponse.setErroraMessage(DMSConstant.INVALID_OTP);
+					forgotpassResponse.setMessage(DMSConstant.INVALID_OTP);
 				}
 			} else {
 				forgotpassResponse.setStatus(DMSConstant.FAILURE);
-				forgotpassResponse.setErroraMessage(DMSConstant.INVALID_OTP + " or expired");
+				forgotpassResponse.setMessage(DMSConstant.INVALID_OTP + " or expired");
 			}
 		} catch (Exception e) {
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);
-			forgotpassResponse.setErroraMessage("Error verifying OTP");
+			forgotpassResponse.setMessage("Error verifying OTP");
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return forgotpassResponse;

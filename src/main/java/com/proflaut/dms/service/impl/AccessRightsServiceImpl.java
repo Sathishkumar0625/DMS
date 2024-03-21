@@ -31,6 +31,8 @@ import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 
+import net.sf.ehcache.management.CacheManager;
+
 @Service
 public class AccessRightsServiceImpl {
 	private static final Logger logger = LogManager.getLogger(AccessRightsServiceImpl.class);
@@ -50,7 +52,7 @@ public class AccessRightsServiceImpl {
 			ProfAccessRightRepository accessRightRepository, FileManagementServiceImpl serviceImpl,
 			ProfAccessUserMappingRepository accessUserMappingRepository,
 			ProfAccessGroupMappingRepository accessGroupMappingRepository, ProfUserInfoRepository infoRepository,
-			GroupServiceImpl groupServiceImpl, ProfGroupInfoRepository groupInfoRepository) {
+			GroupServiceImpl groupServiceImpl, ProfGroupInfoRepository groupInfoRepository,CacheManager cacheManager) {
 		this.dataRepository = dataRepository;
 		this.helper = helper;
 		this.accessRightRepository = accessRightRepository;

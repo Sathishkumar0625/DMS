@@ -1,11 +1,13 @@
 package com.proflaut.dms.helper;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,30 +63,80 @@ public class LicenceHelper {
 	}
 
 	public String convertToList(String inputFilename, String outputFilename, ProfJobPackRequest jobPackRequest) {
-		try (XWPFDocument doc = new XWPFDocument(Files.newInputStream(Paths.get(inputFilename)));
-				FileOutputStream out = new FileOutputStream(outputFilename)) {
+		try {
+			// Load the Word document
+			FileInputStream fis = new FileInputStream(inputFilename);
+			XWPFDocument document = new XWPFDocument(fis);
 
-			boolean foundAgreement = false;
-			for (XWPFParagraph paragraph : doc.getParagraphs()) {
-				String paragraphText = paragraph.getText();
-
-				if (!foundAgreement && paragraphText.startsWith("LOAN AGREEMENT BETWEEN")) {
-					foundAgreement = true;
-					insertAfterLine(paragraph, jobPackRequest.getBorrowerName());
-				} else if (foundAgreement && paragraphText.startsWith("AND")) {
-					insertAfterWord(paragraph, jobPackRequest.getLenderName(), "AND");
-					foundAgreement = false;
-				} else {
-					insertLocationIfMatch(paragraph, jobPackRequest.getLocation());
+			// Manipulate the document
+			boolean foundLoanAgreement = false;
+			for (XWPFParagraph paragraph : document.getParagraphs()) {
+				String text = paragraph.getText();
+				// Check if the paragraph contains the target phrases
+				if (text != null) {
+					if (text.contains("LOAN AGREEMENT BETWEEN")) {
+						// Add lender name directly under "LOAN AGREEMENT BETWEEN"
+						addNameUnderPhrase(paragraph, jobPackRequest.getLenderName(), "LOAN AGREEMENT BETWEEN");
+						foundLoanAgreement = true;
+					} else if (text.contains("AND") && foundLoanAgreement) {
+						// Add borrower name directly under "AND"
+						addNameUnderPhrase(paragraph, jobPackRequest.getBorrowerName(), "AND");
+						foundLoanAgreement = false; // Reset flag after adding name
+					}
+					// Replace placeholders for location, day, and date
+					replacePlaceholders(paragraph, jobPackRequest);
 				}
 			}
-			// Write changes back to the output file
-			doc.write(out);
+
+			// Save the modified document
+			FileOutputStream fos = new FileOutputStream(outputFilename);
+			document.write(fos);
+
+			// Close streams
+			fis.close();
+			fos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "Error";
 		}
 		return "Success";
+	}
+
+	private void replacePlaceholders(XWPFParagraph paragraph, ProfJobPackRequest jobPackRequest) {
+		List<XWPFRun> runs = paragraph.getRuns();
+		for (int i = 0; i < runs.size(); i++) {
+			XWPFRun run = runs.get(i);
+			String text = run.getText(0);
+			if (text != null) {
+				// Replace location placeholder
+				if (text.contains("at") && text.contains("this")) {
+					String location = jobPackRequest.getLocation();
+					text = text.replace("_____", " " + location);
+					run.setText(text, 0);
+					break;
+				}
+			}
+		}
+	}
+
+	private static void addNameUnderPhrase(XWPFParagraph paragraph, String name, String phrase) {
+		int index = paragraph.getText().indexOf(phrase);
+		if (index >= 0) {
+			// Clear the existing text in the paragraph
+			for (int i = paragraph.getRuns().size() - 1; i >= 0; i--) {
+				paragraph.removeRun(i);
+			}
+
+			// Add the phrase
+			XWPFRun run = paragraph.createRun();
+			run.setText(phrase);
+			run.addCarriageReturn(); // Add a new line
+
+			// Add the name
+			run = paragraph.createRun();
+			run.setText(name);
+			run.addCarriageReturn(); // Add a new line
+		}
 	}
 
 	// Method to insert text after a specific line
