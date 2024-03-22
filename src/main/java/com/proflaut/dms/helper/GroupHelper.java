@@ -28,20 +28,18 @@ import com.proflaut.dms.repository.ProfMetaDataRepository;
 
 @Component
 public class GroupHelper {
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	ProfGroupInfoRepository groupInfoRepository;
 	ProfMetaDataRepository metaDataRepository;
-	
-	
+
 	@Autowired
 	public GroupHelper(ProfGroupInfoRepository groupInfoRepository, ProfMetaDataRepository metaDataRepository) {
 		this.groupInfoRepository = groupInfoRepository;
 		this.metaDataRepository = metaDataRepository;
 	}
-
 
 	public ProfGroupInfoEntity convertGroupInfoReqToGroupInfoEnt(ProfGroupInfoRequest groupInfoRequest,
 			ProfUserPropertiesEntity entity2) {
@@ -108,7 +106,6 @@ public class GroupHelper {
 
 		return groupInfoEnt != null;
 	}
-
 
 	public ProfMetaDataEntity convertTableReqToMetaEntity(CreateTableRequest createTableRequest, String tableName) {
 		ProfMetaDataEntity metaDataEntity = new ProfMetaDataEntity();
@@ -189,9 +186,11 @@ public class GroupHelper {
 	public ProfOveralUserInfoResponse convertGroupUserToResponse(List<ProfUserInfoEntity> infoEntities) {
 		ProfOveralUserInfoResponse infoResponses = new ProfOveralUserInfoResponse();
 		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
-			infoResponses.setUserId(profUserInfoEntity.getUserId());
-			infoResponses.setUserName(profUserInfoEntity.getUserName());
-			infoResponses.setCreatedDate(profUserInfoEntity.getCreatedDate());
+			if (!profUserInfoEntity.getStatus().equalsIgnoreCase("I")) {
+				infoResponses.setUserId(profUserInfoEntity.getUserId());
+				infoResponses.setUserName(profUserInfoEntity.getUserName());
+				infoResponses.setCreatedDate(profUserInfoEntity.getCreatedDate());
+			}
 		}
 		return infoResponses;
 	}
@@ -202,7 +201,7 @@ public class GroupHelper {
 		infoResponse.setCreatedDate(infoEntity.getCreatedDate());
 		infoResponse.setEmail(infoEntity.getEmail());
 		infoResponse.setLdap(infoEntity.getLdap());
-		infoResponse.setLocation(infoEntity.getLocation().toUpperCase());	
+		infoResponse.setLocation(infoEntity.getLocation().toUpperCase());
 		infoResponse.setMobileNo(infoEntity.getMobileNo());
 		infoResponse.setStatus(infoEntity.getStatus());
 		infoResponse.setUserId(infoEntity.getUserId());

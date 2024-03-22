@@ -36,9 +36,9 @@ import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 @Service
 @Transactional
 public class GroupServiceImpl {
-	
+
 	private static final Logger logger = LogManager.getLogger(GroupServiceImpl.class);
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -53,8 +53,7 @@ public class GroupServiceImpl {
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 
 	ProfGroupUserMappingRepository groupUserMappingRepository;
-	
-	
+
 	@Autowired
 	public GroupServiceImpl(ProfGroupInfoRepository groupInfoRepository, GroupHelper groupHelper,
 			ProfUserGroupMappingRepository mappingRepository, ProfUserInfoRepository userInfoRepository,
@@ -113,12 +112,17 @@ public class GroupServiceImpl {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = new ArrayList<>();
 		try {
 			List<ProfGroupInfoEntity> groupInfoEntities = groupInfoRepository.findAll();
-
-			for (ProfGroupInfoEntity profGroupInfoEntity : groupInfoEntities) {
-				if (!profGroupInfoEntity.getStatus().equalsIgnoreCase("I")) {
-					ProfOverallGroupInfoResponse response = groupHelper.convertToResponse(profGroupInfoEntity);
-					groupInfoResponses.add(response);
+			if (!groupInfoEntities.isEmpty()) {
+				for (ProfGroupInfoEntity profGroupInfoEntity : groupInfoEntities) {
+					if (!profGroupInfoEntity.getStatus().equalsIgnoreCase("I")) {
+						ProfOverallGroupInfoResponse response = groupHelper.convertToResponse(profGroupInfoEntity);
+						groupInfoResponses.add(response);
+					}
 				}
+			} else {
+				ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();
+				groupInfoResponse.setErrorMessage("No Groups Found");
+				groupInfoResponses.add(groupInfoResponse);
 			}
 
 		} catch (Exception e) {
@@ -159,7 +163,6 @@ public class GroupServiceImpl {
 		return infoResponses;
 	}
 
-
 	public ProfGroupInfoResponse updateSignupUser(ProfSignupUserRequest userRequest, int userId) {
 		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
 		try {
@@ -189,7 +192,7 @@ public class GroupServiceImpl {
 							ProfOverallGroupInfoResponse groupInfoResponse = groupHelper
 									.convertActiveGroupInfo(profGroupInfoEntity);
 							groupInfoResponses.add(groupInfoResponse);
-						} 
+						}
 					}
 				} else {
 					ProfOverallGroupInfoResponse groupInfoResponse = new ProfOverallGroupInfoResponse();

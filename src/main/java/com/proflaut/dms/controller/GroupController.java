@@ -40,7 +40,6 @@ public class GroupController {
 
 	GroupServiceImpl groupServiceImpl;
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
-	
 
 	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,
@@ -85,10 +84,10 @@ public class GroupController {
 		List<ProfOverallGroupInfoResponse> groupInfoResponses = null;
 		try {
 			groupInfoResponses = groupServiceImpl.find();
-			if (!groupInfoResponses.isEmpty()) {
+			if (groupInfoResponses.get(0).getGroupName() != null) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
@@ -176,7 +175,7 @@ public class GroupController {
 			if (!groupInfoResponses.get(0).getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return new ResponseEntity<>(groupInfoResponses, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(groupInfoResponses,HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(groupInfoResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
@@ -264,7 +263,7 @@ public class GroupController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getUser")
 	public ResponseEntity<ProfOveralUserInfoResponse> getUserById(@RequestHeader("token") String token) {
 		ProfOveralUserInfoResponse userInfoResponses = null;
