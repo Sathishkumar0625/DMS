@@ -11,5 +11,8 @@ public class ProfJobPackRequest {
 	private String currentDate;
 	private String amountInNumbers;
 	private String amountInWords;
+	private String loanPeriod;
+	private String loanPeriodFrom;
+	private String loanPeriodTo;
 
 }

@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.crypto.NoSuchPaddingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,9 +18,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.proflaut.dms.configuration.TwilioConfig;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.customexception.CustomExcep;
+import com.proflaut.dms.entity.ProfOtpEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.exception.CustomException;
@@ -29,41 +30,30 @@ import com.proflaut.dms.model.ProfForgotpassResponse;
 import com.proflaut.dms.model.ProfUserLogoutResponse;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.model.UserRegResponse;
+import com.proflaut.dms.repository.ProfOtpEntityRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 import com.proflaut.dms.util.TokenGenerator;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 @Service
 public class AccessServiceImpl {
-
-	private CacheManager cacheManager;
-
-	private Cache otpCache;
 
 	ProfUserInfoRepository profUserInfoRepository;
 	ProfUserPropertiesRepository profUserPropertiesRepository;
 	AccessHelper accessHelper;
 	TokenGenerator tokenGenerator;
-	TwilioConfig twilioConfig;
-	private RedisTemplate<String, String> redisTemplate;
+	ProfOtpEntityRepository otpEntityRepository;
 
 	@Autowired
 	public AccessServiceImpl(ProfUserInfoRepository profUserInfoRepository,
 			ProfUserPropertiesRepository profUserPropertiesRepository, AccessHelper accessHelper,
-			TokenGenerator tokenGenerator, RedisTemplate<String, String> redisTemplate, TwilioConfig twilioConfig,
-			CacheManager cacheManager) {
+			TokenGenerator tokenGenerator, ProfOtpEntityRepository otpEntityRepository) {
 		this.profUserInfoRepository = profUserInfoRepository;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
 		this.accessHelper = accessHelper;
 		this.tokenGenerator = tokenGenerator;
-		this.redisTemplate = redisTemplate;
-		this.twilioConfig = twilioConfig;
-		this.cacheManager = cacheManager;
-		otpCache = cacheManager.getCache("otpCache");
+		this.otpEntityRepository = otpEntityRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(AccessServiceImpl.class);
@@ -214,18 +204,17 @@ public class AccessServiceImpl {
 			ProfUserInfoEntity infoEntity = profUserInfoRepository.findByEmail(mailId);
 			if (infoEntity != null) {
 				String otp = accessHelper.generateOTP();
-				long validityDurationMinutes = 4;
+				// Set OTP validity duration (in minutes)
+				long validityDurationMinutes = 1;
 				accessHelper.sendOTP(mailId, otp, validityDurationMinutes);
-
-				// Storing OTP in cache
-				otpCache.put(new Element(mailId, otp));
-
-				// Set response status and message
+				ProfOtpEntity otpEntity = accessHelper.convertToOtpEntity(otp, mailId);
+				otpEntityRepository.save(otpEntity);
 				forgotpassResponse.setStatus(DMSConstant.SUCCESS);
-				forgotpassResponse.setMessage("OTP SENT SUCCESSFULLY");
+			} else {
+				forgotpassResponse.setStatus(DMSConstant.FAILURE);
+				forgotpassResponse.setMessage("Email ID not Found");
 			}
 		} catch (Exception e) {
-			// Handle exception
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
@@ -237,22 +226,22 @@ public class AccessServiceImpl {
 		try {
 			String email = data.get("email");
 			String otp = data.get("otp");
-
-			// Retrieving OTP from cache
-			Element element = otpCache.get(email);
-			if (element != null) {
-				String storedOTP = (String) element.getObjectValue();
-				if (otp.equals(storedOTP)) {
-					// Clear OTP from storage after verification
-					otpCache.remove(email);
+			ProfOtpEntity otpEntity = otpEntityRepository.findByEmailAndOtp(email, otp);
+			if (otpEntity != null) {
+				// Check if OTP is expired
+				LocalDateTime otpTime = otpEntity.getCreatedAt();
+				if (!otpTime.plusMinutes(1).isBefore(LocalDateTime.now())) {
+					// Clear OTP from database after verification
+					otpEntityRepository.delete(otpEntity);
 					forgotpassResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
+					otpEntityRepository.delete(otpEntity);
 					forgotpassResponse.setStatus(DMSConstant.FAILURE);
-					forgotpassResponse.setMessage(DMSConstant.INVALID_OTP);
+					forgotpassResponse.setMessage(DMSConstant.INVALID_OTP + " or expired");
 				}
 			} else {
 				forgotpassResponse.setStatus(DMSConstant.FAILURE);
-				forgotpassResponse.setMessage(DMSConstant.INVALID_OTP + " or expired");
+				forgotpassResponse.setMessage(DMSConstant.INVALID_OTP);
 			}
 		} catch (Exception e) {
 			forgotpassResponse.setStatus(DMSConstant.FAILURE);

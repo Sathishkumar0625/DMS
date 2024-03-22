@@ -7,41 +7,34 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfLanguageConverterEntity;
 import com.proflaut.dms.entity.ProfLicenseEntity;
 import com.proflaut.dms.helper.LicenceHelper;
-import com.proflaut.dms.model.ProfJobPackRequest;
 import com.proflaut.dms.model.ProfLanguageConverterRequest;
 import com.proflaut.dms.model.ProfLanguageConverterResponse;
 import com.proflaut.dms.model.ProfLicenceResponse;
 import com.proflaut.dms.repository.LangRepository;
 import com.proflaut.dms.repository.ProfLicenseRepository;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
-import com.proflaut.dms.util.AppConfiguration;
 
 @Service
 public class LicenceServiceImpl {
 	private static final Logger logger = LogManager.getLogger(LicenceServiceImpl.class);
 	ProfLicenseRepository licenseRepository;
 	LicenceHelper helper;
-	private final AppConfiguration appConfiguration;
 	LangRepository langRepository;
 
 	@Autowired
 	public LicenceServiceImpl(ProfLicenseRepository licenseRepository, LicenceHelper helper,
-			LangRepository langRepository, AppConfiguration appConfiguration) {
+			LangRepository langRepository) {
 		this.licenseRepository = licenseRepository;
 		this.helper = helper;
 		this.langRepository = langRepository;
-		this.appConfiguration = appConfiguration;
 	}
 
 	public ProfLicenceResponse createLicence() {
@@ -99,17 +92,4 @@ public class LicenceServiceImpl {
 		}
 		return converterResponse;
 	}
-
-	public String getFields(ProfJobPackRequest jobPackRequest) {
-		String fields=null;
-		try {
-			String inputFilename = appConfiguration.getInvoiceInputFileName();
-			String outputFilename = appConfiguration.getInvoiceOutputFileName();
-			fields = helper.convertToList(inputFilename,outputFilename,jobPackRequest);
-		} catch (Exception e) {
-			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
-		}
-		return fields;
-	}
-
 }

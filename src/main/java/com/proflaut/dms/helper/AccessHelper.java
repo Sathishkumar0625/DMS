@@ -19,6 +19,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import com.proflaut.dms.entity.ProfOtpEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.UserInfo;
@@ -95,9 +96,9 @@ public class AccessHelper {
 	}
 
 	public String generateOTP() {
-	    SecureRandom secureRandom = new SecureRandom();
-	    int otp = 100000 + secureRandom.nextInt(900000);
-	    return String.valueOf(otp);
+		SecureRandom secureRandom = new SecureRandom();
+		int otp = 100000 + secureRandom.nextInt(900000);
+		return String.valueOf(otp);
 	}
 
 	public void sendOTP(String email, String otp, long validityDurationMinutes) {
@@ -129,6 +130,14 @@ public class AccessHelper {
 		}
 
 		return builder.toString();
+	}
+
+	public ProfOtpEntity convertToOtpEntity(String otp, String mailId) {
+		ProfOtpEntity otpEntity = new ProfOtpEntity();
+		otpEntity.setOtp(otp);
+		otpEntity.setEmail(mailId);
+		otpEntity.setCreatedAt(LocalDateTime.now());
+		return otpEntity;
 	}
 
 }

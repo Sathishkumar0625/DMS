@@ -52,7 +52,7 @@ public class AccessRightsServiceImpl {
 			ProfAccessRightRepository accessRightRepository, FileManagementServiceImpl serviceImpl,
 			ProfAccessUserMappingRepository accessUserMappingRepository,
 			ProfAccessGroupMappingRepository accessGroupMappingRepository, ProfUserInfoRepository infoRepository,
-			GroupServiceImpl groupServiceImpl, ProfGroupInfoRepository groupInfoRepository,CacheManager cacheManager) {
+			GroupServiceImpl groupServiceImpl, ProfGroupInfoRepository groupInfoRepository) {
 		this.dataRepository = dataRepository;
 		this.helper = helper;
 		this.accessRightRepository = accessRightRepository;
