@@ -286,11 +286,13 @@ public class GroupServiceImpl {
 			List<ProfGroupUserMappingEntity> entity = groupUserMappingRepository.findByGroupId(groupId);
 			if (!entity.isEmpty()) {
 				for (ProfGroupUserMappingEntity groupUserMappingEntity : entity) {
-					List<ProfUserInfoEntity> infoEntities = userInfoRepository
-							.getByUserId(groupUserMappingEntity.getUserId());
-					ProfOveralUserInfoResponse overalUserInfoResponse = groupHelper
-							.convertGroupUserToResponse(infoEntities);
-					overalUserInfoResponses.add(overalUserInfoResponse);
+					ProfUserInfoEntity infoEntities = userInfoRepository
+							.findByUserId(groupUserMappingEntity.getUserId());
+					if (!infoEntities.getStatus().equalsIgnoreCase("I")) {
+						ProfOveralUserInfoResponse overalUserInfoResponse = groupHelper
+								.convertGroupUserToResponse(infoEntities);
+						overalUserInfoResponses.add(overalUserInfoResponse);
+					}
 				}
 			}
 

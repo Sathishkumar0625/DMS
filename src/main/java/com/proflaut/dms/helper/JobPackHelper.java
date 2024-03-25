@@ -4,12 +4,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.stereotype.Component;
-
 import com.proflaut.dms.model.ProfJobPackRequest;
 
 @Component
@@ -18,8 +17,8 @@ public class JobPackHelper {
 	public String convertToList(String inputFilename, String outputFilename, ProfJobPackRequest jobPackRequest) {
 		try (FileInputStream fis = new FileInputStream(inputFilename);
 				XWPFDocument document = new XWPFDocument(fis);
+				PDDocument pdfDoc = new PDDocument();
 				FileOutputStream fos = new FileOutputStream(outputFilename)) {
-//			insertImageAtFirstPage(document, "C:/Users/BILLPC01/Downloads/logo_landscap (1).jpg");
 			// Manipulate the document
 			boolean foundLoanAgreement = false;
 			for (XWPFParagraph paragraph : document.getParagraphs()) {
@@ -35,7 +34,7 @@ public class JobPackHelper {
 						addNameUnderPhrase(paragraph, jobPackRequest.getBorrowerName(), "AND");
 						foundLoanAgreement = false; // Reset flag after adding name
 					}
-					// Replace placeholders for location, day, and date
+					// Replace placeholder for location, day, and date
 					/* -----> Insert Location <------ */
 					insertLocation(paragraph, jobPackRequest);
 					/* -----> Insert Day <------ */
@@ -56,10 +55,8 @@ public class JobPackHelper {
 					insertLoanDates(paragraph, jobPackRequest.getLoanPeriodFrom(), jobPackRequest.getLoanPeriodTo());
 				}
 			}
-
 			// Save the modified document
 			document.write(fos);
-
 			return "Success";
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -234,19 +231,4 @@ public class JobPackHelper {
 			run.addCarriageReturn(); // Add a new line
 		}
 	}
-
-	/*
-	 * private void insertImageAtFirstPage(XWPFDocument document, String imagePath)
-	 * { // Get the first paragraph or create a new one if it doesn't exist
-	 * XWPFParagraph firstParagraph; if (document.getParagraphs().isEmpty()) {
-	 * firstParagraph = document.createParagraph(); } else { firstParagraph =
-	 * document.getParagraphs().get(0); }
-	 * 
-	 * try { // Add the image to the paragraph XWPFRun run =
-	 * firstParagraph.createRun(); run.addBreak(); // Ensure the image is inserted
-	 * as a new line run.addPicture(new FileInputStream(imagePath),
-	 * XWPFDocument.PICTURE_TYPE_PNG, imagePath, Units.toEMU(200),
-	 * Units.toEMU(200)); // Adjust the width and height as needed } catch
-	 * (Exception e) { e.printStackTrace(); } }
-	 */
 }

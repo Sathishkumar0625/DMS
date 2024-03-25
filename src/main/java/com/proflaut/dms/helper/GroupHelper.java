@@ -88,7 +88,7 @@ public class GroupHelper {
 
 	public ProfOveralUserInfoResponse convertToOveralUserResponse(ProfUserInfoEntity profUserInfoEntity) {
 		ProfOveralUserInfoResponse response = new ProfOveralUserInfoResponse();
-		response.setUserId(profUserInfoEntity.getUserId());
+		response.setUserId(String.valueOf(profUserInfoEntity.getUserId()));
 		response.setAdminAccess(profUserInfoEntity.getAdminAccesss());
 		response.setCreatedDate(profUserInfoEntity.getCreatedDate());
 		response.setEmail(profUserInfoEntity.getEmail());
@@ -163,7 +163,7 @@ public class GroupHelper {
 	public ProfOveralUserInfoResponse convertEntityToResponse(List<ProfUserInfoEntity> infoEntities) {
 		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
 		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
-			infoResponse.setUserId(profUserInfoEntity.getUserId());
+			infoResponse.setUserId(String.valueOf(profUserInfoEntity.getUserId()));
 			infoResponse.setUserName(profUserInfoEntity.getUserName());
 			infoResponse.setCreatedDate(profUserInfoEntity.getCreatedDate());
 		}
@@ -183,16 +183,15 @@ public class GroupHelper {
 		return groupInfoResponse;
 	}
 
-	public ProfOveralUserInfoResponse convertGroupUserToResponse(List<ProfUserInfoEntity> infoEntities) {
+	public ProfOveralUserInfoResponse convertGroupUserToResponse(ProfUserInfoEntity infoEntities) {
 		ProfOveralUserInfoResponse infoResponses = new ProfOveralUserInfoResponse();
-		for (ProfUserInfoEntity profUserInfoEntity : infoEntities) {
-			if (!profUserInfoEntity.getStatus().equalsIgnoreCase("I")) {
-				infoResponses.setUserId(profUserInfoEntity.getUserId());
-				infoResponses.setUserName(profUserInfoEntity.getUserName());
-				infoResponses.setCreatedDate(profUserInfoEntity.getCreatedDate());
-			}
-		}
+
+		infoResponses.setUserId(String.valueOf(infoEntities.getUserId()));
+		infoResponses.setUserName(infoEntities.getUserName());
+		infoResponses.setCreatedDate(infoEntities.getCreatedDate());
+
 		return infoResponses;
+
 	}
 
 	public ProfOveralUserInfoResponse convertToDashboardUserResponse(ProfUserInfoEntity infoEntity) {
@@ -204,7 +203,7 @@ public class GroupHelper {
 		infoResponse.setLocation(infoEntity.getLocation().toUpperCase());
 		infoResponse.setMobileNo(infoEntity.getMobileNo());
 		infoResponse.setStatus(infoEntity.getStatus());
-		infoResponse.setUserId(infoEntity.getUserId());
+		infoResponse.setUserId(String.valueOf(infoEntity.getUserId()));
 		infoResponse.setUserName(infoEntity.getUserName().toUpperCase());
 		infoResponse.setWebAccess(infoEntity.getWebAccess());
 		return infoResponse;

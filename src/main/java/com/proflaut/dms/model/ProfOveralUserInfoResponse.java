@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class ProfOveralUserInfoResponse {
-	private Integer userId;
+	private String userId;
 
 	private String userName;
 
@@ -49,11 +49,11 @@ public class ProfOveralUserInfoResponse {
 		this.mobileNo = mobileNo;
 	}
 
-	public Integer getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 

@@ -62,6 +62,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -166,6 +167,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>fr.opensagres.xdocreport</groupId>
+			<artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 
 	</dependencies>
 

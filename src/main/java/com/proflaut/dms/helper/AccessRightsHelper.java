@@ -34,7 +34,7 @@ public class AccessRightsHelper {
 	ProfAccessGroupMappingRepository groupMappingRepository;
 
 	ProfAccessUserMappingRepository userMappingRepository;
-	
+
 	public static String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" dd-MM-yyyy HH:mm ");
@@ -154,7 +154,7 @@ public class AccessRightsHelper {
 
 	public ProfOveralUserInfoResponse convertUserInfoToRequest(ProfUserInfoEntity infoEntity) {
 		ProfOveralUserInfoResponse infoResponse = new ProfOveralUserInfoResponse();
-		infoResponse.setUserId(infoEntity.getUserId());
+		infoResponse.setUserId(String.valueOf(infoEntity.getUserId()));
 		infoResponse.setUserName(infoEntity.getUserName());
 		return infoResponse;
 	}
