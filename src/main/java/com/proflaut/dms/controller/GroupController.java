@@ -39,12 +39,13 @@ import lombok.AllArgsConstructor;
 public class GroupController {
 
 	GroupServiceImpl groupServiceImpl;
+
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
 
 	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,
 			@Valid @RequestBody ProfGroupInfoRequest groupInfoRequest) {
-		ProfGroupInfoResponse groupInfoResponse = new ProfGroupInfoResponse();
+		ProfGroupInfoResponse groupInfoResponse = null;
 		try {
 			logger.info("GEtting into Create Group");
 			groupInfoResponse = groupServiceImpl.createGroup(groupInfoRequest, token);

@@ -117,7 +117,6 @@ public class MetaServiceImpl {
 					List<ProfMetaDataPropertiesEntity> propertiesList = metaHelper
 							.convertMetaEntityToMetaProperties(createTableRequest, dataEnt);
 					dataPropRepository.saveAll(propertiesList);
-
 					metaDataResponse.setStatus(DMSConstant.SUCCESS);
 				} else {
 					throw new CustomException("ProfMetaDataEntity is Null");

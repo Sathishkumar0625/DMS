@@ -1,6 +1,7 @@
 package com.proflaut.dms.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.model.MailResponse;
 import com.proflaut.dms.model.ProfJobPackRequest;
 import com.proflaut.dms.model.ProfLanguageConverterRequest;
 import com.proflaut.dms.model.ProfLanguageConverterResponse;
@@ -78,5 +80,17 @@ public class LicenceController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
+	}
+
+	@GetMapping("path")
+	public Map<String, Object>  getMethodName() {
+		Map<String, Object> map=new HashMap<>();
+		String hl="HL";
+		String lsp="lsp";
+		MailResponse mailResponse=new MailResponse();
+		mailResponse.setHl(hl);
+		mailResponse.setLsp(lsp);
+		map.put("key", mailResponse);
+		return map;
 	}
 }
