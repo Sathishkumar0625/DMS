@@ -90,42 +90,6 @@ public class HomeServiceImpl {
 		return response;
 	}
 
-//	public BookmarkResponse findAll(String token) {
-//		BookmarkResponse bookmarkResponse = new BookmarkResponse();
-//		try {
-//			ProfUserPropertiesEntity profUserPropertiesEntity = userPropertiesRepository.findByToken(token);
-//			if (profUserPropertiesEntity != null && !profUserPropertiesEntity.getToken().isBlank()) {
-//				// Fetch file bookmarks for the user
-//				List<ProfFileBookmarkEntity> fileBookmarkEntities = fileBookmarkRepository
-//						.findByBookmarkedBy(profUserPropertiesEntity.getUserName());
-//				List<Integer> fileIds = fileBookmarkEntities.stream().map(ProfFileBookmarkEntity::getFileId)
-//						.collect(Collectors.toList());
-//				for (int integer : fileIds) {
-//					ProfDocEntity fileSize = docUploadRepository.findById(integer);
-//					List<FileBookmark> fileBookmarks = homeHelper.mapToFileBookmarks(fileBookmarkEntities,fileSize);
-//					bookmarkResponse.setFiles(fileBookmarks);
-//				}
-//
-//				// Fetch folder bookmarks for the user
-//				List<ProfFolderBookMarkEntity> folderBookmarkEntities = bookmarkRepository
-//						.findByBookMarkedBy(profUserPropertiesEntity.getUserName());
-//				List<Integer> folderIds = folderBookmarkEntities.stream().map(ProfFolderBookMarkEntity::getFolderId)
-//						.collect(Collectors.toList());
-//				for (Integer integer : folderIds) {
-//					List<ProfDocEntity> folderSize = docUploadRepository.findByFolderId(integer);
-//					long size = getTotalFileSize(folderSize);
-//					List<FolderBookmark> folderBookmarks = homeHelper.mapToFolderBookmarks(folderBookmarkEntities,
-//							size);
-//
-//					bookmarkResponse.setFolders(folderBookmarks);
-//
-//				}
-//			}
-//		} catch (Exception e) {
-//			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
-//		}
-//		return bookmarkResponse;
-//	}
 	public BookmarkResponse findAll(String token) {
 		BookmarkResponse bookmarkResponse = new BookmarkResponse();
 		try {

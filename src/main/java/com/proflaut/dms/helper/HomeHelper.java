@@ -61,35 +61,6 @@ public class HomeHelper {
 		return bookMarkEntity;
 	}
 
-//	public List<FileBookmark> mapToFileBookmarks(List<ProfFileBookmarkEntity> fileBookmarkEntities,
-//			ProfDocEntity fileSize) {
-//		List<FileBookmark> fileBookmarks = new ArrayList<>();
-//		for (ProfFileBookmarkEntity entity : fileBookmarkEntities) {
-//			FileBookmark fileBookmark = new FileBookmark();
-//			fileBookmark.setFileName(entity.getFileName());
-//			fileBookmark.setFileId(String.valueOf(entity.getFileId()));
-//			fileBookmark.setBookmarkedBy(entity.getBookmarkedBy());
-//			fileBookmark.setBookmarkDateAndTime(entity.getBookmarkDateAndTime());
-//			fileBookmark.setFileSize(fileSize.getFileSize());
-//			fileBookmarks.add(fileBookmark);
-//		}
-//		return fileBookmarks;
-//	}
-//
-//	public List<FolderBookmark> mapToFolderBookmarks(List<ProfFolderBookMarkEntity> folderBookmarkEntities,
-//			long totalSizeKB) {
-//		List<FolderBookmark> folderBookmarks = new ArrayList<>();
-//		for (ProfFolderBookMarkEntity entity : folderBookmarkEntities) {
-//			FolderBookmark folderBookmark = new FolderBookmark();
-//			folderBookmark.setFolderId(String.valueOf(entity.getFolderId()));
-//			folderBookmark.setFolderName(entity.getFolderName());
-//			folderBookmark.setBookmarkedBy(entity.getBookMarkedBy());
-//			folderBookmark.setBookmarkDateAndTime(entity.getBookamrkDateAndTime());
-//			folderBookmark.setFolderSize(totalSizeKB + "kb");
-//			folderBookmarks.add(folderBookmark);
-//		}
-//		return folderBookmarks;
-//	}
 	public Map<Integer, ProfDocEntity> getFileSizesForFiles(List<ProfFileBookmarkEntity> fileBookmarkEntities) {
 		List<Integer> fileIds = fileBookmarkEntities.stream().map(ProfFileBookmarkEntity::getFileId)
 				.collect(Collectors.toList());
@@ -108,7 +79,7 @@ public class HomeHelper {
 			fileBookmark.setBookmarkedBy(entity.getBookmarkedBy());
 			fileBookmark.setBookmarkDateAndTime(entity.getBookmarkDateAndTime());
 			if (fileSize != null) {
-				fileBookmark.setFileSize(fileSize.getFileSize());
+				fileBookmark.setSize(fileSize.getFileSize());
 				fileBookmark.setFileUploadeddateAndTime(fileSize.getUploadTime());
 			}
 			fileBookmarks.add(fileBookmark);
@@ -127,7 +98,7 @@ public class HomeHelper {
 			folderBookmark.setFolderName(entity.getFolderName());
 			folderBookmark.setBookmarkedBy(entity.getBookMarkedBy());
 			folderBookmark.setBookmarkDateAndTime(entity.getBookamrkDateAndTime());
-			folderBookmark.setFolderSize(totalSizeKB + "kb");
+			folderBookmark.setSize(totalSizeKB + "kb");
 			folderBookmark.setFolderCreatedDateAndTime(folderEntity.getCreatedAt());
 			folderBookmarks.add(folderBookmark);
 		}
@@ -145,22 +116,4 @@ public class HomeHelper {
 		return totalFileSize;
 	}
 
-	public long parseSizeStringToKB(String sizeString) {
-		String[] parts = sizeString.split(" ");
-		if (parts.length == 2) {
-			long size = Long.parseLong(parts[0]);
-			String unit = parts[1].toLowerCase();
-			if (unit.equals("kb")) {
-				return size;
-			} else if (unit.equals("mb")) {
-				return size * 1024;
-			} else if (unit.equals("gb")) {
-				return size * 1024 * 1024;
-			} else {
-				throw new IllegalArgumentException("Unsupported unit: " + unit);
-			}
-		} else {
-			throw new IllegalArgumentException("Invalid size string format: " + sizeString);
-		}
-	}
 }
