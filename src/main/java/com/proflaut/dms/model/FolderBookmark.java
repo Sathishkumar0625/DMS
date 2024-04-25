@@ -9,5 +9,6 @@ public class FolderBookmark {
 	private String folderSize;
 	private String bookmarkedBy;
 	private String bookmarkDateAndTime;
+	private String folderCreatedDateAndTime;
 
 }

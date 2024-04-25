@@ -64,4 +64,6 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	@Query("SELECT p FROM ProfDocEntity p WHERE p.folderId IN :folderIds")
 	List<ProfDocEntity> findByFolderIdIn(List<Integer> folderIds);
 
+	List<ProfDocEntity> findByIdIn(List<Integer> fileIds);
+
 }

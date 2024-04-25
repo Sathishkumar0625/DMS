@@ -1,8 +1,10 @@
 package com.proflaut.dms.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -88,6 +90,42 @@ public class HomeServiceImpl {
 		return response;
 	}
 
+//	public BookmarkResponse findAll(String token) {
+//		BookmarkResponse bookmarkResponse = new BookmarkResponse();
+//		try {
+//			ProfUserPropertiesEntity profUserPropertiesEntity = userPropertiesRepository.findByToken(token);
+//			if (profUserPropertiesEntity != null && !profUserPropertiesEntity.getToken().isBlank()) {
+//				// Fetch file bookmarks for the user
+//				List<ProfFileBookmarkEntity> fileBookmarkEntities = fileBookmarkRepository
+//						.findByBookmarkedBy(profUserPropertiesEntity.getUserName());
+//				List<Integer> fileIds = fileBookmarkEntities.stream().map(ProfFileBookmarkEntity::getFileId)
+//						.collect(Collectors.toList());
+//				for (int integer : fileIds) {
+//					ProfDocEntity fileSize = docUploadRepository.findById(integer);
+//					List<FileBookmark> fileBookmarks = homeHelper.mapToFileBookmarks(fileBookmarkEntities,fileSize);
+//					bookmarkResponse.setFiles(fileBookmarks);
+//				}
+//
+//				// Fetch folder bookmarks for the user
+//				List<ProfFolderBookMarkEntity> folderBookmarkEntities = bookmarkRepository
+//						.findByBookMarkedBy(profUserPropertiesEntity.getUserName());
+//				List<Integer> folderIds = folderBookmarkEntities.stream().map(ProfFolderBookMarkEntity::getFolderId)
+//						.collect(Collectors.toList());
+//				for (Integer integer : folderIds) {
+//					List<ProfDocEntity> folderSize = docUploadRepository.findByFolderId(integer);
+//					long size = getTotalFileSize(folderSize);
+//					List<FolderBookmark> folderBookmarks = homeHelper.mapToFolderBookmarks(folderBookmarkEntities,
+//							size);
+//
+//					bookmarkResponse.setFolders(folderBookmarks);
+//
+//				}
+//			}
+//		} catch (Exception e) {
+//			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+//		}
+//		return bookmarkResponse;
+//	}
 	public BookmarkResponse findAll(String token) {
 		BookmarkResponse bookmarkResponse = new BookmarkResponse();
 		try {
@@ -96,43 +134,25 @@ public class HomeServiceImpl {
 				// Fetch file bookmarks for the user
 				List<ProfFileBookmarkEntity> fileBookmarkEntities = fileBookmarkRepository
 						.findByBookmarkedBy(profUserPropertiesEntity.getUserName());
-				List<Integer> fileIds = fileBookmarkEntities.stream().map(ProfFileBookmarkEntity::getFileId)
-						.collect(Collectors.toList());
-				for (int integer : fileIds) {
-					ProfDocEntity fileSize = docUploadRepository.findById(integer);
-					List<FileBookmark> fileBookmarks = homeHelper.mapToFileBookmarks(fileBookmarkEntities,fileSize);
-					bookmarkResponse.setFiles(fileBookmarks);
-				}
 
 				// Fetch folder bookmarks for the user
 				List<ProfFolderBookMarkEntity> folderBookmarkEntities = bookmarkRepository
 						.findByBookMarkedBy(profUserPropertiesEntity.getUserName());
-				List<Integer> folderIds = folderBookmarkEntities.stream().map(ProfFolderBookMarkEntity::getFolderId)
-						.collect(Collectors.toList());
-				for (Integer integer : folderIds) {
-					List<ProfDocEntity> folderSize = docUploadRepository.findByFolderId(integer);
-					long size = getTotalFileSize(folderSize);
-					List<FolderBookmark> folderBookmarks = homeHelper.mapToFolderBookmarks(folderBookmarkEntities,
-							size);
 
-					bookmarkResponse.setFolders(folderBookmarks);
+				// Map file sizes to file bookmark entities
+				Map<Integer, ProfDocEntity> fileSizeMap = homeHelper.getFileSizesForFiles(fileBookmarkEntities);
 
-				}
+				// Set file bookmarks
+				List<FileBookmark> fileBookmarks = homeHelper.mapToFileBookmarks(fileBookmarkEntities, fileSizeMap);
+				bookmarkResponse.setFiles(fileBookmarks);
+
+				// Set folder bookmarks with total folder sizes
+				List<FolderBookmark> folderBookmarks = homeHelper.mapToFolderBookmarks(folderBookmarkEntities);
+				bookmarkResponse.setFolders(folderBookmarks);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return bookmarkResponse;
-	}
-
-	public long getTotalFileSize(List<ProfDocEntity> docEntities) {
-		long totalFileSize = 0;
-		for (ProfDocEntity docEntity : docEntities) {
-			String fileSizeString = docEntity.getFileSize();
-			String numericValue = fileSizeString.replaceAll("[^\\d.]", "");
-			long fileSize = Long.parseLong(numericValue);
-			totalFileSize += fileSize;
-		}
-		return totalFileSize;
 	}
 }

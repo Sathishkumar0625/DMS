@@ -10,4 +10,5 @@ public class FileBookmark {
 	private String fileSize;
 	private String bookmarkedBy;
 	private String bookmarkDateAndTime;
+	private String fileUploadeddateAndTime;
 }
