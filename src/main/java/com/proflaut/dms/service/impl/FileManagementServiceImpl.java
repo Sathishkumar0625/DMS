@@ -2,6 +2,8 @@ package com.proflaut.dms.service.impl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +25,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
+
+import javax.imageio.ImageIO;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -201,7 +206,7 @@ public class FileManagementServiceImpl {
 					.findByFolderId(docEntity.getFolderId());
 			ProfMountPointEntity mountPointEntity = mountPointRepository
 					.findById(folderMappingEntity.getMountPointId());
-			String decrypted = fileHelper.retrieveDocument(docEntity,mountPointEntity);
+			String decrypted = fileHelper.retrieveDocument(docEntity, mountPointEntity);
 			if (!org.springframework.util.StringUtils.isEmpty(decrypted)) {
 				fileRetreiveByResponse.setImage(decrypted);
 				fileRetreiveByResponse.setExtention(docEntity.getExtention());
@@ -348,6 +353,24 @@ public class FileManagementServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return emailShareResponse;
+	}
+
+	public ImageResponse converToImage() {
+		ImageResponse imageResponse = new ImageResponse();
+		try {
+			File file = new File("C:\\Users\\BILLPC01\\Downloads\\220000917978_UID.pdf");
+			PDDocument document = PDDocument.load(file);
+
+			PDFRenderer renderer = new PDFRenderer(document);
+
+			BufferedImage image = renderer.renderImageWithDPI(0, 120);
+
+			ImageIO.write(image, "JPEG", new File("C:\\\\Users\\\\BILLPC01\\\\Downloads\\myimage.jpg"));
+			imageResponse.setSharpenImage("SUCCESS");
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return imageResponse;
 	}
 
 }

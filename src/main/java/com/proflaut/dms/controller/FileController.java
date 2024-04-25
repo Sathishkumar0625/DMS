@@ -273,4 +273,21 @@ public class FileController {
 
 	}
 
+	@PostMapping("/compression")
+	public ResponseEntity<ImageResponse> compression() {
+		ImageResponse imageResponse = null;
+		try {
+			imageResponse = fileManagementServiceImpl.converToImage();
+			if (imageResponse != null) {
+				return new ResponseEntity<>(imageResponse, HttpStatus.OK);
+
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }

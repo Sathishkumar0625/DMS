@@ -60,4 +60,8 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 
 	List<ProfDocEntity> getById(int i);
 
+	Long getSumFileSizeByFolderId(String folderId);
+	@Query("SELECT p FROM ProfDocEntity p WHERE p.folderId IN :folderIds")
+	List<ProfDocEntity> findByFolderIdIn(List<Integer> folderIds);
+
 }
