@@ -91,4 +91,40 @@ public class HomeController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PostMapping("/saveRecentFolders")
+	public ResponseEntity<Map<String, String>> addRecentFolders(@RequestBody FolderBookmarkRequest bookmarkRequest,
+			@RequestHeader("token") String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response = homeServiceImpl.addRecentFol(bookmarkRequest, token);
+			if (response.get(DMSConstant.STATUS).equals(DMSConstant.SUCCESS)) {
+				return ResponseEntity.ok(response);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@PostMapping("/saveRecentFiles")
+	public ResponseEntity<Map<String, String>> addRecentFiles(@RequestBody FileBookMarkRequest fileBookmarkRequest,
+			@RequestHeader("token") String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response = homeServiceImpl.addRecentFil(fileBookmarkRequest, token);
+			if (response.get(DMSConstant.STATUS).equals(DMSConstant.SUCCESS)) {
+				return ResponseEntity.ok(response);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+
 }

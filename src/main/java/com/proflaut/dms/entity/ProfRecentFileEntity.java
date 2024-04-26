@@ -11,21 +11,20 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "PROF_FILE_BOOKMARK")
-public class ProfFileBookmarkEntity {
+@Table(name = "PROF_RECENT_FILE")
+public class ProfRecentFileEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private int id;
-	@Column(name = "FILE_NAME")
-	private String fileName;
 	@Column(name = "FILE_ID")
 	private int fileId;
-	@Column(name = "BOOKMARK_DATE_AND_TIME")
-	private String bookmarkDateAndTime;
-	@Column(name = "BOOKMARKED_BY")
-	private String bookmarkedBy;
-	@Column(name = "BOOKMARK")
-	private String bookmark;
+	@Column(name = "FILE_NAME")
+	private String fileName;
+	@Column(name = "ADDED_ON")
+	private String addedOn;
+	@Column(name = "ADDED_BY")
+	private String addedBy;
+
 }

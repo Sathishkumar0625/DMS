@@ -14,4 +14,5 @@ public interface BookmarkRepository extends JpaRepository<ProfFolderBookMarkEnti
 
 	ProfFolderBookMarkEntity findByFolderId(int id);
 
+
 }

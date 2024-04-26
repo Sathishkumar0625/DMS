@@ -15,6 +15,8 @@ import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
+import com.proflaut.dms.entity.ProfRecentFileEntity;
+import com.proflaut.dms.entity.ProfRecentFoldersEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FileBookmark;
@@ -48,6 +50,7 @@ public class HomeHelper {
 		bookMarkEntity.setFolderName(bookmarkRequest.getFolderName());
 		bookMarkEntity.setBookamrkDateAndTime(formatCurrentDateTime());
 		bookMarkEntity.setBookMarkedBy(propertiesEntity.getUserName());
+		bookMarkEntity.setBookmark(bookmarkRequest.getBookmark());
 		return bookMarkEntity;
 	}
 
@@ -58,6 +61,7 @@ public class HomeHelper {
 		bookMarkEntity.setFileId(Integer.parseInt(fileBookMarkRequest.getFileId()));
 		bookMarkEntity.setBookmarkDateAndTime(formatCurrentDateTime());
 		bookMarkEntity.setBookmarkedBy(propertiesEntity.getUserName());
+		bookMarkEntity.setBookmark("YES");
 		return bookMarkEntity;
 	}
 
@@ -114,6 +118,26 @@ public class HomeHelper {
 			totalFileSize += fileSize;
 		}
 		return totalFileSize;
+	}
+
+	public ProfRecentFoldersEntity convertRequestToRecentEntity(FolderBookmarkRequest bookmarkRequest,
+			ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfRecentFoldersEntity profRecentFoldersEntity = new ProfRecentFoldersEntity();
+		profRecentFoldersEntity.setFolderName(bookmarkRequest.getFolderName());
+		profRecentFoldersEntity.setFolderId(bookmarkRequest.getFolderId());
+		profRecentFoldersEntity.setAddedBy(profUserPropertiesEntity.getUserName());
+		profRecentFoldersEntity.setAddedOn(formatCurrentDateTime());
+		return profRecentFoldersEntity;
+	}
+
+	public ProfRecentFileEntity convertRequestToRecentFileEntity(FileBookMarkRequest fileBookmarkRequest,
+			ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfRecentFileEntity profRecentFileEntity = new ProfRecentFileEntity();
+		profRecentFileEntity.setFileName(fileBookmarkRequest.getFileName());
+		profRecentFileEntity.setFileId(Integer.parseInt(fileBookmarkRequest.getFileId()));
+		profRecentFileEntity.setAddedBy(profUserPropertiesEntity.getUserName());
+		profRecentFileEntity.setAddedOn(formatCurrentDateTime());
+		return profRecentFileEntity;
 	}
 
 }

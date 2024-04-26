@@ -27,4 +27,6 @@ public class DMSConstant {
 	public static final String PRINTSTACKTRACE = "An error occurred: {}";
 	public static final String OTP_VERIFIED = "OTP verified Successfully";
 	public static final String INVALID_OTP = "Invalid OTP";
+	public static final String STATUS = "Status";
+	public static final String STATUSFAILURE = "Failure";
 }

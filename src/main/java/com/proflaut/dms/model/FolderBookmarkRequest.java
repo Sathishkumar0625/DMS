@@ -6,4 +6,5 @@ import lombok.Data;
 public class FolderBookmarkRequest {
 	private String folderId;
 	private String folderName;
+	private String bookmark;
 }
