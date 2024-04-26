@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
+import com.proflaut.dms.model.SearchFilesResponse;
 import com.proflaut.dms.repository.BookmarkRepository;
 import com.proflaut.dms.repository.FileBookmarkRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
@@ -236,5 +239,20 @@ public class HomeServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return allRecentFilesResponses;
+	}
+
+	public List<SearchFilesResponse> findAllSearchFiles(String fileName) {
+		List<SearchFilesResponse> filesResponses = new ArrayList<>();
+		try {
+			List<ProfDocEntity> profDocEntity = docUploadRepository.findByDocNameLike("%" + fileName + "%");
+			for (ProfDocEntity profDocEnt : profDocEntity) {
+				SearchFilesResponse filesResponse=homeHelper.convertToSearchFilesResponse(profDocEnt);
+				filesResponses.add(filesResponse);
+			}
+
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return filesResponses;
 	}
 }

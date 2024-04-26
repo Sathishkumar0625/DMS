@@ -24,6 +24,7 @@ import com.proflaut.dms.model.FolderBookmarkRequest;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
+import com.proflaut.dms.model.SearchFilesResponse;
 import com.proflaut.dms.service.impl.HomeServiceImpl;
 
 @RestController
@@ -159,6 +160,19 @@ public class HomeController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-
+	@GetMapping("/getAllRecentFiles/{fileName}")
+	public ResponseEntity<List<SearchFilesResponse>> getAllSearchfile (@PathVariable String fileName) {
+		List<SearchFilesResponse> searchFilesResponses = null;
+		try {
+			searchFilesResponses = homeServiceImpl.findAllSearchFiles(fileName);
+			if (!searchFilesResponses.isEmpty()) {
+				return new ResponseEntity<>(searchFilesResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(searchFilesResponses, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

@@ -6,8 +6,8 @@ import lombok.Data;
 public class GetAllRecentFilesResponse {
 	
 	private int id;
-	private int fileId;
-	private String fileName;
+	private int ids;
+	private String name;
 	private String addedOn;
 	private String addedBy;
 

@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class GetAllRecentFolderResponse {
 	private int id;
-	private String folderId;
-	private String folderName;
+	private String ids;
+	private String name;
 	private String addedBy;
 	private String addedOn;
 }

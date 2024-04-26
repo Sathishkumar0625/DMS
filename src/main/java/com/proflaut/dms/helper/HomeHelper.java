@@ -26,6 +26,7 @@ import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
+import com.proflaut.dms.model.SearchFilesResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 
@@ -175,19 +176,25 @@ public class HomeHelper {
 		folderResponse.setId(profRecentFolderPropertyEntity.getId());
 		folderResponse.setAddedBy(profRecentFolderPropertyEntity.getAddedBy());
 		folderResponse.setAddedOn(profRecentFolderPropertyEntity.getAddedOn());
-		folderResponse.setFolderId(profRecentFolderPropertyEntity.getFolderId());
-		folderResponse.setFolderName(profRecentFolderPropertyEntity.getFolderName());
+		folderResponse.setIds(profRecentFolderPropertyEntity.getFolderId());
+		folderResponse.setName(profRecentFolderPropertyEntity.getFolderName());
 		return folderResponse;
 	}
 
 	public GetAllRecentFilesResponse convertFilePropertyToResponse(ProfRecentFilePropertyEntity filePropertyEntity) {
 		GetAllRecentFilesResponse filesResponse = new GetAllRecentFilesResponse();
-		filesResponse.setFileName(filePropertyEntity.getFileName());
-		filesResponse.setFileId(filePropertyEntity.getFileId());
+		filesResponse.setName(filePropertyEntity.getFileName());
+		filesResponse.setIds(filePropertyEntity.getFileId());
 		filesResponse.setAddedBy(filePropertyEntity.getAddedBy());
 		filesResponse.setAddedOn(filePropertyEntity.getAddedOn());
 		filesResponse.setId(filePropertyEntity.getId());
 		return filesResponse;
+	}
+
+	public SearchFilesResponse convertToSearchFilesResponse(ProfDocEntity profDocEnt) {
+		SearchFilesResponse response=new SearchFilesResponse();
+		
+		return response;
 	}
 
 }

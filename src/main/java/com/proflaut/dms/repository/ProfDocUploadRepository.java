@@ -1,5 +1,6 @@
 package com.proflaut.dms.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.model.FileRequest;
 
 @Repository
@@ -65,5 +67,10 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	List<ProfDocEntity> findByFolderIdIn(List<Integer> folderIds);
 
 	List<ProfDocEntity> findByIdIn(List<Integer> fileIds);
+
+
+	List<ProfDocEntity> findByDocNameLike(String docName);
+
+
 
 }
