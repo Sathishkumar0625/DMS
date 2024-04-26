@@ -1,11 +1,15 @@
 package com.proflaut.dms.model;
 
+import lombok.Data;
+
+@Data
 public class Files {
 	private String docName;
 	private String fileName;
 	private int id;
 	private String createdBy;
 	private String createdAt;
+	private String bookmark;
 
 	public int getId() {
 		return id;

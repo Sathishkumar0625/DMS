@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class FileBookmark {
 
-	private String fileName;
+	private String name;
 	private String fileId;
 	private String size;
 	private String bookmarkedBy;

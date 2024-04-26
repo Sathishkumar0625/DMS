@@ -10,4 +10,6 @@ public interface FileBookmarkRepository extends JpaRepository<ProfFileBookmarkEn
 
 	List<ProfFileBookmarkEntity> findByBookmarkedBy(String userName);
 
+	ProfFileBookmarkEntity findByFileId(Integer id);
+
 }

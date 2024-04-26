@@ -5,6 +5,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import lombok.Data;
+
+@Data
 @JsonInclude(Include.NON_NULL)
 public class FolderPathResponse {
 	private String folderPath;
@@ -16,6 +19,7 @@ public class FolderPathResponse {
 	private String createdAt;
 	private String view;
 	private String write;
+	private String bookmark;
 	private List<Folders> folders;
 
 	public List<Folders> getFolders() {

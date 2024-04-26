@@ -21,6 +21,8 @@ import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
+import com.proflaut.dms.entity.ProfFileBookmarkEntity;
+import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
 import com.proflaut.dms.entity.ProfUserGroupMappingEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileResponse;
@@ -29,6 +31,8 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
+import com.proflaut.dms.repository.BookmarkRepository;
+import com.proflaut.dms.repository.FileBookmarkRepository;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
@@ -40,7 +44,7 @@ import com.proflaut.dms.service.impl.MountPointServiceImpl;
 
 @Component
 public class FolderHelper {
-	
+
 	FolderRepository folderRepository;
 	@Value("${create.folderlocation}")
 	private String folderLocation;
@@ -52,15 +56,17 @@ public class FolderHelper {
 	ProfAccessUserMappingRepository accessUserMappingRepository;
 	ProfAccessRightRepository accessRightRepository;
 	MountPointServiceImpl mountPointServiceImpl;
-	
-	
+	BookmarkRepository bookmarkRepository;
+	FileBookmarkRepository fileBookmarkRepository;
+
 	@Autowired
 	public FolderHelper(FolderRepository folderRepository, FolderRepository folderRepo,
 			ProfUserPropertiesRepository profUserPropertiesRepository, ProfMetaDataRepository dataRepository,
 			ProfUserGroupMappingRepository groupMappingRepository,
 			ProfAccessGroupMappingRepository accessGroupMappingRepository,
 			ProfAccessUserMappingRepository accessUserMappingRepository,
-			ProfAccessRightRepository accessRightRepository, MountPointServiceImpl mountPointServiceImpl) {
+			ProfAccessRightRepository accessRightRepository, MountPointServiceImpl mountPointServiceImpl,
+			FileBookmarkRepository fileBookmarkRepository, BookmarkRepository bookmarkRepository) {
 		this.folderRepository = folderRepository;
 		this.folderRepo = folderRepo;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
@@ -70,6 +76,8 @@ public class FolderHelper {
 		this.accessUserMappingRepository = accessUserMappingRepository;
 		this.accessRightRepository = accessRightRepository;
 		this.mountPointServiceImpl = mountPointServiceImpl;
+		this.bookmarkRepository = bookmarkRepository;
+		this.fileBookmarkRepository = fileBookmarkRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(FolderHelper.class);
@@ -80,8 +88,7 @@ public class FolderHelper {
 		return currentDateTime.format(formatter);
 	}
 
-	public FolderEntity convertFOtoBO(FolderFO folderFO, 
-			ProfUserPropertiesEntity propertiesEntity) {
+	public FolderEntity convertFOtoBO(FolderFO folderFO, ProfUserPropertiesEntity propertiesEntity) {
 
 		FolderEntity ent = new FolderEntity();
 		ent.setFolderName(folderFO.getFolderName());
@@ -94,6 +101,7 @@ public class FolderHelper {
 	}
 
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity) {
+		ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
 		Folders folders = new Folders();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
@@ -103,6 +111,11 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
+		if (bookMarkEntity.getFolderName().isEmpty()) {
+			folders.setBookmark("NO");
+		} else {
+			folders.setBookmark("YES");
+		}
 		return folders;
 	}
 
@@ -199,12 +212,18 @@ public class FolderHelper {
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
 		for (ProfDocEntity profDocEntity : docEntity) {
+			ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository.findByFileId(profDocEntity.getId());
 			Files file = new Files();
 			file.setDocName(profDocEntity.getDocName());
 			file.setFileName(profDocEntity.getDocPath());
 			file.setId(profDocEntity.getId());
 			file.setCreatedAt(profDocEntity.getUploadTime());
 			file.setCreatedBy(profDocEntity.getCreatedBy());
+			if (fileBookmarkEntity.getFileName().isEmpty()) {
+				file.setBookmark("NO");
+			} else {
+				file.setBookmark("YES");
+			}
 			files.add(file);
 		}
 		folders.setFiles(files);
@@ -217,6 +236,7 @@ public class FolderHelper {
 		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
 
 		for (FolderEntity folderEntity : entity) {
+			ProfFolderBookMarkEntity folderBookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
 			FolderPathResponse folderPathResponse = new FolderPathResponse();
 			folderPathResponse.setFolderPath(folderEntity.getFolderPath());
 			folderPathResponse.setIsParent(folderEntity.getIsParent());
@@ -225,6 +245,11 @@ public class FolderHelper {
 			folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 			folderPathResponse.setFolderName(folderEntity.getFolderName());
 			folderPathResponse.setMetaId(folderEntity.getMetaId());
+			if (folderBookMarkEntity.getFolderName().isEmpty()) {
+				folderPathResponse.setBookmark("NO");
+			} else {
+				folderPathResponse.setBookmark("YES");
+			}
 
 			// Find the corresponding access rights for this folder
 			Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()

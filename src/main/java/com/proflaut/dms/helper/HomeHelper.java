@@ -74,7 +74,7 @@ public class HomeHelper {
 		for (ProfFileBookmarkEntity entity : fileBookmarkEntities) {
 			ProfDocEntity fileSize = fileSizeMap.get(entity.getFileId());
 			FileBookmark fileBookmark = new FileBookmark();
-			fileBookmark.setFileName(entity.getFileName());
+			fileBookmark.setName(entity.getFileName());
 			fileBookmark.setFileId(String.valueOf(entity.getFileId()));
 			fileBookmark.setBookmarkedBy(entity.getBookmarkedBy());
 			fileBookmark.setBookmarkDateAndTime(entity.getBookmarkDateAndTime());
@@ -95,7 +95,7 @@ public class HomeHelper {
 			FolderEntity folderEntity = folderRepository.findById(entity.getFolderId());
 			FolderBookmark folderBookmark = new FolderBookmark();
 			folderBookmark.setFolderId(String.valueOf(entity.getFolderId()));
-			folderBookmark.setFolderName(entity.getFolderName());
+			folderBookmark.setName(entity.getFolderName());
 			folderBookmark.setBookmarkedBy(entity.getBookMarkedBy());
 			folderBookmark.setBookmarkDateAndTime(entity.getBookamrkDateAndTime());
 			folderBookmark.setSize(totalSizeKB + "kb");
