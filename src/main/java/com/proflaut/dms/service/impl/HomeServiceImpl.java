@@ -1,5 +1,6 @@
 package com.proflaut.dms.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
 import com.proflaut.dms.entity.ProfRecentFileEntity;
+import com.proflaut.dms.entity.ProfRecentFilePropertyEntity;
+import com.proflaut.dms.entity.ProfRecentFolderPropertyEntity;
 import com.proflaut.dms.entity.ProfRecentFoldersEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.helper.HomeHelper;
@@ -20,10 +23,14 @@ import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FileBookmark;
 import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.GetAllRecentFilesResponse;
+import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.repository.BookmarkRepository;
 import com.proflaut.dms.repository.FileBookmarkRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfRecentFileRepository;
+import com.proflaut.dms.repository.ProfRecentFilesPropertyRepository;
+import com.proflaut.dms.repository.ProfRecentFoldersPropertyRepository;
 import com.proflaut.dms.repository.ProfRecentFoldersRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
 
@@ -37,12 +44,16 @@ public class HomeServiceImpl {
 	ProfDocUploadRepository docUploadRepository;
 	ProfRecentFoldersRepository profRecentFoldersRepository;
 	ProfRecentFileRepository profRecentFileRepository;
+	ProfRecentFilesPropertyRepository filesPropertyRepository;
+	ProfRecentFoldersPropertyRepository foldersPropertyRepository;
 
 	@Autowired
 	public HomeServiceImpl(HomeHelper homeHelper, BookmarkRepository bookmarkRepository,
 			ProfUserPropertiesRepository userPropertiesRepository, FileBookmarkRepository fileBookmarkRepository,
 			ProfDocUploadRepository docUploadRepository, ProfRecentFoldersRepository profRecentFoldersRepository,
-			ProfRecentFileRepository profRecentFileRepository) {
+			ProfRecentFileRepository profRecentFileRepository,
+			ProfRecentFilesPropertyRepository filesPropertyRepository,
+			ProfRecentFoldersPropertyRepository foldersPropertyRepository) {
 		this.homeHelper = homeHelper;
 		this.bookmarkRepository = bookmarkRepository;
 		this.userPropertiesRepository = userPropertiesRepository;
@@ -50,6 +61,8 @@ public class HomeServiceImpl {
 		this.docUploadRepository = docUploadRepository;
 		this.profRecentFoldersRepository = profRecentFoldersRepository;
 		this.profRecentFileRepository = profRecentFileRepository;
+		this.filesPropertyRepository = filesPropertyRepository;
+		this.foldersPropertyRepository = foldersPropertyRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(HomeServiceImpl.class);
@@ -88,8 +101,8 @@ public class HomeServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
 			if (!propertiesEntity.getToken().isEmpty()) {
 				if (fileBookMarkRequest.getBookmark().equalsIgnoreCase("YES")) {
-					ProfFileBookmarkEntity fileBookMarkEntity = homeHelper.convertRequestToFileEntity(fileBookMarkRequest,
-							propertiesEntity);
+					ProfFileBookmarkEntity fileBookMarkEntity = homeHelper
+							.convertRequestToFileEntity(fileBookMarkRequest, propertiesEntity);
 					fileBookmarkRepository.save(fileBookMarkEntity);
 					response.put("Status", DMSConstant.SUCCESS);
 				} else {
@@ -148,6 +161,17 @@ public class HomeServiceImpl {
 					profUserPropertiesEntity);
 			profRecentFoldersRepository.save(profRecentFoldersEntity);
 			response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			long count = foldersPropertyRepository.count();
+			if (count < 50) {
+				ProfRecentFolderPropertyEntity folderPropertyEntity = homeHelper
+						.convertRequestToFolderProperty(bookmarkRequest, profUserPropertiesEntity);
+				foldersPropertyRepository.save(folderPropertyEntity);
+			} else {
+				foldersPropertyRepository.deleteAll();
+				ProfRecentFolderPropertyEntity folderPropertyEntity = homeHelper
+						.convertRequestToFolderProperty(bookmarkRequest, profUserPropertiesEntity);
+				foldersPropertyRepository.save(folderPropertyEntity);
+			}
 		} catch (Exception e) {
 			response.put(DMSConstant.STATUSFAILURE, DMSConstant.FAILURE);
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
@@ -163,9 +187,54 @@ public class HomeServiceImpl {
 					profUserPropertiesEntity);
 			profRecentFileRepository.save(profRecentFileEntity);
 			response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			long count = filesPropertyRepository.count();
+			if (count < 50) {
+				ProfRecentFilePropertyEntity folderPropertyEntity = homeHelper
+						.convertRequestToRecentFilePropertyEntity(fileBookmarkRequest, profUserPropertiesEntity);
+				filesPropertyRepository.save(folderPropertyEntity);
+			} else {
+				filesPropertyRepository.deleteAll();
+				ProfRecentFilePropertyEntity folderPropertyEntity = homeHelper
+						.convertRequestToRecentFilePropertyEntity(fileBookmarkRequest, profUserPropertiesEntity);
+				filesPropertyRepository.save(folderPropertyEntity);
+			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return response;
+	}
+
+	public List<GetAllRecentFolderResponse> findAllRecentFolders(String token) {
+		List<GetAllRecentFolderResponse> allRecentFolderResponses = new ArrayList<>();
+		try {
+			List<ProfRecentFolderPropertyEntity> folderPropertyEntites = foldersPropertyRepository.findAll();
+			if (!folderPropertyEntites.isEmpty()) {
+				for (ProfRecentFolderPropertyEntity profRecentFolderPropertyEntity : folderPropertyEntites) {
+					GetAllRecentFolderResponse folderResponse = homeHelper
+							.convertFolderPropertyToResponse(profRecentFolderPropertyEntity);
+					allRecentFolderResponses.add(folderResponse);
+				}
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return allRecentFolderResponses;
+	}
+
+	public List<GetAllRecentFilesResponse> findAllRecentFiles() {
+		List<GetAllRecentFilesResponse> allRecentFilesResponses = new ArrayList<>();
+		try {
+			List<ProfRecentFilePropertyEntity> filerPropertyEntites = filesPropertyRepository.findAll();
+			if (!filerPropertyEntites.isEmpty()) {
+				for (ProfRecentFilePropertyEntity filePropertyEntity : filerPropertyEntites) {
+					GetAllRecentFilesResponse folderResponse = homeHelper
+							.convertFilePropertyToResponse(filePropertyEntity);
+					allRecentFilesResponses.add(folderResponse);
+				}
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return allRecentFilesResponses;
 	}
 }

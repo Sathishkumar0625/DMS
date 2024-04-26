@@ -16,12 +16,16 @@ import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
 import com.proflaut.dms.entity.ProfRecentFileEntity;
+import com.proflaut.dms.entity.ProfRecentFilePropertyEntity;
+import com.proflaut.dms.entity.ProfRecentFolderPropertyEntity;
 import com.proflaut.dms.entity.ProfRecentFoldersEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FileBookmark;
 import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.GetAllRecentFilesResponse;
+import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 
@@ -143,6 +147,47 @@ public class HomeHelper {
 		profRecentFileEntity.setAddedBy(profUserPropertiesEntity.getUserName());
 		profRecentFileEntity.setAddedOn(formatCurrentDateTime());
 		return profRecentFileEntity;
+	}
+
+	public ProfRecentFolderPropertyEntity convertRequestToFolderProperty(FolderBookmarkRequest bookmarkRequest,
+			ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfRecentFolderPropertyEntity folderPropertyEntity = new ProfRecentFolderPropertyEntity();
+		folderPropertyEntity.setFolderName(bookmarkRequest.getFolderName());
+		folderPropertyEntity.setFolderId(bookmarkRequest.getFolderId());
+		folderPropertyEntity.setAddedBy(profUserPropertiesEntity.getUserName());
+		folderPropertyEntity.setAddedOn(formatCurrentDateTime());
+		return folderPropertyEntity;
+	}
+
+	public ProfRecentFilePropertyEntity convertRequestToRecentFilePropertyEntity(
+			FileBookMarkRequest fileBookmarkRequest, ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfRecentFilePropertyEntity filePropertyEntity = new ProfRecentFilePropertyEntity();
+		filePropertyEntity.setFileName(fileBookmarkRequest.getFileName());
+		filePropertyEntity.setFileId(Integer.parseInt(fileBookmarkRequest.getFileId()));
+		filePropertyEntity.setAddedBy(profUserPropertiesEntity.getUserName());
+		filePropertyEntity.setAddedOn(formatCurrentDateTime());
+		return filePropertyEntity;
+	}
+
+	public GetAllRecentFolderResponse convertFolderPropertyToResponse(
+			ProfRecentFolderPropertyEntity profRecentFolderPropertyEntity) {
+		GetAllRecentFolderResponse folderResponse = new GetAllRecentFolderResponse();
+		folderResponse.setId(profRecentFolderPropertyEntity.getId());
+		folderResponse.setAddedBy(profRecentFolderPropertyEntity.getAddedBy());
+		folderResponse.setAddedOn(profRecentFolderPropertyEntity.getAddedOn());
+		folderResponse.setFolderId(profRecentFolderPropertyEntity.getFolderId());
+		folderResponse.setFolderName(profRecentFolderPropertyEntity.getFolderName());
+		return folderResponse;
+	}
+
+	public GetAllRecentFilesResponse convertFilePropertyToResponse(ProfRecentFilePropertyEntity filePropertyEntity) {
+		GetAllRecentFilesResponse filesResponse = new GetAllRecentFilesResponse();
+		filesResponse.setFileName(filePropertyEntity.getFileName());
+		filesResponse.setFileId(filePropertyEntity.getFileId());
+		filesResponse.setAddedBy(filePropertyEntity.getAddedBy());
+		filesResponse.setAddedOn(filePropertyEntity.getAddedOn());
+		filesResponse.setId(filePropertyEntity.getId());
+		return filesResponse;
 	}
 
 }

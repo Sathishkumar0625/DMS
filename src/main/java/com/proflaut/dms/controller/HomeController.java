@@ -21,6 +21,8 @@ import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.BookmarkResponse;
 import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.GetAllRecentFilesResponse;
+import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.service.impl.HomeServiceImpl;
 
@@ -77,7 +79,7 @@ public class HomeController {
 	}
 
 	@GetMapping("/getAllFilesAndFolders")
-	public ResponseEntity<BookmarkResponse> getAllGroupInfo(@RequestHeader("token") String token) {
+	public ResponseEntity<BookmarkResponse> getAllFilesFolders(@RequestHeader("token") String token) {
 		BookmarkResponse bookmarkResponse = null;
 		try {
 			bookmarkResponse = homeServiceImpl.findAll(token);
@@ -123,6 +125,38 @@ public class HomeController {
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@GetMapping("/getAllRecentFolders")
+	public ResponseEntity<List<GetAllRecentFolderResponse>> getAllRecentFolders (@RequestHeader("token") String token) {
+		List<GetAllRecentFolderResponse> getAllRecentFolderResponse = null;
+		try {
+			getAllRecentFolderResponse = homeServiceImpl.findAllRecentFolders(token);
+			if (!getAllRecentFolderResponse.isEmpty()) {
+				return new ResponseEntity<>(getAllRecentFolderResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(getAllRecentFolderResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/getAllRecentFiles")
+	public ResponseEntity<List<GetAllRecentFilesResponse>> getAllRecentFolders () {
+		List<GetAllRecentFilesResponse> getAllRecentFilesResponse = null;
+		try {
+			getAllRecentFilesResponse = homeServiceImpl.findAllRecentFiles();
+			if (!getAllRecentFilesResponse.isEmpty()) {
+				return new ResponseEntity<>(getAllRecentFilesResponse, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(getAllRecentFilesResponse, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
