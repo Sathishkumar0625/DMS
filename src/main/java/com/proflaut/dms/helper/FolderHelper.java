@@ -97,6 +97,7 @@ public class FolderHelper {
 		ent.setCreatedAt(formatCurrentDateTime());
 		ent.setCreatedBy(propertiesEntity.getUserName());
 		ent.setParentFolderID(Integer.parseInt(folderFO.getParentFolderID()));
+		ent.setStatus("A");
 		return ent;
 	}
 

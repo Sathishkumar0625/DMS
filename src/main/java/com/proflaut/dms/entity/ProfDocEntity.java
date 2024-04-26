@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import lombok.Data;
+
+@Data
 @Entity
 @Table(name = "PROF_DOCUMENT_PROPERTY", indexes = { @Index(columnList = "CREATED_BY") })
 public class ProfDocEntity {
@@ -52,109 +55,7 @@ public class ProfDocEntity {
 
 	@Column(name = "UPLOAD_EXECUTION_TIME")
 	private int uploadExecutionTime;
-
-	public int getUploadExecutionTime() {
-		return uploadExecutionTime;
-	}
-
-	public void setUploadExecutionTime(int uploadExecutionTime) {
-		this.uploadExecutionTime = uploadExecutionTime;
-	}
-
-	public String getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(String fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public int getMetaId() {
-		return metaId;
-	}
-
-	public void setMetaId(int metaId) {
-		this.metaId = metaId;
-	}
-
-	public String getEmilResId() {
-		return emilResId;
-	}
-
-	public void setEmilResId(String emilResId) {
-		this.emilResId = emilResId;
-	}
-
-	public String getIsEmail() {
-		return isEmail;
-	}
-
-	public void setIsEmail(String isEmail) {
-		this.isEmail = isEmail;
-	}
-
-	public String getExtention() {
-		return extention;
-	}
-
-	public void setExtention(String extention) {
-		this.extention = extention;
-	}
-
-	public int getFolderId() {
-		return folderId;
-	}
-
-	public void setFolderId(int folderId) {
-		this.folderId = folderId;
-	}
-
-	public String getProspectId() {
-		return prospectId;
-	}
-
-	public void setProspectId(String prospectId) {
-		this.prospectId = prospectId;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public String getUploadTime() {
-		return uploadTime;
-	}
-
-	public void setUploadTime(String uploadTime) {
-		this.uploadTime = uploadTime;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getDocName() {
-		return docName;
-	}
-
-	public void setDocName(String docName) {
-		this.docName = docName;
-	}
-
-	public String getDocPath() {
-		return docPath;
-	}
-
-	public void setDocPath(String docPath) {
-		this.docPath = docPath;
-	}
-
+	
+	@Column(name="STATUS")
+	private String status;
 }

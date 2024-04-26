@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
+import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
@@ -28,8 +29,10 @@ import com.proflaut.dms.model.FolderBookmarkRequest;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
+import com.proflaut.dms.model.SearchFolderResponse;
 import com.proflaut.dms.repository.BookmarkRepository;
 import com.proflaut.dms.repository.FileBookmarkRepository;
+import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfRecentFileRepository;
 import com.proflaut.dms.repository.ProfRecentFilesPropertyRepository;
@@ -49,6 +52,7 @@ public class HomeServiceImpl {
 	ProfRecentFileRepository profRecentFileRepository;
 	ProfRecentFilesPropertyRepository filesPropertyRepository;
 	ProfRecentFoldersPropertyRepository foldersPropertyRepository;
+	FolderRepository folderRepository;
 
 	@Autowired
 	public HomeServiceImpl(HomeHelper homeHelper, BookmarkRepository bookmarkRepository,
@@ -56,7 +60,7 @@ public class HomeServiceImpl {
 			ProfDocUploadRepository docUploadRepository, ProfRecentFoldersRepository profRecentFoldersRepository,
 			ProfRecentFileRepository profRecentFileRepository,
 			ProfRecentFilesPropertyRepository filesPropertyRepository,
-			ProfRecentFoldersPropertyRepository foldersPropertyRepository) {
+			ProfRecentFoldersPropertyRepository foldersPropertyRepository,FolderRepository folderRepository) {
 		this.homeHelper = homeHelper;
 		this.bookmarkRepository = bookmarkRepository;
 		this.userPropertiesRepository = userPropertiesRepository;
@@ -66,6 +70,7 @@ public class HomeServiceImpl {
 		this.profRecentFileRepository = profRecentFileRepository;
 		this.filesPropertyRepository = filesPropertyRepository;
 		this.foldersPropertyRepository = foldersPropertyRepository;
+		this.folderRepository=folderRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(HomeServiceImpl.class);
@@ -210,7 +215,7 @@ public class HomeServiceImpl {
 	public List<GetAllRecentFolderResponse> findAllRecentFolders(String token) {
 		List<GetAllRecentFolderResponse> allRecentFolderResponses = new ArrayList<>();
 		try {
-			List<ProfRecentFolderPropertyEntity> folderPropertyEntites = foldersPropertyRepository.findAll();
+			List<ProfRecentFolderPropertyEntity> folderPropertyEntites = foldersPropertyRepository.findAllByOrderByIdDesc();
 			if (!folderPropertyEntites.isEmpty()) {
 				for (ProfRecentFolderPropertyEntity profRecentFolderPropertyEntity : folderPropertyEntites) {
 					GetAllRecentFolderResponse folderResponse = homeHelper
@@ -227,7 +232,7 @@ public class HomeServiceImpl {
 	public List<GetAllRecentFilesResponse> findAllRecentFiles() {
 		List<GetAllRecentFilesResponse> allRecentFilesResponses = new ArrayList<>();
 		try {
-			List<ProfRecentFilePropertyEntity> filerPropertyEntites = filesPropertyRepository.findAll();
+			List<ProfRecentFilePropertyEntity> filerPropertyEntites = filesPropertyRepository.findAllByOrderByIdDesc();
 			if (!filerPropertyEntites.isEmpty()) {
 				for (ProfRecentFilePropertyEntity filePropertyEntity : filerPropertyEntites) {
 					GetAllRecentFilesResponse folderResponse = homeHelper
@@ -246,7 +251,7 @@ public class HomeServiceImpl {
 		try {
 			List<ProfDocEntity> profDocEntity = docUploadRepository.findByDocNameLike("%" + fileName + "%");
 			for (ProfDocEntity profDocEnt : profDocEntity) {
-				SearchFilesResponse filesResponse=homeHelper.convertToSearchFilesResponse(profDocEnt);
+				SearchFilesResponse filesResponse = homeHelper.convertToSearchFilesResponse(profDocEnt);
 				filesResponses.add(filesResponse);
 			}
 
@@ -254,5 +259,19 @@ public class HomeServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return filesResponses;
+	}
+
+	public List<SearchFolderResponse> findAllSearchFolders(String folderName) {
+		List<SearchFolderResponse> folderResponses = new ArrayList<>();
+		try {
+			List<FolderEntity> folderEntities = folderRepository.findByFolderNameLike("%" + folderName + "%");
+			for (FolderEntity folderEntity : folderEntities) {
+				SearchFolderResponse folderResponse = homeHelper.convertToSearchFolderResponse(folderEntity);
+				folderResponses.add(folderResponse);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return folderResponses;
 	}
 }

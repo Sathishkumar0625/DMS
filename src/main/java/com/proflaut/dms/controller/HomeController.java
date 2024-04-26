@@ -25,6 +25,7 @@ import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
+import com.proflaut.dms.model.SearchFolderResponse;
 import com.proflaut.dms.service.impl.HomeServiceImpl;
 
 @RestController
@@ -169,6 +170,22 @@ public class HomeController {
 				return new ResponseEntity<>(searchFilesResponses, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(searchFilesResponses, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/getAllSearchFolders/{folderName}")
+	public ResponseEntity<List<SearchFolderResponse>> getAllSearchFlder(@PathVariable String folderName) {
+		List<SearchFolderResponse> searchFoldersResponses = null;
+		try {
+			searchFoldersResponses = homeServiceImpl.findAllSearchFolders(folderName);
+			if (!searchFoldersResponses.isEmpty()) {
+				return new ResponseEntity<>(searchFoldersResponses, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(searchFoldersResponses, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);

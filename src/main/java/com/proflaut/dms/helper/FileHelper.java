@@ -224,6 +224,7 @@ public class FileHelper {
 		ent.setExtention(fileRequest.getExtention());
 		ent.setIsEmail("N");
 		ent.setMetaId(Integer.valueOf(fileRequest.getCreateTableRequests().get(0).getMetadataId()));
+		ent.setStatus("A");
 		return ent;
 	}
 

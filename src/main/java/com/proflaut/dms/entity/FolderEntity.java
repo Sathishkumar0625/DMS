@@ -46,5 +46,7 @@ public class FolderEntity {
 	@Column(name = "CREATED_AT")
 	private String createdAt;
 
+	@Column(name = "STATUS")
+	private String status;
 
 }

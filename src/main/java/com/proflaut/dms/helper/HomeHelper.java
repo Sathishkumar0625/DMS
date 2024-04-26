@@ -27,6 +27,7 @@ import com.proflaut.dms.model.FolderBookmarkRequest;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
+import com.proflaut.dms.model.SearchFolderResponse;
 import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 
@@ -192,9 +193,23 @@ public class HomeHelper {
 	}
 
 	public SearchFilesResponse convertToSearchFilesResponse(ProfDocEntity profDocEnt) {
-		SearchFilesResponse response=new SearchFilesResponse();
-		
+		SearchFilesResponse response = new SearchFilesResponse();
+		response.setFileSize(profDocEnt.getFileSize());
+		response.setCreatedBy(profDocEnt.getCreatedBy());
+		response.setExtention(profDocEnt.getExtention());
+		response.setFileName(profDocEnt.getDocName());
+		response.setUploadedtime(profDocEnt.getUploadTime());
+		response.setId(profDocEnt.getId());
 		return response;
+	}
+
+	public SearchFolderResponse convertToSearchFolderResponse(FolderEntity folderEntity) {
+		SearchFolderResponse folderResponse = new SearchFolderResponse();
+		folderResponse.setFolderName(folderEntity.getFolderName());
+		folderResponse.setCreatedAt(folderEntity.getCreatedAt());
+		folderResponse.setCreatedBy(folderEntity.getCreatedBy());
+		folderResponse.setId(folderEntity.getId());
+		return folderResponse;
 	}
 
 }

@@ -38,4 +38,6 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
 	List<FolderEntity> findByCreatedBy(String userName);
 
+	List<FolderEntity> findByFolderNameLike(String string);
+
 }
