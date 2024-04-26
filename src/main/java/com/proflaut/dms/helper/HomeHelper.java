@@ -76,17 +76,19 @@ public class HomeHelper {
 			Map<Integer, ProfDocEntity> fileSizeMap) {
 		List<FileBookmark> fileBookmarks = new ArrayList<>();
 		for (ProfFileBookmarkEntity entity : fileBookmarkEntities) {
-			ProfDocEntity fileSize = fileSizeMap.get(entity.getFileId());
-			FileBookmark fileBookmark = new FileBookmark();
-			fileBookmark.setName(entity.getFileName());
-			fileBookmark.setFileId(String.valueOf(entity.getFileId()));
-			fileBookmark.setBookmarkedBy(entity.getBookmarkedBy());
-			fileBookmark.setBookmarkDateAndTime(entity.getBookmarkDateAndTime());
-			if (fileSize != null) {
-				fileBookmark.setSize(fileSize.getFileSize());
-				fileBookmark.setFileUploadeddateAndTime(fileSize.getUploadTime());
+			if (entity.getBookmark().equalsIgnoreCase("YES")) {
+				ProfDocEntity fileSize = fileSizeMap.get(entity.getFileId());
+				FileBookmark fileBookmark = new FileBookmark();
+				fileBookmark.setName(entity.getFileName());
+				fileBookmark.setFileId(String.valueOf(entity.getFileId()));
+				fileBookmark.setBookmarkedBy(entity.getBookmarkedBy());
+				fileBookmark.setBookmarkDateAndTime(entity.getBookmarkDateAndTime());
+				if (fileSize != null) {
+					fileBookmark.setSize(fileSize.getFileSize());
+					fileBookmark.setFileUploadeddateAndTime(fileSize.getUploadTime());
+				}
+				fileBookmarks.add(fileBookmark);
 			}
-			fileBookmarks.add(fileBookmark);
 		}
 		return fileBookmarks;
 	}
@@ -94,17 +96,20 @@ public class HomeHelper {
 	public List<FolderBookmark> mapToFolderBookmarks(List<ProfFolderBookMarkEntity> folderBookmarkEntities) {
 		List<FolderBookmark> folderBookmarks = new ArrayList<>();
 		for (ProfFolderBookMarkEntity entity : folderBookmarkEntities) {
-			List<ProfDocEntity> folderFiles = docUploadRepository.findByFolderId(entity.getFolderId());
-			long totalSizeKB = getTotalFileSize(folderFiles);
-			FolderEntity folderEntity = folderRepository.findById(entity.getFolderId());
-			FolderBookmark folderBookmark = new FolderBookmark();
-			folderBookmark.setFolderId(String.valueOf(entity.getFolderId()));
-			folderBookmark.setName(entity.getFolderName());
-			folderBookmark.setBookmarkedBy(entity.getBookMarkedBy());
-			folderBookmark.setBookmarkDateAndTime(entity.getBookamrkDateAndTime());
-			folderBookmark.setSize(totalSizeKB + "kb");
-			folderBookmark.setFolderCreatedDateAndTime(folderEntity.getCreatedAt());
-			folderBookmarks.add(folderBookmark);
+			if (entity.getBookmark().equalsIgnoreCase("YES")) {
+				List<ProfDocEntity> folderFiles = docUploadRepository.findByFolderId(entity.getFolderId());
+				long totalSizeKB = getTotalFileSize(folderFiles);
+				FolderEntity folderEntity = folderRepository.findById(entity.getFolderId());
+				FolderBookmark folderBookmark = new FolderBookmark();
+				folderBookmark.setFolderId(String.valueOf(entity.getFolderId()));
+				folderBookmark.setName(entity.getFolderName());
+				folderBookmark.setBookmarkedBy(entity.getBookMarkedBy());
+				folderBookmark.setBookmarkDateAndTime(entity.getBookamrkDateAndTime());
+				folderBookmark.setSize(totalSizeKB + "kb");
+				folderBookmark.setFolderCreatedDateAndTime(folderEntity.getCreatedAt());
+				folderBookmarks.add(folderBookmark);
+			}
+
 		}
 		return folderBookmarks;
 	}
