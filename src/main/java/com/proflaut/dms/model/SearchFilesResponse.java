@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class SearchFilesResponse {
 	private int id;
-	private String fileName;
+	private String docName;
 	private String extention;
 	private String createdBy;
-	private String uploadedtime;
+	private String uploadtime;
 	private String fileSize;
 }

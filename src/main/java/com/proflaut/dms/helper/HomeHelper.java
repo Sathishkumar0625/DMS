@@ -197,16 +197,16 @@ public class HomeHelper {
 		response.setFileSize(profDocEnt.getFileSize());
 		response.setCreatedBy(profDocEnt.getCreatedBy());
 		response.setExtention(profDocEnt.getExtention());
-		response.setFileName(profDocEnt.getDocName());
-		response.setUploadedtime(profDocEnt.getUploadTime());
+		response.setDocName(profDocEnt.getDocName());
+		response.setUploadtime(profDocEnt.getUploadTime());
 		response.setId(profDocEnt.getId());
 		return response;
 	}
 
 	public SearchFolderResponse convertToSearchFolderResponse(FolderEntity folderEntity) {
 		SearchFolderResponse folderResponse = new SearchFolderResponse();
-		folderResponse.setFolderName(folderEntity.getFolderName());
-		folderResponse.setCreatedAt(folderEntity.getCreatedAt());
+		folderResponse.setDocName(folderEntity.getFolderName());
+		folderResponse.setUploadTime(folderEntity.getCreatedAt());
 		folderResponse.setCreatedBy(folderEntity.getCreatedBy());
 		folderResponse.setId(folderEntity.getId());
 		return folderResponse;

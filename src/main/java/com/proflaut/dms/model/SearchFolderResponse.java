@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class SearchFolderResponse {
 	private int id;
-	private String folderName;
+	private String docName;
 	private String createdBy;
-	private String createdAt;
+	private String uploadTime;
 }

@@ -60,7 +60,7 @@ public class HomeServiceImpl {
 			ProfDocUploadRepository docUploadRepository, ProfRecentFoldersRepository profRecentFoldersRepository,
 			ProfRecentFileRepository profRecentFileRepository,
 			ProfRecentFilesPropertyRepository filesPropertyRepository,
-			ProfRecentFoldersPropertyRepository foldersPropertyRepository,FolderRepository folderRepository) {
+			ProfRecentFoldersPropertyRepository foldersPropertyRepository, FolderRepository folderRepository) {
 		this.homeHelper = homeHelper;
 		this.bookmarkRepository = bookmarkRepository;
 		this.userPropertiesRepository = userPropertiesRepository;
@@ -70,7 +70,7 @@ public class HomeServiceImpl {
 		this.profRecentFileRepository = profRecentFileRepository;
 		this.filesPropertyRepository = filesPropertyRepository;
 		this.foldersPropertyRepository = foldersPropertyRepository;
-		this.folderRepository=folderRepository;
+		this.folderRepository = folderRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(HomeServiceImpl.class);
@@ -215,7 +215,8 @@ public class HomeServiceImpl {
 	public List<GetAllRecentFolderResponse> findAllRecentFolders(String token) {
 		List<GetAllRecentFolderResponse> allRecentFolderResponses = new ArrayList<>();
 		try {
-			List<ProfRecentFolderPropertyEntity> folderPropertyEntites = foldersPropertyRepository.findAllByOrderByIdDesc();
+			List<ProfRecentFolderPropertyEntity> folderPropertyEntites = foldersPropertyRepository
+					.findAllByOrderByIdDesc();
 			if (!folderPropertyEntites.isEmpty()) {
 				for (ProfRecentFolderPropertyEntity profRecentFolderPropertyEntity : folderPropertyEntites) {
 					GetAllRecentFolderResponse folderResponse = homeHelper
@@ -273,5 +274,19 @@ public class HomeServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return folderResponses;
+	}
+
+	public Map<String, String> updateFiles(int id) {
+		Map<String, String> resposne = new HashMap<>();
+		try {
+			ProfDocEntity docEntity = docUploadRepository.findById(id);
+			if (!docEntity.getDocName().isEmpty()) {
+				docEntity.setStatus("I");
+				docUploadRepository.save(docEntity);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return resposne;
 	}
 }

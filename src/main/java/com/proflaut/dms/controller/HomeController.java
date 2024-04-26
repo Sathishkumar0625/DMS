@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -112,7 +113,7 @@ public class HomeController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@PostMapping("/saveRecentFiles")
 	public ResponseEntity<Map<String, String>> addRecentFiles(@RequestBody FileBookMarkRequest fileBookmarkRequest,
 			@RequestHeader("token") String token) {
@@ -129,9 +130,9 @@ public class HomeController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@GetMapping("/getAllRecentFolders")
-	public ResponseEntity<List<GetAllRecentFolderResponse>> getAllRecentFolders (@RequestHeader("token") String token) {
+	public ResponseEntity<List<GetAllRecentFolderResponse>> getAllRecentFolders(@RequestHeader("token") String token) {
 		List<GetAllRecentFolderResponse> getAllRecentFolderResponse = null;
 		try {
 			getAllRecentFolderResponse = homeServiceImpl.findAllRecentFolders(token);
@@ -145,9 +146,9 @@ public class HomeController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getAllRecentFiles")
-	public ResponseEntity<List<GetAllRecentFilesResponse>> getAllRecentFolders () {
+	public ResponseEntity<List<GetAllRecentFilesResponse>> getAllRecentFolders() {
 		List<GetAllRecentFilesResponse> getAllRecentFilesResponse = null;
 		try {
 			getAllRecentFilesResponse = homeServiceImpl.findAllRecentFiles();
@@ -161,8 +162,9 @@ public class HomeController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping("/getAllRecentFiles/{fileName}")
-	public ResponseEntity<List<SearchFilesResponse>> getAllSearchfile (@PathVariable String fileName) {
+
+	@GetMapping("/getAllSearchFiles/{fileName}")
+	public ResponseEntity<List<SearchFilesResponse>> getAllSearchfile(@PathVariable String fileName) {
 		List<SearchFilesResponse> searchFilesResponses = null;
 		try {
 			searchFilesResponses = homeServiceImpl.findAllSearchFiles(fileName);
@@ -176,7 +178,7 @@ public class HomeController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getAllSearchFolders/{folderName}")
 	public ResponseEntity<List<SearchFolderResponse>> getAllSearchFlder(@PathVariable String folderName) {
 		List<SearchFolderResponse> searchFoldersResponses = null;
@@ -187,6 +189,18 @@ public class HomeController {
 			} else {
 				return new ResponseEntity<>(searchFoldersResponses, HttpStatus.NOT_FOUND);
 			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PutMapping("/updateInactiveFile/{id}")
+	public ResponseEntity<Map<String, String>> inactiveFiles(@PathVariable int id) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response=homeServiceImpl.updateFiles(id);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
