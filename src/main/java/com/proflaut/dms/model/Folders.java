@@ -22,7 +22,7 @@ public class Folders {
 	private String view;
 	private String write;
 	private String bookmark;
-
+	private String checkIn;
 	public List<Files> getFiles() {
 		return files;
 	}

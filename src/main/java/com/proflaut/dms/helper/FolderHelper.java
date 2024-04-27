@@ -112,6 +112,7 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
+		folders.setCheckIn(folderEntity.getCheckIn());
 		if (bookMarkEntity == null) {
 			folders.setBookmark("NO");
 		} else {
@@ -249,6 +250,7 @@ public class FolderHelper {
 				folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 				folderPathResponse.setFolderName(folderEntity.getFolderName());
 				folderPathResponse.setMetaId(folderEntity.getMetaId());
+				folderPathResponse.setCheckIn(folderEntity.getCheckIn());
 				if (folderBookMarkEntity == null) {
 					folderPathResponse.setBookmark("NO");
 				} else {

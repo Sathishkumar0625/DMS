@@ -21,6 +21,7 @@ public class FolderPathResponse {
 	private String write;
 	private String bookmark;
 	private String name;
+	private String checkIn;
 	private List<Folders> folders;
 
 	public List<Folders> getFolders() {
