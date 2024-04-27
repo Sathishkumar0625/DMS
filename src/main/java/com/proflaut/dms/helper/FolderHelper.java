@@ -186,8 +186,8 @@ public class FolderHelper {
 		List<FolderEntity> foldersList = folderRepo.findAll(Sort.by(Sort.Direction.ASC, "parentFolderID"));
 
 		int parentFolder = foldersList.get(0).getParentFolderID();
-		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID())
-				.map(folderEntity -> {
+		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID()
+				&& folderEntity.getStatus().equalsIgnoreCase("A")).map(folderEntity -> {
 					Folders folder = convertFolderEntityToFolder(folderEntity);
 					for (ProfAccessRightsEntity accessRight : accessRights) {
 						if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
@@ -213,19 +213,21 @@ public class FolderHelper {
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
 		for (ProfDocEntity profDocEntity : docEntity) {
-			ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository.findByFileId(profDocEntity.getId());
-			Files file = new Files();
-			file.setDocName(profDocEntity.getDocName());
-			file.setFileName(profDocEntity.getDocPath());
-			file.setId(profDocEntity.getId());
-			file.setCreatedAt(profDocEntity.getUploadTime());
-			file.setCreatedBy(profDocEntity.getCreatedBy());
-			if (fileBookmarkEntity.getFileName().isEmpty()) {
-				file.setBookmark("NO");
-			} else {
-				file.setBookmark("YES");
+			if (profDocEntity.getStatus().equalsIgnoreCase(folderLocation)) {
+				ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository.findByFileId(profDocEntity.getId());
+				Files file = new Files();
+				file.setDocName(profDocEntity.getDocName());
+				file.setFileName(profDocEntity.getDocPath());
+				file.setId(profDocEntity.getId());
+				file.setCreatedAt(profDocEntity.getUploadTime());
+				file.setCreatedBy(profDocEntity.getCreatedBy());
+				if (fileBookmarkEntity.getFileName().isEmpty()) {
+					file.setBookmark("NO");
+				} else {
+					file.setBookmark("YES");
+				}
+				files.add(file);
 			}
-			files.add(file);
 		}
 		folders.setFiles(files);
 		return folders;
@@ -237,32 +239,34 @@ public class FolderHelper {
 		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
 
 		for (FolderEntity folderEntity : entity) {
-			ProfFolderBookMarkEntity folderBookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
-			FolderPathResponse folderPathResponse = new FolderPathResponse();
-			folderPathResponse.setFolderPath(folderEntity.getFolderPath());
-			folderPathResponse.setIsParent(folderEntity.getIsParent());
-			folderPathResponse.setCreatedAt(folderEntity.getCreatedAt());
-			folderPathResponse.setCreatedBy(folderEntity.getCreatedBy());
-			folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
-			folderPathResponse.setFolderName(folderEntity.getFolderName());
-			folderPathResponse.setMetaId(folderEntity.getMetaId());
-			if (folderBookMarkEntity.getFolderName().isEmpty()) {
-				folderPathResponse.setBookmark("NO");
-			} else {
-				folderPathResponse.setBookmark("YES");
+			if (folderEntity.getStatus().equalsIgnoreCase("A")) {
+				ProfFolderBookMarkEntity folderBookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
+				FolderPathResponse folderPathResponse = new FolderPathResponse();
+				folderPathResponse.setFolderPath(folderEntity.getFolderPath());
+				folderPathResponse.setIsParent(folderEntity.getIsParent());
+				folderPathResponse.setCreatedAt(folderEntity.getCreatedAt());
+				folderPathResponse.setCreatedBy(folderEntity.getCreatedBy());
+				folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
+				folderPathResponse.setFolderName(folderEntity.getFolderName());
+				folderPathResponse.setMetaId(folderEntity.getMetaId());
+				if (folderBookMarkEntity.getFolderName().isEmpty()) {
+					folderPathResponse.setBookmark("NO");
+				} else {
+					folderPathResponse.setBookmark("YES");
+				}
+
+				// Find the corresponding access rights for this folder
+				Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
+						.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
+
+				// Set view and write access if access rights are present
+				accessRight.ifPresent(access -> {
+					folderPathResponse.setView(access.getView());
+					folderPathResponse.setWrite(access.getWrite());
+				});
+
+				folderPathResponses.add(folderPathResponse);
 			}
-
-			// Find the corresponding access rights for this folder
-			Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
-					.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
-
-			// Set view and write access if access rights are present
-			accessRight.ifPresent(access -> {
-				folderPathResponse.setView(access.getView());
-				folderPathResponse.setWrite(access.getWrite());
-			});
-
-			folderPathResponses.add(folderPathResponse);
 		}
 		folderRetrieveResponse.setSubFolderPath(folderPathResponses);
 		return folderRetrieveResponse;

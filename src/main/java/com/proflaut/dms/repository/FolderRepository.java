@@ -40,4 +40,6 @@ public interface FolderRepository extends JpaRepository<FolderEntity, Integer> {
 
 	List<FolderEntity> findByFolderNameLike(String string);
 
+	@Query("SELECT f FROM FolderEntity f WHERE LOWER(f.folderName) = LOWER(?1) AND f.status = ?2")
+    FolderEntity findByFolderNameAndStatusIgnoreCase(String folderName, String status);
 }

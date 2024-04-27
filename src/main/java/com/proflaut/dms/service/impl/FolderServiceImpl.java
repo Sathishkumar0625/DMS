@@ -86,32 +86,41 @@ public class FolderServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = dataRepository.findById(Integer.parseInt(folderFO.getMetaDataId()));
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
-			if (dataEntity != null && propertiesEntity != null) {
-				String folderPath = folderLocation + folderFO.getFolderName();
-				String path = Paths.get(folderPath).toString();
-				File folder = new File(path);
+			FolderEntity folderEntity = folderRepo
+					.findByFolderNameAndStatusIgnoreCase(folderFO.getFolderName().toLowerCase(), "D");
 
-				if (folder.exists()) {
+			if (dataEntity != null && propertiesEntity != null) {
+				if (folderEntity != null) {
+					String folderPath = folderLocation + folderFO.getFolderName();
+					String path = Paths.get(folderPath).toString();
+					File folder = new File(path);
+
+					if (folder.exists()) {
+						fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
+						fileResponse.setStatus(DMSConstant.FAILURE);
+						return fileResponse;
+					}
+
+					FolderEntity folderEnt = helper.convertFOtoBO(folderFO, propertiesEntity);
+					FolderEntity folderRespEnt = folderRepo.save(folderEnt);
+					List<Integer> digits = convertToArrayList(folderEnt.getId());
+					ProfMountFolderMappingRequest folderMappingRequest = new ProfMountFolderMappingRequest();
+					folderMappingRequest.setMountPointId(folderFO.getMountId());
+					folderMappingRequest.setFolderId(digits);
+					pointServiceImpl.saveMountPointMapping(folderMappingRequest, token);
+					fileResponse.setId(folderRespEnt.getId());
+					fileResponse.setFolderPath(folderRespEnt.getFolderPath());
+					fileResponse.setStatus(DMSConstant.SUCCESS);
+				} else {
 					fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 					fileResponse.setStatus(DMSConstant.FAILURE);
-					return fileResponse;
 				}
-
-				FolderEntity folderEnt = helper.convertFOtoBO(folderFO, propertiesEntity);
-				FolderEntity folderRespEnt = folderRepo.save(folderEnt);
-				List<Integer> digits = convertToArrayList(folderEnt.getId());
-				ProfMountFolderMappingRequest folderMappingRequest = new ProfMountFolderMappingRequest();
-				folderMappingRequest.setMountPointId(folderFO.getMountId());
-				folderMappingRequest.setFolderId(digits);
-				pointServiceImpl.saveMountPointMapping(folderMappingRequest, token);
-				fileResponse.setId(folderRespEnt.getId());
-				fileResponse.setFolderPath(folderRespEnt.getFolderPath());
-				fileResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
 				fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 				fileResponse.setStatus(DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
+			fileResponse.setErrorMessage(DMSConstant.FOLDER_ALREADY_EXIST);
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			throw new CustomException(e.getMessage());
 		}
@@ -120,7 +129,7 @@ public class FolderServiceImpl {
 
 	private List<Integer> convertToArrayList(Integer id) {
 		List<Integer> digits = new ArrayList<>();
-		digits.add(id); 
+		digits.add(id);
 		return digits;
 	}
 
@@ -145,7 +154,7 @@ public class FolderServiceImpl {
 		Folders folders = new Folders();
 		try {
 			FolderEntity folderEntity = folderRepo.findById(id);
-			if (folderEntity != null) {
+			if (folderEntity != null && folderEntity.getStatus().equalsIgnoreCase("A")) {
 				List<ProfDocEntity> docEntity = docUploadRepository.findByFolderId(folderEntity.getId());
 				folders = helper.convertFolderEntityToFolderFo(folderEntity, docEntity);
 			}

@@ -22,8 +22,10 @@ import com.proflaut.dms.entity.ProfRecentFoldersEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FileBookmark;
+import com.proflaut.dms.model.Files;
 import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
@@ -210,6 +212,25 @@ public class HomeHelper {
 		folderResponse.setCreatedBy(folderEntity.getCreatedBy());
 		folderResponse.setId(folderEntity.getId());
 		return folderResponse;
+	}
+
+	public FolderPathResponse convertToInactiveFolderResponse(FolderEntity folderEntity) {
+		FolderPathResponse response = new FolderPathResponse();
+		response.setFolderName(folderEntity.getFolderName());
+		response.setFolderPath(folderEntity.getIsParent());
+		response.setCreatedBy(folderEntity.getCreatedBy());
+		response.setCreatedAt(folderEntity.getCreatedAt());
+		response.setFolderID(String.valueOf(folderEntity.getId()));
+		return response;
+	}
+
+	public Files convertToInactiveFiles(ProfDocEntity profDocEntity) {
+		Files files = new Files();
+		files.setFileName(profDocEntity.getDocName());
+		files.setCreatedAt(profDocEntity.getUploadTime());
+		files.setCreatedBy(profDocEntity.getCreatedBy());
+		files.setId(profDocEntity.getId());
+		return files;
 	}
 
 }

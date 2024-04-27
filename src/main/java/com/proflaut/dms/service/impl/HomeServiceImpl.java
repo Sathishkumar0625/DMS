@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,10 @@ import com.proflaut.dms.helper.HomeHelper;
 import com.proflaut.dms.model.BookmarkResponse;
 import com.proflaut.dms.model.FileBookMarkRequest;
 import com.proflaut.dms.model.FileBookmark;
+import com.proflaut.dms.model.Files;
 import com.proflaut.dms.model.FolderBookmark;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
@@ -81,10 +81,18 @@ public class HomeServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
 			if (!propertiesEntity.getToken().isEmpty()) {
 				if (bookmarkRequest.getBookmark().equalsIgnoreCase("YES")) {
-					ProfFolderBookMarkEntity bookMarkEntity = homeHelper.convertRequestToEntity(bookmarkRequest,
-							propertiesEntity);
-					bookmarkRepository.save(bookMarkEntity);
-					response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+					ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository
+							.findByFolderId(Integer.parseInt(bookmarkRequest.getFolderId()));
+					if (bookMarkEntity.getFolderName() != null) {
+						bookMarkEntity.setBookmark(bookmarkRequest.getBookmark());
+						bookmarkRepository.save(bookMarkEntity);
+						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+					} else {
+						ProfFolderBookMarkEntity bookMarkEntit = homeHelper.convertRequestToEntity(bookmarkRequest,
+								propertiesEntity);
+						bookmarkRepository.save(bookMarkEntit);
+						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+					}
 				} else {
 					ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository
 							.findByFolderId(Integer.parseInt(bookmarkRequest.getFolderId()));
@@ -98,7 +106,7 @@ public class HomeServiceImpl {
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
-			response.put("Status", DMSConstant.FAILURE);
+			response.put(DMSConstant.STATUSFAILURE, DMSConstant.FAILURE);
 		}
 		return response;
 	}
@@ -109,10 +117,18 @@ public class HomeServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = userPropertiesRepository.findByToken(token);
 			if (!propertiesEntity.getToken().isEmpty()) {
 				if (fileBookMarkRequest.getBookmark().equalsIgnoreCase("YES")) {
-					ProfFileBookmarkEntity fileBookMarkEntity = homeHelper
-							.convertRequestToFileEntity(fileBookMarkRequest, propertiesEntity);
-					fileBookmarkRepository.save(fileBookMarkEntity);
-					response.put("Status", DMSConstant.SUCCESS);
+					ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository
+							.findByFileId(Integer.parseInt(fileBookMarkRequest.getFileId()));
+					if (fileBookmarkEntity.getFileName() != null) {
+						fileBookmarkEntity.setBookmark(fileBookMarkRequest.getBookmark());
+						fileBookmarkRepository.save(fileBookmarkEntity);
+						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+					} else {
+						ProfFileBookmarkEntity fileBookMarkEntity = homeHelper
+								.convertRequestToFileEntity(fileBookMarkRequest, propertiesEntity);
+						fileBookmarkRepository.save(fileBookMarkEntity);
+						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+					}
 				} else {
 					ProfFileBookmarkEntity bookMarkEntity = fileBookmarkRepository
 							.findByFileId(Integer.parseInt(fileBookMarkRequest.getFileId()));
@@ -121,12 +137,11 @@ public class HomeServiceImpl {
 					response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
 				}
 			} else {
-
-				response.put("Failure", DMSConstant.FAILURE);
+				response.put(DMSConstant.STATUSFAILURE, DMSConstant.FAILURE);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
-			response.put("Status", DMSConstant.FAILURE);
+			response.put(DMSConstant.STATUSFAILURE, DMSConstant.FAILURE);
 		}
 		return response;
 	}
@@ -276,17 +291,86 @@ public class HomeServiceImpl {
 		return folderResponses;
 	}
 
-	public Map<String, String> updateFiles(int id) {
+	public Map<String, String> updateFiles(int id, String status) {
 		Map<String, String> resposne = new HashMap<>();
 		try {
 			ProfDocEntity docEntity = docUploadRepository.findById(id);
-			if (!docEntity.getDocName().isEmpty()) {
+			if (status.equalsIgnoreCase("A")) {
+				docEntity.setStatus("A");
+				docUploadRepository.save(docEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			} else if (status.equalsIgnoreCase("I")) {
 				docEntity.setStatus("I");
 				docUploadRepository.save(docEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			} else {
+				docEntity.setStatus("D");
+				docUploadRepository.save(docEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return resposne;
 	}
+
+	public Map<String, String> updateFolder(int id, String status) {
+		Map<String, String> resposne = new HashMap<>();
+		try {
+			FolderEntity folderEntity = folderRepository.findById(id);
+			if (status.equalsIgnoreCase("A")) {
+				folderEntity.setStatus("A");
+				folderRepository.save(folderEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			} else if (status.equalsIgnoreCase("I")) {
+				folderEntity.setStatus("I");
+				folderRepository.save(folderEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			} else {
+				folderEntity.setStatus("D");
+				folderRepository.save(folderEntity);
+				resposne.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return resposne;
+	}
+
+	public List<FolderPathResponse> getAllInActive() {
+		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
+		try {
+			List<FolderEntity> folderEnt = folderRepository.findAll();
+			if (!folderEnt.isEmpty()) {
+				for (FolderEntity folderEntity : folderEnt) {
+					if (folderEntity.getStatus().equalsIgnoreCase("I")) {
+						FolderPathResponse response = homeHelper.convertToInactiveFolderResponse(folderEntity);
+						folderPathResponses.add(response);
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return folderPathResponses;
+	}
+
+	public List<Files> getAllInActiveFi() {
+		List<Files> files = new ArrayList<>();
+		try {
+			List<ProfDocEntity> docEntities = docUploadRepository.findAll();
+			if (!docEntities.isEmpty()) {
+				for (ProfDocEntity profDocEntity : docEntities) {
+					if (profDocEntity.getStatus().equalsIgnoreCase("I")) {
+						Files file = homeHelper.convertToInactiveFiles(profDocEntity);
+						files.add(file);
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return files;
+	}
+
 }

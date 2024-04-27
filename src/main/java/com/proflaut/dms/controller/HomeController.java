@@ -16,15 +16,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.BookmarkResponse;
 import com.proflaut.dms.model.FileBookMarkRequest;
+import com.proflaut.dms.model.Files;
 import com.proflaut.dms.model.FolderBookmarkRequest;
+import com.proflaut.dms.model.FolderPathResponse;
 import com.proflaut.dms.model.GetAllRecentFilesResponse;
 import com.proflaut.dms.model.GetAllRecentFolderResponse;
-import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.model.SearchFilesResponse;
 import com.proflaut.dms.model.SearchFolderResponse;
 import com.proflaut.dms.service.impl.HomeServiceImpl;
@@ -195,15 +197,52 @@ public class HomeController {
 		}
 	}
 
-	@PutMapping("/updateInactiveFile/{id}")
-	public ResponseEntity<Map<String, String>> inactiveFiles(@PathVariable int id) {
+	@PutMapping("/updateInactiveFile")
+	public ResponseEntity<Map<String, String>> inactiveFiles(@RequestParam int id,@RequestParam String status) {
 		Map<String, String> response = new HashMap<>();
 		try {
-			response=homeServiceImpl.updateFiles(id);
+			response = homeServiceImpl.updateFiles(id,status);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PutMapping("/updateInactiveFolder")
+	public ResponseEntity<Map<String, String>> inactiveFolder(@RequestParam int id,@RequestParam String status) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response = homeServiceImpl.updateFolder(id,status);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getAllInActiveFolders")
+	public ResponseEntity<List<FolderPathResponse>> getAllInActiveFolders() {
+		List<FolderPathResponse> response = null;
+		try {
+			response = homeServiceImpl.getAllInActive();
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getAllInActiveFiles")
+	public ResponseEntity<List<Files>> getAllInActiveFiles() {
+		List<Files> response = null;
+		try {
+			response = homeServiceImpl.getAllInActiveFi();
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }
