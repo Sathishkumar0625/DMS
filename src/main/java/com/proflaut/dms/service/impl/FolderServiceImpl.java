@@ -172,7 +172,8 @@ public class FolderServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
 			if (propertiesEntity != null) {
 				int userId = propertiesEntity.getUserId();
-				List<Folders> folders = helper.convertToGetAllFolders(userId);
+				String userName=propertiesEntity.getUserName();
+				List<Folders> folders = helper.convertToGetAllFolders(userId,userName);
 				folderRetreiveResponse.setFolder(folders);
 				folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 			} else {

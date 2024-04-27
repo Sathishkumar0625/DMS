@@ -261,7 +261,7 @@ public class HomeController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	@PutMapping("/saveCheckOut")
+	@PostMapping("/saveCheckOut")
 	public ResponseEntity<Map<String, String>> addCheckOut(@RequestParam int id,@RequestParam String folderName,
 			@RequestHeader("token") String token) {
 		Map<String, String> response = new HashMap<>();

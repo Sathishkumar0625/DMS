@@ -101,7 +101,7 @@ public class FolderHelper {
 		return ent;
 	}
 
-	public Folders convertFolderEntityToFolder(FolderEntity folderEntity) {
+	public Folders convertFolderEntityToFolder(FolderEntity folderEntity, String userName) {
 		ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
 		Folders folders = new Folders();
 		folders.setFolderID(folderEntity.getId());
@@ -112,7 +112,11 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
+		if (userName.equalsIgnoreCase(folderEntity.getCreatedBy())) {
+			folders.setCheckIn("NO");
+		}else {
 		folders.setCheckIn(folderEntity.getCheckIn());
+		}
 		if (bookMarkEntity == null) {
 			folders.setBookmark("NO");
 		} else {
@@ -148,7 +152,7 @@ public class FolderHelper {
 		return folderPath;
 	}
 
-	public List<Folders> convertToGetAllFolders(int userId) {
+	public List<Folders> convertToGetAllFolders(int userId, String userName) {
 		// Retrieve user's group mappings
 		List<ProfUserGroupMappingEntity> userGroupMappings = groupMappingRepository.findByUserId(userId);
 		// Retrieve user's access mappings
@@ -189,7 +193,7 @@ public class FolderHelper {
 		int parentFolder = foldersList.get(0).getParentFolderID();
 		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID()
 				&& folderEntity.getStatus().equalsIgnoreCase("A")).map(folderEntity -> {
-					Folders folder = convertFolderEntityToFolder(folderEntity);
+					Folders folder = convertFolderEntityToFolder(folderEntity,userName);
 					for (ProfAccessRightsEntity accessRight : accessRights) {
 						if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
 							folder.setView(accessRight.getView());
