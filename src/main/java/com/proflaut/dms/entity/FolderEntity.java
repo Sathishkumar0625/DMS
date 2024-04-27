@@ -49,4 +49,16 @@ public class FolderEntity {
 	@Column(name = "STATUS")
 	private String status;
 
+	@Column(name = "CHECK_IN")
+	private String checkIn;
+
+	@Column(name = "CHECK_OUT")
+	private String checkOut;
+
+	@Column(name = "CHECK_IN_TIME")
+	private String checkInTime;
+
+	@Column(name = "CHECK_OUT_TIME")
+	private String checkOutTime;
+
 }

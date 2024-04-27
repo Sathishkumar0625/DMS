@@ -10,6 +10,7 @@ public class Files {
 	private String createdBy;
 	private String createdAt;
 	private String bookmark;
+	private String name;
 
 	public int getId() {
 		return id;

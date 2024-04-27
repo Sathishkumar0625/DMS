@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.FolderEntity;
+import com.proflaut.dms.entity.ProfCheckInAndOutEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
@@ -33,6 +34,7 @@ import com.proflaut.dms.model.SearchFolderResponse;
 import com.proflaut.dms.repository.BookmarkRepository;
 import com.proflaut.dms.repository.FileBookmarkRepository;
 import com.proflaut.dms.repository.FolderRepository;
+import com.proflaut.dms.repository.ProfCheckInAndOutRepository;
 import com.proflaut.dms.repository.ProfDocUploadRepository;
 import com.proflaut.dms.repository.ProfRecentFileRepository;
 import com.proflaut.dms.repository.ProfRecentFilesPropertyRepository;
@@ -53,6 +55,7 @@ public class HomeServiceImpl {
 	ProfRecentFilesPropertyRepository filesPropertyRepository;
 	ProfRecentFoldersPropertyRepository foldersPropertyRepository;
 	FolderRepository folderRepository;
+	ProfCheckInAndOutRepository checkInAndOutRepository;
 
 	@Autowired
 	public HomeServiceImpl(HomeHelper homeHelper, BookmarkRepository bookmarkRepository,
@@ -60,7 +63,8 @@ public class HomeServiceImpl {
 			ProfDocUploadRepository docUploadRepository, ProfRecentFoldersRepository profRecentFoldersRepository,
 			ProfRecentFileRepository profRecentFileRepository,
 			ProfRecentFilesPropertyRepository filesPropertyRepository,
-			ProfRecentFoldersPropertyRepository foldersPropertyRepository, FolderRepository folderRepository) {
+			ProfRecentFoldersPropertyRepository foldersPropertyRepository, FolderRepository folderRepository,
+			ProfCheckInAndOutRepository checkInAndOutRepository) {
 		this.homeHelper = homeHelper;
 		this.bookmarkRepository = bookmarkRepository;
 		this.userPropertiesRepository = userPropertiesRepository;
@@ -71,6 +75,7 @@ public class HomeServiceImpl {
 		this.filesPropertyRepository = filesPropertyRepository;
 		this.foldersPropertyRepository = foldersPropertyRepository;
 		this.folderRepository = folderRepository;
+		this.checkInAndOutRepository = checkInAndOutRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(HomeServiceImpl.class);
@@ -83,7 +88,7 @@ public class HomeServiceImpl {
 				if (bookmarkRequest.getBookmark().equalsIgnoreCase("YES")) {
 					ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository
 							.findByFolderId(Integer.parseInt(bookmarkRequest.getFolderId()));
-					if (bookMarkEntity.getFolderName() != null) {
+					if (bookMarkEntity != null) {
 						bookMarkEntity.setBookmark(bookmarkRequest.getBookmark());
 						bookmarkRepository.save(bookMarkEntity);
 						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
@@ -119,7 +124,7 @@ public class HomeServiceImpl {
 				if (fileBookMarkRequest.getBookmark().equalsIgnoreCase("YES")) {
 					ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository
 							.findByFileId(Integer.parseInt(fileBookMarkRequest.getFileId()));
-					if (fileBookmarkEntity.getFileName() != null) {
+					if (fileBookmarkEntity != null) {
 						fileBookmarkEntity.setBookmark(fileBookMarkRequest.getBookmark());
 						fileBookmarkRepository.save(fileBookmarkEntity);
 						response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
@@ -291,10 +296,10 @@ public class HomeServiceImpl {
 		return folderResponses;
 	}
 
-	public Map<String, String> updateFiles(int id, String status) {
+	public Map<String, String> updateFiles(String id, String status) {
 		Map<String, String> resposne = new HashMap<>();
 		try {
-			ProfDocEntity docEntity = docUploadRepository.findById(id);
+			ProfDocEntity docEntity = docUploadRepository.findById(Integer.parseInt(id));
 			if (status.equalsIgnoreCase("A")) {
 				docEntity.setStatus("A");
 				docUploadRepository.save(docEntity);
@@ -314,10 +319,10 @@ public class HomeServiceImpl {
 		return resposne;
 	}
 
-	public Map<String, String> updateFolder(int id, String status) {
+	public Map<String, String> updateFolder(String id, String status) {
 		Map<String, String> resposne = new HashMap<>();
 		try {
-			FolderEntity folderEntity = folderRepository.findById(id);
+			FolderEntity folderEntity = folderRepository.findById(Integer.parseInt(id));
 			if (status.equalsIgnoreCase("A")) {
 				folderEntity.setStatus("A");
 				folderRepository.save(folderEntity);
@@ -371,6 +376,46 @@ public class HomeServiceImpl {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}
 		return files;
+	}
+
+	public Map<String, String> addCheckIn(int id, String folderName, String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			ProfUserPropertiesEntity profUserPropertiesEntity = userPropertiesRepository.findByToken(token);
+			ProfCheckInAndOutEntity inAndOutEntity = homeHelper.convertToCheckInOutEnty(id, folderName,
+					profUserPropertiesEntity);
+			FolderEntity folderEntity = folderRepository.findById(id);
+			checkInAndOutRepository.save(inAndOutEntity);
+			folderEntity.setCheckIn("YES");
+			folderEntity.setCheckOut("NO");
+			folderEntity.setCheckInTime(homeHelper.formatCurrentDateTime());
+			folderRepository.save(folderEntity);
+			response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return response;
+	}
+
+	public Map<String, String> addCheckOut(int id, String folderName, String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			ProfUserPropertiesEntity profUserPropertiesEntity = userPropertiesRepository.findByToken(token);
+			FolderEntity folderEntity = folderRepository.findById(id);
+			ProfCheckInAndOutEntity andOutEntity = checkInAndOutRepository.findByFolderIdAndFolderNameAndUserId(id,
+					folderName, profUserPropertiesEntity.getUserId());
+
+			if (andOutEntity != null && folderEntity != null) {
+				andOutEntity = homeHelper.convertTocheckoutEntity(andOutEntity);
+				checkInAndOutRepository.save(andOutEntity);
+				folderEntity = homeHelper.convertCheckOutEntity(folderEntity);
+				folderRepository.save(folderEntity);
+				response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+		}
+		return response;
 	}
 
 }

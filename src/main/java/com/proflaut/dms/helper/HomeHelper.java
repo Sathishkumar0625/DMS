@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.proflaut.dms.entity.FolderEntity;
+import com.proflaut.dms.entity.ProfCheckInAndOutEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
@@ -216,7 +217,7 @@ public class HomeHelper {
 
 	public FolderPathResponse convertToInactiveFolderResponse(FolderEntity folderEntity) {
 		FolderPathResponse response = new FolderPathResponse();
-		response.setFolderName(folderEntity.getFolderName());
+		response.setName(folderEntity.getFolderName());
 		response.setFolderPath(folderEntity.getIsParent());
 		response.setCreatedBy(folderEntity.getCreatedBy());
 		response.setCreatedAt(folderEntity.getCreatedAt());
@@ -226,11 +227,38 @@ public class HomeHelper {
 
 	public Files convertToInactiveFiles(ProfDocEntity profDocEntity) {
 		Files files = new Files();
-		files.setFileName(profDocEntity.getDocName());
+		files.setName(profDocEntity.getDocName());
 		files.setCreatedAt(profDocEntity.getUploadTime());
 		files.setCreatedBy(profDocEntity.getCreatedBy());
 		files.setId(profDocEntity.getId());
 		return files;
+	}
+
+	public ProfCheckInAndOutEntity convertToCheckInOutEnty(int id, String folderName,
+			ProfUserPropertiesEntity profUserPropertiesEntity) {
+		ProfCheckInAndOutEntity entity = new ProfCheckInAndOutEntity();
+		entity.setFolderName(folderName);
+		entity.setUserId(profUserPropertiesEntity.getUserId());
+		entity.setCheckIn("YES");
+		entity.setCheckOut("NO");
+		entity.setCheckInBy(profUserPropertiesEntity.getUserName());
+		entity.setFolderId(id);
+		entity.setCheckInTime(formatCurrentDateTime());
+		return entity;
+	}
+
+	public ProfCheckInAndOutEntity convertTocheckoutEntity(ProfCheckInAndOutEntity andOutEntity) {
+		andOutEntity.setCheckIn("NO");
+		andOutEntity.setCheckOut("YES");
+		andOutEntity.setCheckOutTime(formatCurrentDateTime());
+		return andOutEntity;
+	}
+
+	public FolderEntity convertCheckOutEntity(FolderEntity folderEntity) {
+		folderEntity.setCheckIn("NO");
+		folderEntity.setCheckOut("YES");
+		folderEntity.setCheckOutTime(formatCurrentDateTime());
+		return folderEntity;
 	}
 
 }

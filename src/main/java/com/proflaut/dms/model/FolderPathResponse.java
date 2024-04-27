@@ -20,6 +20,7 @@ public class FolderPathResponse {
 	private String view;
 	private String write;
 	private String bookmark;
+	private String name;
 	private List<Folders> folders;
 
 	public List<Folders> getFolders() {

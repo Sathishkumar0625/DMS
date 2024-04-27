@@ -198,7 +198,7 @@ public class HomeController {
 	}
 
 	@PutMapping("/updateInactiveFile")
-	public ResponseEntity<Map<String, String>> inactiveFiles(@RequestParam int id,@RequestParam String status) {
+	public ResponseEntity<Map<String, String>> inactiveFiles(@RequestParam String id,@RequestParam String status) {
 		Map<String, String> response = new HashMap<>();
 		try {
 			response = homeServiceImpl.updateFiles(id,status);
@@ -210,7 +210,7 @@ public class HomeController {
 	}
 
 	@PutMapping("/updateInactiveFolder")
-	public ResponseEntity<Map<String, String>> inactiveFolder(@RequestParam int id,@RequestParam String status) {
+	public ResponseEntity<Map<String, String>> inactiveFolder(@RequestParam String id,@RequestParam String status) {
 		Map<String, String> response = new HashMap<>();
 		try {
 			response = homeServiceImpl.updateFolder(id,status);
@@ -242,6 +242,39 @@ public class HomeController {
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/saveCheckIn")
+	public ResponseEntity<Map<String, String>> addCheckIn(@RequestParam int id,@RequestParam String folderName,
+			@RequestHeader("token") String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response = homeServiceImpl.addCheckIn(id,folderName, token);
+			if (response.get(DMSConstant.STATUS).equals(DMSConstant.SUCCESS)) {
+				return ResponseEntity.ok(response);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	@PutMapping("/saveCheckOut")
+	public ResponseEntity<Map<String, String>> addCheckOut(@RequestParam int id,@RequestParam String folderName,
+			@RequestHeader("token") String token) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			response = homeServiceImpl.addCheckOut(id,folderName, token);
+			if (response.get(DMSConstant.STATUS).equals(DMSConstant.SUCCESS)) {
+				return ResponseEntity.ok(response);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 

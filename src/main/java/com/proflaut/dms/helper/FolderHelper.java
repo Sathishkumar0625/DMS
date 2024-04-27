@@ -112,7 +112,7 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
-		if (bookMarkEntity.getFolderName().isEmpty()) {
+		if (bookMarkEntity == null) {
 			folders.setBookmark("NO");
 		} else {
 			folders.setBookmark("YES");
@@ -221,7 +221,7 @@ public class FolderHelper {
 				file.setId(profDocEntity.getId());
 				file.setCreatedAt(profDocEntity.getUploadTime());
 				file.setCreatedBy(profDocEntity.getCreatedBy());
-				if (fileBookmarkEntity.getFileName().isEmpty()) {
+				if (fileBookmarkEntity == null) {
 					file.setBookmark("NO");
 				} else {
 					file.setBookmark("YES");
@@ -249,7 +249,7 @@ public class FolderHelper {
 				folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 				folderPathResponse.setFolderName(folderEntity.getFolderName());
 				folderPathResponse.setMetaId(folderEntity.getMetaId());
-				if (folderBookMarkEntity.getFolderName().isEmpty()) {
+				if (folderBookMarkEntity == null) {
 					folderPathResponse.setBookmark("NO");
 				} else {
 					folderPathResponse.setBookmark("YES");
