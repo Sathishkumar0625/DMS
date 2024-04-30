@@ -261,4 +261,16 @@ public class HomeHelper {
 		return folderEntity;
 	}
 
+	public ProfCheckInAndOutEntity convertToUpdateCheckInOutEnty(int id, String folderName,
+			ProfUserPropertiesEntity profUserPropertiesEntity, ProfCheckInAndOutEntity checkInAndOutEntity) {
+		checkInAndOutEntity.setFolderName(folderName);
+		checkInAndOutEntity.setUserId(profUserPropertiesEntity.getUserId());
+		checkInAndOutEntity.setCheckIn("YES");
+		checkInAndOutEntity.setCheckOut("NO");
+		checkInAndOutEntity.setCheckInBy(profUserPropertiesEntity.getUserName());
+		checkInAndOutEntity.setFolderId(id);
+		checkInAndOutEntity.setCheckInTime(formatCurrentDateTime());
+		return checkInAndOutEntity;
+	}
+
 }

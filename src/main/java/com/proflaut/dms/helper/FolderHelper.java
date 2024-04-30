@@ -108,7 +108,7 @@ public class FolderHelper {
 
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity, String userName, int userId) {
 		ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
-		ProfCheckInAndOutEntity andOutEntity=checkInAndOutRepository.folderId(folderEntity.getId());
+		ProfCheckInAndOutEntity andOutEntity = checkInAndOutRepository.folderId(folderEntity.getId());
 		Folders folders = new Folders();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
@@ -118,8 +118,10 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
-		if (userId == andOutEntity.getUserId()) {
+		if (andOutEntity != null && userId == andOutEntity.getUserId()) {
 			folders.setCheckIn("YES");
+		} else if (andOutEntity != null && andOutEntity.getCheckIn().equalsIgnoreCase("NO")) {
+			folders.setCheckIn("NO");
 		} else {
 			folders.setCheckIn("NO");
 		}
@@ -199,7 +201,7 @@ public class FolderHelper {
 		int parentFolder = foldersList.get(0).getParentFolderID();
 		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID()
 				&& folderEntity.getStatus().equalsIgnoreCase("A")).map(folderEntity -> {
-					Folders folder = convertFolderEntityToFolder(folderEntity, userName,userId);
+					Folders folder = convertFolderEntityToFolder(folderEntity, userName, userId);
 					for (ProfAccessRightsEntity accessRight : accessRights) {
 						if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
 							folder.setView(accessRight.getView());
@@ -223,7 +225,6 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
-		folders.setCheckIn(folderEntity.getCheckIn());
 		for (ProfDocEntity profDocEntity : docEntity) {
 			if (profDocEntity.getStatus().equalsIgnoreCase(folderLocation)) {
 				ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository.findByFileId(profDocEntity.getId());
@@ -246,12 +247,15 @@ public class FolderHelper {
 	}
 
 	public ProfFolderRetrieveResponse convertFolderEntityToFolderRetrieveResponse(List<FolderEntity> entity,
-			List<ProfAccessRightsEntity> accessRights) {
+			List<ProfAccessRightsEntity> accessRights, String token) {
 		ProfFolderRetrieveResponse folderRetrieveResponse = new ProfFolderRetrieveResponse();
 		List<FolderPathResponse> folderPathResponses = new ArrayList<>();
+		ProfUserPropertiesEntity userPropertiesEntity = profUserPropertiesRepository.findByToken(token);
 
 		for (FolderEntity folderEntity : entity) {
 			if (folderEntity.getStatus().equalsIgnoreCase("A")) {
+				ProfCheckInAndOutEntity andOutEntity = checkInAndOutRepository.findByFolderIdAndFolderNameAndUserId(
+						folderEntity.getId(), folderEntity.getFolderName(), userPropertiesEntity.getUserId());
 				ProfFolderBookMarkEntity folderBookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
 				FolderPathResponse folderPathResponse = new FolderPathResponse();
 				folderPathResponse.setFolderPath(folderEntity.getFolderPath());
@@ -261,27 +265,35 @@ public class FolderHelper {
 				folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 				folderPathResponse.setFolderName(folderEntity.getFolderName());
 				folderPathResponse.setMetaId(folderEntity.getMetaId());
-				folderPathResponse.setCheckIn(folderEntity.getCheckIn());
-				if (folderBookMarkEntity == null) {
-					folderPathResponse.setBookmark("NO");
+				if (andOutEntity != null && userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
+					folderPathResponse.setCheckIn("YES");
+				} else if (andOutEntity != null && andOutEntity.getCheckIn().equalsIgnoreCase("NO")) {
+					folderPathResponse.setCheckIn("NO");
 				} else {
-					folderPathResponse.setBookmark("YES");
+					folderPathResponse.setCheckIn("NO");
+
+					if (folderBookMarkEntity == null) {
+						folderPathResponse.setBookmark("NO");
+					} else {
+						folderPathResponse.setBookmark("YES");
+					}
+
+					// Find the corresponding access rights for this folder
+					Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
+							.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
+
+					// Set view and write access if access rights are present
+					accessRight.ifPresent(access -> {
+						folderPathResponse.setView(access.getView());
+						folderPathResponse.setWrite(access.getWrite());
+					});
+
+					folderPathResponses.add(folderPathResponse);
 				}
-
-				// Find the corresponding access rights for this folder
-				Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
-						.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
-
-				// Set view and write access if access rights are present
-				accessRight.ifPresent(access -> {
-					folderPathResponse.setView(access.getView());
-					folderPathResponse.setWrite(access.getWrite());
-				});
-
-				folderPathResponses.add(folderPathResponse);
 			}
+			folderRetrieveResponse.setSubFolderPath(folderPathResponses);
+
 		}
-		folderRetrieveResponse.setSubFolderPath(folderPathResponses);
 		return folderRetrieveResponse;
 	}
 

@@ -141,14 +141,14 @@ public class FolderController {
 	}
 
 	@GetMapping("getByParentId")
-	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestParam int parentFolderID) {
+	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestHeader("token") String token,@RequestParam int parentFolderID) {
 		if (StringUtils.isEmpty(parentFolderID)) {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		ProfFolderRetrieveResponse folderRetrieveResponse = null;
 		try {
-			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID);
+			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID,token);
 			if (!folderRetrieveResponse.getSubFolderPath().isEmpty()) {
 				return new ResponseEntity<>(folderRetrieveResponse, HttpStatus.OK);
 			} else {

@@ -381,16 +381,26 @@ public class HomeServiceImpl {
 	public Map<String, String> addCheckIn(int id, String folderName, String token) {
 		Map<String, String> response = new HashMap<>();
 		try {
+
 			ProfUserPropertiesEntity profUserPropertiesEntity = userPropertiesRepository.findByToken(token);
-			ProfCheckInAndOutEntity inAndOutEntity = homeHelper.convertToCheckInOutEnty(id, folderName,
-					profUserPropertiesEntity);
-			FolderEntity folderEntity = folderRepository.findById(id);
-			checkInAndOutRepository.save(inAndOutEntity);
-			folderEntity.setCheckIn("YES");
-			folderEntity.setCheckOut("NO");
-			folderEntity.setCheckInTime(homeHelper.formatCurrentDateTime());
-			folderRepository.save(folderEntity);
-			response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			ProfCheckInAndOutEntity checkInAndOutEntity = checkInAndOutRepository
+					.findByFolderIdAndFolderNameAndUserId(id, folderName, profUserPropertiesEntity.getUserId());
+			if (checkInAndOutEntity != null) {
+				checkInAndOutEntity = homeHelper.convertToUpdateCheckInOutEnty(id, folderName, profUserPropertiesEntity,
+						checkInAndOutEntity);
+				checkInAndOutRepository.save(checkInAndOutEntity);
+				response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			} else {
+				ProfCheckInAndOutEntity inAndOutEntity = homeHelper.convertToCheckInOutEnty(id, folderName,
+						profUserPropertiesEntity);
+				FolderEntity folderEntity = folderRepository.findById(id);
+				checkInAndOutRepository.save(inAndOutEntity);
+				folderEntity.setCheckIn("YES");
+				folderEntity.setCheckOut("NO");
+				folderEntity.setCheckInTime(homeHelper.formatCurrentDateTime());
+				folderRepository.save(folderEntity);
+				response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
+			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 		}

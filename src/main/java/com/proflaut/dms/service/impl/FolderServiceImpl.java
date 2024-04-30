@@ -172,8 +172,8 @@ public class FolderServiceImpl {
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
 			if (propertiesEntity != null) {
 				int userId = propertiesEntity.getUserId();
-				String userName=propertiesEntity.getUserName();
-				List<Folders> folders = helper.convertToGetAllFolders(userId,userName);
+				String userName = propertiesEntity.getUserName();
+				List<Folders> folders = helper.convertToGetAllFolders(userId, userName);
 				folderRetreiveResponse.setFolder(folders);
 				folderRetreiveResponse.setStatus(DMSConstant.SUCCESS);
 			} else {
@@ -186,14 +186,14 @@ public class FolderServiceImpl {
 		return folderRetreiveResponse;
 	}
 
-	public ProfFolderRetrieveResponse fetchByParentId(int parentFolderID) {
+	public ProfFolderRetrieveResponse fetchByParentId(int parentFolderID, String token) {
 		ProfFolderRetrieveResponse folders = new ProfFolderRetrieveResponse();
 		try {
 			List<FolderEntity> entity = folderRepo.findByParentFolderID(parentFolderID);
 			if (entity != null) {
 				List<String> metaIds = entity.stream().map(FolderEntity::getMetaId).collect(Collectors.toList());
 				List<ProfAccessRightsEntity> accessRights = accessRightRepository.findByMetaIdIn(metaIds);
-				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity, accessRights);
+				folders = helper.convertFolderEntityToFolderRetrieveResponse(entity, accessRights, token);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
