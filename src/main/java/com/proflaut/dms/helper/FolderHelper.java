@@ -128,7 +128,7 @@ public class FolderHelper {
 		} else if (folderEntity.getCheckIn().equalsIgnoreCase("YES") && userId == andOutEntity.getUserId()) {
 			folders.setIsCheckOption("YES");
 		} else {
-			folders.setIsCheckOption("YES");
+			folders.setIsCheckOption("NO");
 		}
 
 		if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
@@ -281,6 +281,16 @@ public class FolderHelper {
 				folderPathResponse.setFolderName(folderEntity.getFolderName());
 				folderPathResponse.setMetaId(folderEntity.getMetaId());
 				folderPathResponse.setIsCheckIn(folderEntity.getCheckIn());
+
+				if (folderEntity.getCheckIn().equalsIgnoreCase("NO")) {
+					folderPathResponse.setIsCheckOption("YES");
+				} else if (folderEntity.getCheckIn().equalsIgnoreCase("YES")
+						&& userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
+					folderPathResponse.setIsCheckOption("YES");
+				} else {
+					folderPathResponse.setIsCheckOption("NO");
+				}
+
 				if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
 						&& userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
 					folderPathResponse.setCheckIn("YES");
