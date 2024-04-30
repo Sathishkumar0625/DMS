@@ -20,6 +20,7 @@ import com.proflaut.dms.entity.FolderEntity;
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
+import com.proflaut.dms.entity.ProfCheckInAndOutEntity;
 import com.proflaut.dms.entity.ProfDocEntity;
 import com.proflaut.dms.entity.ProfFileBookmarkEntity;
 import com.proflaut.dms.entity.ProfFolderBookMarkEntity;
@@ -37,6 +38,7 @@ import com.proflaut.dms.repository.FolderRepository;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessRightRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
+import com.proflaut.dms.repository.ProfCheckInAndOutRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserGroupMappingRepository;
 import com.proflaut.dms.repository.ProfUserPropertiesRepository;
@@ -58,6 +60,7 @@ public class FolderHelper {
 	MountPointServiceImpl mountPointServiceImpl;
 	BookmarkRepository bookmarkRepository;
 	FileBookmarkRepository fileBookmarkRepository;
+	ProfCheckInAndOutRepository checkInAndOutRepository;
 
 	@Autowired
 	public FolderHelper(FolderRepository folderRepository, FolderRepository folderRepo,
@@ -66,7 +69,8 @@ public class FolderHelper {
 			ProfAccessGroupMappingRepository accessGroupMappingRepository,
 			ProfAccessUserMappingRepository accessUserMappingRepository,
 			ProfAccessRightRepository accessRightRepository, MountPointServiceImpl mountPointServiceImpl,
-			FileBookmarkRepository fileBookmarkRepository, BookmarkRepository bookmarkRepository) {
+			FileBookmarkRepository fileBookmarkRepository, BookmarkRepository bookmarkRepository,
+			ProfCheckInAndOutRepository checkInAndOutRepository) {
 		this.folderRepository = folderRepository;
 		this.folderRepo = folderRepo;
 		this.profUserPropertiesRepository = profUserPropertiesRepository;
@@ -78,6 +82,7 @@ public class FolderHelper {
 		this.mountPointServiceImpl = mountPointServiceImpl;
 		this.bookmarkRepository = bookmarkRepository;
 		this.fileBookmarkRepository = fileBookmarkRepository;
+		this.checkInAndOutRepository = checkInAndOutRepository;
 	}
 
 	private static final Logger logger = LogManager.getLogger(FolderHelper.class);
@@ -101,8 +106,9 @@ public class FolderHelper {
 		return ent;
 	}
 
-	public Folders convertFolderEntityToFolder(FolderEntity folderEntity, String userName) {
+	public Folders convertFolderEntityToFolder(FolderEntity folderEntity, String userName, int userId) {
 		ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
+		ProfCheckInAndOutEntity andOutEntity=checkInAndOutRepository.folderId(folderEntity.getId());
 		Folders folders = new Folders();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
@@ -112,10 +118,10 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
-		if (userName.equalsIgnoreCase(folderEntity.getCreatedBy())) {
+		if (userId == andOutEntity.getUserId()) {
+			folders.setCheckIn("YES");
+		} else {
 			folders.setCheckIn("NO");
-		}else {
-		folders.setCheckIn(folderEntity.getCheckIn());
 		}
 		if (bookMarkEntity == null) {
 			folders.setBookmark("NO");
@@ -193,7 +199,7 @@ public class FolderHelper {
 		int parentFolder = foldersList.get(0).getParentFolderID();
 		return foldersList.stream().filter(folderEntity -> parentFolder == folderEntity.getParentFolderID()
 				&& folderEntity.getStatus().equalsIgnoreCase("A")).map(folderEntity -> {
-					Folders folder = convertFolderEntityToFolder(folderEntity,userName);
+					Folders folder = convertFolderEntityToFolder(folderEntity, userName,userId);
 					for (ProfAccessRightsEntity accessRight : accessRights) {
 						if (folder.getMetaId() != null && folder.getMetaId().equals(accessRight.getMetaId())) {
 							folder.setView(accessRight.getView());
@@ -217,6 +223,7 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
+		folders.setCheckIn(folderEntity.getCheckIn());
 		for (ProfDocEntity profDocEntity : docEntity) {
 			if (profDocEntity.getStatus().equalsIgnoreCase(folderLocation)) {
 				ProfFileBookmarkEntity fileBookmarkEntity = fileBookmarkRepository.findByFileId(profDocEntity.getId());

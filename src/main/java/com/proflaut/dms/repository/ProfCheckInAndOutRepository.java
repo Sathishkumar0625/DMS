@@ -8,4 +8,6 @@ public interface ProfCheckInAndOutRepository extends JpaRepository<ProfCheckInAn
 
 	ProfCheckInAndOutEntity findByFolderIdAndFolderNameAndUserId(int id, String folderName, Integer userId);
 
+	ProfCheckInAndOutEntity folderId(int i);
+
 }
