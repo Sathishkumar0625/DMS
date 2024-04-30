@@ -28,12 +28,17 @@ import com.proflaut.dms.service.impl.AccessServiceImpl;
 import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessRightsHelper {
 
 	ProfAccessGroupMappingRepository groupMappingRepository;
 
 	ProfAccessUserMappingRepository userMappingRepository;
+
+	public AccessRightsHelper(ProfAccessGroupMappingRepository groupMappingRepository,
+			ProfAccessUserMappingRepository userMappingRepository) {
+		this.groupMappingRepository = groupMappingRepository;
+		this.userMappingRepository = userMappingRepository;
+	}
 
 	public static String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();

@@ -30,7 +30,6 @@ import com.proflaut.dms.staticlass.PasswordEncDecrypt;
 import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessHelper {
 
 	ProfUserInfoRepository userInfoRepository;
@@ -38,6 +37,12 @@ public class AccessHelper {
 	private JavaMailSender mailSender;
 
 	private static final Logger logger = LogManager.getLogger(AccessHelper.class);
+
+	@Autowired
+	public AccessHelper(ProfUserInfoRepository userInfoRepository, JavaMailSender mailSender) {
+		this.userInfoRepository = userInfoRepository;
+		this.mailSender = mailSender;
+	}
 
 	public static String formatCurrentDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();

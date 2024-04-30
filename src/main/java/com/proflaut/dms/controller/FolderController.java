@@ -33,7 +33,6 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/folder")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class FolderController {
 
 	FolderServiceImpl folderServiceImpl;
@@ -41,9 +40,16 @@ public class FolderController {
 	FileManagementServiceImpl serviceIMPL;
 
 	FolderHelper folderHelper;
-	
 
 	private static final Logger logger = LogManager.getLogger(FolderController.class);
+
+	@Autowired
+	public FolderController(FolderServiceImpl folderServiceImpl, FileManagementServiceImpl serviceIMPL,
+			FolderHelper folderHelper) {
+		this.folderServiceImpl = folderServiceImpl;
+		this.serviceIMPL = serviceIMPL;
+		this.folderHelper = folderHelper;
+	}
 
 	@PostMapping("/create")
 	public ResponseEntity<FileResponse> createFolder(@RequestHeader("token") String token,
@@ -141,14 +147,15 @@ public class FolderController {
 	}
 
 	@GetMapping("getByParentId")
-	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestHeader("token") String token,@RequestParam int parentFolderID) {
+	public ResponseEntity<ProfFolderRetrieveResponse> getFoldersByParentId(@RequestHeader("token") String token,
+			@RequestParam int parentFolderID) {
 		if (StringUtils.isEmpty(parentFolderID)) {
 			logger.info(DMSConstant.INVALID_INPUT);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		ProfFolderRetrieveResponse folderRetrieveResponse = null;
 		try {
-			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID,token);
+			folderRetrieveResponse = folderServiceImpl.fetchByParentId(parentFolderID, token);
 			if (!folderRetrieveResponse.getSubFolderPath().isEmpty()) {
 				return new ResponseEntity<>(folderRetrieveResponse, HttpStatus.OK);
 			} else {

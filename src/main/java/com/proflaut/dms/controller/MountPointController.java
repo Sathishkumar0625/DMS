@@ -30,12 +30,16 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/mount")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class MountPointController {
 
 	private static final Logger logger = LogManager.getLogger(MountPointController.class);
 
 	MountPointServiceImpl mountPointServiceImpl;
+
+	@Autowired
+	public MountPointController(MountPointServiceImpl mountPointServiceImpl) {
+		this.mountPointServiceImpl = mountPointServiceImpl;
+	}
 
 	@PostMapping("/saveMountPoint")
 	public ResponseEntity<ProfMountPointResponse> saveMount(@RequestHeader("token") String token,

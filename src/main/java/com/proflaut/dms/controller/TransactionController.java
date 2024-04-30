@@ -47,7 +47,6 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/transaction")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class TransactionController {
 
 	private final AppConfiguration appConfiguration;
@@ -55,6 +54,12 @@ public class TransactionController {
 	TransactionServiceImpl transactionImpl;
 
 	private static final Logger logger = LogManager.getLogger(TransactionController.class);
+
+	@Autowired
+	public TransactionController(AppConfiguration appConfiguration, TransactionServiceImpl transactionImpl) {
+		this.appConfiguration = appConfiguration;
+		this.transactionImpl = transactionImpl;
+	}
 
 	@SuppressWarnings("unchecked")
 	@PostMapping("/loadActivity")

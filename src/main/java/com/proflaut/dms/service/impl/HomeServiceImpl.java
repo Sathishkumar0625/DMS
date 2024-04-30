@@ -386,9 +386,14 @@ public class HomeServiceImpl {
 			ProfCheckInAndOutEntity checkInAndOutEntity = checkInAndOutRepository
 					.findByFolderIdAndFolderNameAndUserId(id, folderName, profUserPropertiesEntity.getUserId());
 			if (checkInAndOutEntity != null) {
+				FolderEntity folderEntity = folderRepository.findById(id);
 				checkInAndOutEntity = homeHelper.convertToUpdateCheckInOutEnty(id, folderName, profUserPropertiesEntity,
 						checkInAndOutEntity);
 				checkInAndOutRepository.save(checkInAndOutEntity);
+				folderEntity.setCheckIn("YES");
+				folderEntity.setCheckOut("NO");
+				folderEntity.setCheckInTime(homeHelper.formatCurrentDateTime());
+				folderRepository.save(folderEntity);
 				response.put(DMSConstant.STATUS, DMSConstant.SUCCESS);
 			} else {
 				ProfCheckInAndOutEntity inAndOutEntity = homeHelper.convertToCheckInOutEnty(id, folderName,

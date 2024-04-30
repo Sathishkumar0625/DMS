@@ -34,13 +34,16 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/meta")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class MetaController {
 
 	private static final Logger logger = LogManager.getLogger(MetaController.class);
 
 	MetaServiceImpl metaServiceImpl;
-	
+
+	@Autowired
+	public MetaController(MetaServiceImpl metaServiceImpl) {
+		this.metaServiceImpl = metaServiceImpl;
+	}
 
 	@PostMapping("/createTable")
 	public ResponseEntity<ProfMetaDataResponse> createTable(@RequestHeader("token") String token,
@@ -162,24 +165,25 @@ public class MetaController {
 	}
 
 	@PostMapping("/searchDocument")
-	public ResponseEntity< Map<String, Object>> searchDocument(@RequestBody Map<String, Object> requestBody) {
-		Map<String, Object> response=null;
+	public ResponseEntity<Map<String, Object>> searchDocument(@RequestBody Map<String, Object> requestBody) {
+		Map<String, Object> response = null;
 		try {
 			response = metaServiceImpl.search(requestBody);
 			if (!response.isEmpty()) {
-				return new ResponseEntity<>(response,HttpStatus.OK);
-			}else {
-				return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			logger.error(DMSConstant.PRINTSTACKTRACE, e.getMessage(), e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
+
 	}
+
 	@PutMapping("/updateTable/{metaId}")
 	public ResponseEntity<ProfMetaDataResponse> updateTable(@RequestHeader("token") String token,
-			@Valid @RequestBody CreateTableRequest createTableRequest,@PathVariable int metaId) {
+			@Valid @RequestBody CreateTableRequest createTableRequest, @PathVariable int metaId) {
 		if (StringUtils.isEmpty(metaId) || StringUtils.isEmpty(createTableRequest.getTableName())
 				|| StringUtils.isEmpty(createTableRequest.getFileExtension())) {
 			logger.info(DMSConstant.INVALID_INPUT);
@@ -187,7 +191,7 @@ public class MetaController {
 		}
 		ProfMetaDataResponse metaDataResponse = new ProfMetaDataResponse();
 		try {
-			metaDataResponse = metaServiceImpl.updateTable(createTableRequest,metaId);
+			metaDataResponse = metaServiceImpl.updateTable(createTableRequest, metaId);
 			if (!metaDataResponse.getStatus().equalsIgnoreCase(DMSConstant.FAILURE)) {
 				return ResponseEntity.ok(metaDataResponse);
 			} else {
@@ -200,5 +204,5 @@ public class MetaController {
 			return new ResponseEntity<>(metaDataResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 }

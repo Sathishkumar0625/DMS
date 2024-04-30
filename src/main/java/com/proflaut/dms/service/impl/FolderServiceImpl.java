@@ -90,7 +90,7 @@ public class FolderServiceImpl {
 					.findByFolderNameAndStatusIgnoreCase(folderFO.getFolderName().toLowerCase(), "D");
 
 			if (dataEntity != null && propertiesEntity != null) {
-				if (folderEntity != null) {
+				if (folderEntity == null) {
 					String folderPath = folderLocation + folderFO.getFolderName();
 					String path = Paths.get(folderPath).toString();
 					File folder = new File(path);

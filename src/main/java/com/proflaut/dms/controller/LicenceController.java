@@ -29,12 +29,16 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/licence")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class LicenceController {
 
 	private static final Logger logger = LogManager.getLogger(LicenceController.class);
 
 	LicenceServiceImpl licenceServiceImpl;
+
+	@Autowired
+	public LicenceController(LicenceServiceImpl licenceServiceImpl) {
+		this.licenceServiceImpl = licenceServiceImpl;
+	}
 
 	@PostMapping("/createLicence")
 	public ResponseEntity<ProfLicenceResponse> create() {
@@ -83,11 +87,11 @@ public class LicenceController {
 	}
 
 	@GetMapping("path")
-	public Map<String, Object>  getMethodName() {
-		Map<String, Object> map=new HashMap<>();
-		String hl="HL";
-		String lsp="lsp";
-		MailResponse mailResponse=new MailResponse();
+	public Map<String, Object> getMethodName() {
+		Map<String, Object> map = new HashMap<>();
+		String hl = "HL";
+		String lsp = "lsp";
+		MailResponse mailResponse = new MailResponse();
 		mailResponse.setHl(hl);
 		mailResponse.setLsp(lsp);
 		map.put("key", mailResponse);

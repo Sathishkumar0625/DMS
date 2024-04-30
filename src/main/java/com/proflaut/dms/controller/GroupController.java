@@ -35,12 +35,17 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/group")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class GroupController {
 
 	GroupServiceImpl groupServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(GroupController.class);
+	
+	
+	@Autowired
+	public GroupController(GroupServiceImpl groupServiceImpl) {
+		this.groupServiceImpl = groupServiceImpl;
+	}
 
 	@PostMapping("/createGroupInfo")
 	public ResponseEntity<ProfGroupInfoResponse> create(@RequestHeader("token") String token,

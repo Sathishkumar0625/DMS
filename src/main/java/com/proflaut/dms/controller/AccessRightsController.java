@@ -34,7 +34,6 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/access")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessRightsController {
 
 	FileManagementServiceImpl fileManagementServiceImpl;
@@ -42,6 +41,13 @@ public class AccessRightsController {
 	AccessRightsServiceImpl accessRightsServiceImpl;
 
 	private static final Logger logger = LogManager.getLogger(AccessRightsController.class);
+
+	@Autowired
+	public AccessRightsController(FileManagementServiceImpl fileManagementServiceImpl,
+			AccessRightsServiceImpl accessRightsServiceImpl) {
+		this.fileManagementServiceImpl = fileManagementServiceImpl;
+		this.accessRightsServiceImpl = accessRightsServiceImpl;
+	}
 
 	@PostMapping("/saveAccess")
 	public ResponseEntity<ProfAccessRightResponse> createAccess(

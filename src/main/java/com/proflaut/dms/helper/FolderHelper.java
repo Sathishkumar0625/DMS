@@ -102,13 +102,16 @@ public class FolderHelper {
 		ent.setCreatedAt(formatCurrentDateTime());
 		ent.setCreatedBy(propertiesEntity.getUserName());
 		ent.setParentFolderID(Integer.parseInt(folderFO.getParentFolderID()));
+		ent.setCheckIn("NO");
+		ent.setCheckOut("YES");
 		ent.setStatus("A");
 		return ent;
 	}
 
 	public Folders convertFolderEntityToFolder(FolderEntity folderEntity, String userName, int userId) {
 		ProfFolderBookMarkEntity bookMarkEntity = bookmarkRepository.findByFolderId(folderEntity.getId());
-		ProfCheckInAndOutEntity andOutEntity = checkInAndOutRepository.folderId(folderEntity.getId());
+		ProfCheckInAndOutEntity andOutEntity = checkInAndOutRepository
+				.findByFolderIdAndFolderNameAndUserId(folderEntity.getId(), folderEntity.getFolderName(), userId);
 		Folders folders = new Folders();
 		folders.setFolderID(folderEntity.getId());
 		folders.setFolderName(folderEntity.getFolderName());
@@ -118,13 +121,17 @@ public class FolderHelper {
 		folders.setCreatedAt(folderEntity.getCreatedAt());
 		folders.setCreatedBy(folderEntity.getCreatedBy());
 		folders.setParentFolderId(String.valueOf(folderEntity.getParentFolderID()));
-		if (andOutEntity != null && userId == andOutEntity.getUserId()) {
+		folders.setIsCheckIn(folderEntity.getCheckIn());
+
+		if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
+				&& userId == andOutEntity.getUserId()) {
 			folders.setCheckIn("YES");
-		} else if (andOutEntity != null && andOutEntity.getCheckIn().equalsIgnoreCase("NO")) {
-			folders.setCheckIn("NO");
+		} else if (folderEntity.getCheckOut().equalsIgnoreCase("YES")) {
+			folders.setCheckIn("YES");
 		} else {
 			folders.setCheckIn("NO");
 		}
+
 		if (bookMarkEntity == null) {
 			folders.setBookmark("NO");
 		} else {
@@ -265,35 +272,36 @@ public class FolderHelper {
 				folderPathResponse.setFolderID(String.valueOf(folderEntity.getId()));
 				folderPathResponse.setFolderName(folderEntity.getFolderName());
 				folderPathResponse.setMetaId(folderEntity.getMetaId());
-				if (andOutEntity != null && userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
+				folderPathResponse.setIsCheckIn(folderEntity.getCheckIn());
+				if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
+						&& userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
 					folderPathResponse.setCheckIn("YES");
-				} else if (andOutEntity != null && andOutEntity.getCheckIn().equalsIgnoreCase("NO")) {
-					folderPathResponse.setCheckIn("NO");
+				} else if (folderEntity.getCheckOut().equalsIgnoreCase("YES")) {
+					folderPathResponse.setCheckIn("YES");
 				} else {
 					folderPathResponse.setCheckIn("NO");
-
-					if (folderBookMarkEntity == null) {
-						folderPathResponse.setBookmark("NO");
-					} else {
-						folderPathResponse.setBookmark("YES");
-					}
-
-					// Find the corresponding access rights for this folder
-					Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
-							.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
-
-					// Set view and write access if access rights are present
-					accessRight.ifPresent(access -> {
-						folderPathResponse.setView(access.getView());
-						folderPathResponse.setWrite(access.getWrite());
-					});
-
-					folderPathResponses.add(folderPathResponse);
 				}
-			}
-			folderRetrieveResponse.setSubFolderPath(folderPathResponses);
 
+				if (folderBookMarkEntity == null) {
+					folderPathResponse.setBookmark("NO");
+				} else {
+					folderPathResponse.setBookmark("YES");
+				}
+
+				// Find the corresponding access rights for this folder
+				Optional<ProfAccessRightsEntity> accessRight = accessRights.stream()
+						.filter(access -> folderEntity.getMetaId().equals(access.getMetaId())).findFirst();
+
+				// Set view and write access if access rights are present
+				accessRight.ifPresent(access -> {
+					folderPathResponse.setView(access.getView());
+					folderPathResponse.setWrite(access.getWrite());
+				});
+
+				folderPathResponses.add(folderPathResponse);
+			}
 		}
+		folderRetrieveResponse.setSubFolderPath(folderPathResponses);
 		return folderRetrieveResponse;
 	}
 

@@ -29,7 +29,6 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/dashboard")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class DashboardController {
 
 	DashboardServiceImpl dashboardServiceImpl;

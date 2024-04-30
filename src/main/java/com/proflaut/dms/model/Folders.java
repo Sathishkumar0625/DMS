@@ -23,6 +23,8 @@ public class Folders {
 	private String write;
 	private String bookmark;
 	private String checkIn;
+	private String isCheckIn;
+	private String isCheckOption;
 	public List<Files> getFiles() {
 		return files;
 	}

@@ -32,12 +32,16 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/access")
-@AllArgsConstructor(onConstructor_ = @Autowired)
 public class AccessController {
 
 	private static final Logger logger = LogManager.getLogger(AccessController.class);
 
 	AccessServiceImpl accessServiceImpl;
+
+	@Autowired
+	public AccessController(AccessServiceImpl accessServiceImpl) {
+		this.accessServiceImpl = accessServiceImpl;
+	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<UserRegResponse> createUser(@Valid @RequestBody UserInfo userInfo,
