@@ -24,6 +24,7 @@ public class FolderPathResponse {
 	private String checkIn;
 	private String isCheckIn;
 	private List<Folders> folders;
+	private String isCheckOption;
 
 	public List<Folders> getFolders() {
 		return folders;

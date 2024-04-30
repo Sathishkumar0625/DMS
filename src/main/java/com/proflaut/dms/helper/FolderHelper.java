@@ -126,10 +126,13 @@ public class FolderHelper {
 		if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
 				&& userId == andOutEntity.getUserId()) {
 			folders.setCheckIn("YES");
+			folders.setIsCheckOption("YES");
 		} else if (folderEntity.getCheckOut().equalsIgnoreCase("YES")) {
 			folders.setCheckIn("YES");
+			folders.setIsCheckOption("YES");
 		} else {
 			folders.setCheckIn("NO");
+			folders.setIsCheckOption("YES");
 		}
 
 		if (bookMarkEntity == null) {
@@ -276,10 +279,13 @@ public class FolderHelper {
 				if (andOutEntity != null && folderEntity.getCheckIn().equalsIgnoreCase("YES")
 						&& userPropertiesEntity.getUserId() == andOutEntity.getUserId()) {
 					folderPathResponse.setCheckIn("YES");
+					folderPathResponse.setIsCheckOption("YES");
 				} else if (folderEntity.getCheckOut().equalsIgnoreCase("YES")) {
 					folderPathResponse.setCheckIn("YES");
+					folderPathResponse.setIsCheckOption("YES");
 				} else {
 					folderPathResponse.setCheckIn("NO");
+					folderPathResponse.setIsCheckOption("YES");
 				}
 
 				if (folderBookMarkEntity == null) {
