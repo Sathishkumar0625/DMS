@@ -3,13 +3,11 @@ package com.proflaut.dms.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
@@ -30,8 +28,6 @@ import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
 import com.proflaut.dms.repository.ProfGroupInfoRepository;
 import com.proflaut.dms.repository.ProfMetaDataRepository;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
-
-import net.sf.ehcache.management.CacheManager;
 
 @Service
 public class AccessRightsServiceImpl {

@@ -184,7 +184,6 @@ public class TransactionServiceImpl {
 			mainResponse.setStatus(DMSConstant.FAILURE);
 
 		}
-
 		return mainResponse;
 	}
 

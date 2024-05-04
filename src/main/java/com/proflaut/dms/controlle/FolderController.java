@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import javax.validation.Valid;
 
@@ -25,11 +25,8 @@ import com.proflaut.dms.model.FolderFO;
 import com.proflaut.dms.model.FolderRetreiveResponse;
 import com.proflaut.dms.model.Folders;
 import com.proflaut.dms.model.ProfFolderRetrieveResponse;
-import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.FileManagementServiceImpl;
 import com.proflaut.dms.service.impl.FolderServiceImpl;
-
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/folder")

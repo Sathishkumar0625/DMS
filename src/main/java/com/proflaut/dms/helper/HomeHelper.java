@@ -201,7 +201,7 @@ public class HomeHelper {
 		response.setCreatedBy(profDocEnt.getCreatedBy());
 		response.setExtention(profDocEnt.getExtention());
 		response.setDocName(profDocEnt.getDocName());
-		response.setUploadtime(profDocEnt.getUploadTime());
+		response.setUploadTime(profDocEnt.getUploadTime());
 		response.setId(profDocEnt.getId());
 		return response;
 	}

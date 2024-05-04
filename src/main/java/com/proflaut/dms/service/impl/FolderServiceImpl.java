@@ -86,11 +86,11 @@ public class FolderServiceImpl {
 		try {
 			ProfMetaDataEntity dataEntity = dataRepository.findById(Integer.parseInt(folderFO.getMetaDataId()));
 			ProfUserPropertiesEntity propertiesEntity = profUserPropertiesRepository.findByToken(token);
-			FolderEntity folderEntity = folderRepo
-					.findByFolderNameAndStatusIgnoreCase(folderFO.getFolderName().toLowerCase(), "D");
+			FolderEntity folderEntity = folderRepo.findByFolderNameIgnoreCase(folderFO.getFolderName());
 
 			if (dataEntity != null && propertiesEntity != null) {
-				if (folderEntity == null) {
+				if (folderEntity == null || !folderEntity.getStatus().equalsIgnoreCase("I")
+						|| folderEntity.getStatus().equalsIgnoreCase("D")) {
 					String folderPath = folderLocation + folderFO.getFolderName();
 					String path = Paths.get(folderPath).toString();
 					File folder = new File(path);

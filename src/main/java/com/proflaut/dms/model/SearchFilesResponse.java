@@ -8,6 +8,6 @@ public class SearchFilesResponse {
 	private String docName;
 	private String extention;
 	private String createdBy;
-	private String uploadtime;
+	private String uploadTime;
 	private String fileSize;
 }

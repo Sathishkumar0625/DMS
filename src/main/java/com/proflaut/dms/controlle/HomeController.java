@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import java.util.HashMap;
 import java.util.List;

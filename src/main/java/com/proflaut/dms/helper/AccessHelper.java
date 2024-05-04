@@ -9,25 +9,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import javax.crypto.NoSuchPaddingException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
-
 import com.proflaut.dms.entity.ProfOtpEntity;
 import com.proflaut.dms.entity.ProfUserInfoEntity;
 import com.proflaut.dms.entity.ProfUserPropertiesEntity;
 import com.proflaut.dms.model.UserInfo;
 import com.proflaut.dms.repository.ProfUserInfoRepository;
-import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.staticlass.PasswordEncDecrypt;
-
-import lombok.AllArgsConstructor;
 
 @Component
 public class AccessHelper {

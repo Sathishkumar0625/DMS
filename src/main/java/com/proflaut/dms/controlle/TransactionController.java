@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import java.io.File;
 import java.io.FileReader;

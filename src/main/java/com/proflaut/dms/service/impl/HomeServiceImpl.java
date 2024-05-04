@@ -270,7 +270,8 @@ public class HomeServiceImpl {
 	public List<SearchFilesResponse> findAllSearchFiles(String fileName) {
 		List<SearchFilesResponse> filesResponses = new ArrayList<>();
 		try {
-			List<ProfDocEntity> profDocEntity = docUploadRepository.findByDocNameLike("%" + fileName + "%");
+			List<ProfDocEntity> profDocEntity = docUploadRepository.findByDocNameLikeIgnoreCase(fileName);
+
 			for (ProfDocEntity profDocEnt : profDocEntity) {
 				SearchFilesResponse filesResponse = homeHelper.convertToSearchFilesResponse(profDocEnt);
 				filesResponses.add(filesResponse);
@@ -285,7 +286,8 @@ public class HomeServiceImpl {
 	public List<SearchFolderResponse> findAllSearchFolders(String folderName) {
 		List<SearchFolderResponse> folderResponses = new ArrayList<>();
 		try {
-			List<FolderEntity> folderEntities = folderRepository.findByFolderNameLike("%" + folderName + "%");
+			List<FolderEntity> folderEntities = folderRepository.findByFolderNameLikeIgnoreCase(folderName);
+
 			for (FolderEntity folderEntity : folderEntities) {
 				SearchFolderResponse folderResponse = homeHelper.convertToSearchFolderResponse(folderEntity);
 				folderResponses.add(folderResponse);

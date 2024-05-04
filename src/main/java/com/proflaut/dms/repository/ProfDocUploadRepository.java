@@ -25,7 +25,6 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 			+ " WHERE created_by = :createdBy ")
 	void updatedocName(@Param("docName") String dockName, @Param("createdBy") int createdBy);
 
-
 	ProfDocEntity findByProspectIdAndDocName(String prospectId, String docName);
 
 	ProfDocEntity findById(int id);
@@ -63,14 +62,15 @@ public interface ProfDocUploadRepository extends JpaRepository<ProfDocEntity, In
 	List<ProfDocEntity> getById(int i);
 
 	Long getSumFileSizeByFolderId(String folderId);
+
 	@Query("SELECT p FROM ProfDocEntity p WHERE p.folderId IN :folderIds")
 	List<ProfDocEntity> findByFolderIdIn(List<Integer> folderIds);
 
 	List<ProfDocEntity> findByIdIn(List<Integer> fileIds);
 
-
 	List<ProfDocEntity> findByDocNameLike(String docName);
 
-
+	@Query("SELECT d FROM ProfDocEntity d WHERE LOWER(d.docName) LIKE LOWER(concat('%', :fileName, '%'))")
+	List<ProfDocEntity> findByDocNameLikeIgnoreCase(String fileName);
 
 }

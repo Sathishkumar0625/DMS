@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import java.util.List;
 import org.apache.logging.log4j.LogManager;

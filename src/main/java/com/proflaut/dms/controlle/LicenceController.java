@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,14 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proflaut.dms.constant.DMSConstant;
 import com.proflaut.dms.model.MailResponse;
-import com.proflaut.dms.model.ProfJobPackRequest;
 import com.proflaut.dms.model.ProfLanguageConverterRequest;
 import com.proflaut.dms.model.ProfLanguageConverterResponse;
 import com.proflaut.dms.model.ProfLicenceResponse;
-import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.LicenceServiceImpl;
-
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/licence")
@@ -75,7 +71,6 @@ public class LicenceController {
 	@PostMapping("/langConverter")
 	public ResponseEntity<ProfLanguageConverterResponse> languageConverter(
 			@RequestBody ProfLanguageConverterRequest converterRequest) {
-		System.out.println("getting in");
 		ProfLanguageConverterResponse converterResponse = null;
 		try {
 			converterResponse = licenceServiceImpl.converter(converterRequest);

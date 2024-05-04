@@ -1,4 +1,4 @@
-package com.proflaut.dms.controller;
+package com.proflaut.dms.controlle;
 
 import java.util.List;
 import java.util.Map;
@@ -27,10 +27,7 @@ import com.proflaut.dms.model.GetAllTableResponse;
 import com.proflaut.dms.model.ProfMetaDataResponse;
 import com.proflaut.dms.model.ProfOverallMetaDataResponse;
 import com.proflaut.dms.model.ProfUploadAccessResponse;
-import com.proflaut.dms.service.impl.AccessServiceImpl;
 import com.proflaut.dms.service.impl.MetaServiceImpl;
-
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/meta")

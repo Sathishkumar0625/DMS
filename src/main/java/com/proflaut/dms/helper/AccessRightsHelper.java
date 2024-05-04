@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.proflaut.dms.entity.ProfAccessGroupMappingEntity;
 import com.proflaut.dms.entity.ProfAccessRightsEntity;
 import com.proflaut.dms.entity.ProfAccessUserMappingEntity;
@@ -23,9 +20,6 @@ import com.proflaut.dms.model.ProfOverallAccessRightsResponse;
 import com.proflaut.dms.model.ProfOverallGroupInfoResponse;
 import com.proflaut.dms.repository.ProfAccessGroupMappingRepository;
 import com.proflaut.dms.repository.ProfAccessUserMappingRepository;
-import com.proflaut.dms.service.impl.AccessServiceImpl;
-
-import lombok.AllArgsConstructor;
 
 @Component
 public class AccessRightsHelper {
